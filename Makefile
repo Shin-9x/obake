@@ -1,9 +1,9 @@
 GODOT ?= godot
 PYTHON ?= python3
 VENV ?= .venv
-GD_SOURCES := src tests
+GD_SOURCES := src tests data
 
-.PHONY: setup format lint test check
+.PHONY: setup format lint test check bench
 
 setup:
 	$(PYTHON) -m venv $(VENV)
@@ -27,3 +27,6 @@ test:
 check:
 	$(MAKE) lint
 	$(MAKE) test
+
+bench:
+	$(GODOT) --headless --path . -s res://src/tools/sim_benchmark.gd

@@ -12,10 +12,11 @@ A 2D pixel-art Peggle-like roguelike set in Japanese folklore, built with Godot 
 
 ```bash
 make setup    # create .venv and install gdtoolkit
-make format   # format GDScript in src/ and tests/
+make format   # format GDScript in src/, tests/ and data/
 make lint     # check formatting and run gdlint
 make test     # run the gdUnit4 test suite headless
 make check    # lint, then test
+make bench    # measure simulation cost per tick
 ```
 
 ## Layout
