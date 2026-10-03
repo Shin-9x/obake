@@ -1,0 +1,78 @@
+[gd_scene format=3 uid="uid://cs8y4assilw3t"]
+
+[ext_resource type="Script" uid="uid://wr1xm1ufr4e0" path="res://src/tools/layout_editor/layout_document.gd" id="1_dgufl"]
+[ext_resource type="Script" uid="uid://p81dwr5cedpj" path="res://src/tools/layout_editor/arc_pattern.gd" id="2_xyans"]
+[ext_resource type="Script" uid="uid://c18xxja5btt3j" path="res://src/tools/layout_editor/peg_marker.gd" id="3_oenk5"]
+[ext_resource type="Script" uid="uid://dxqwv3stwpeqi" path="res://src/tools/layout_editor/grid_pattern.gd" id="4_w5nkn"]
+[ext_resource type="Script" uid="uid://dl0veuy6ol4es" path="res://src/tools/layout_editor/moving_group_marker.gd" id="5_nlrng"]
+
+[node name="Bamboo01" type="Node2D" unique_id=1070572270]
+script = ExtResource("1_dgufl")
+id = "bamboo_01"
+
+[node name="TopArc" type="Node2D" parent="." unique_id=1279737869]
+position = Vector2(180, 20)
+script = ExtResource("2_xyans")
+radius = 90.0
+from_degrees = 40.0
+to_degrees = 140.0
+count = 9
+
+[node name="LeftRamp" type="Node2D" parent="." unique_id=1970635662]
+position = Vector2(40, 110)
+rotation = 0.43633232
+script = ExtResource("3_oenk5")
+shape = 1
+size = Vector2(26, 6)
+
+[node name="RightRamp" type="Node2D" parent="." unique_id=1213889172]
+position = Vector2(320, 110)
+rotation = -0.43633232
+script = ExtResource("3_oenk5")
+shape = 1
+size = Vector2(26, 6)
+
+[node name="Field" type="Node2D" parent="." unique_id=64980535]
+position = Vector2(180, 200)
+script = ExtResource("4_w5nkn")
+rows = 5
+
+[node name="BottomRow" type="Node2D" parent="." unique_id=78739114]
+position = Vector2(180, 330)
+script = ExtResource("4_w5nkn")
+columns = 5
+rows = 1
+spacing = Vector2(70, 0)
+staggered = false
+
+[node name="TopStalks" type="Node2D" parent="." unique_id=363692584]
+position = Vector2(180, 50)
+script = ExtResource("5_nlrng")
+motion = 1
+period_seconds = 4.0
+travel = Vector2(36, 0)
+
+[node name="Stalks" type="Node2D" parent="TopStalks" unique_id=1609735074]
+script = ExtResource("4_w5nkn")
+columns = 4
+rows = 1
+spacing = Vector2(60, 0)
+staggered = false
+shape = 1
+rect_size = Vector2(4, 22)
+
+[node name="LowStalks" type="Node2D" parent="." unique_id=639188573]
+position = Vector2(180, 300)
+script = ExtResource("5_nlrng")
+motion = 1
+period_seconds = 5.0
+travel = Vector2(36, 0)
+
+[node name="Stalks" type="Node2D" parent="LowStalks" unique_id=1287881982]
+script = ExtResource("4_w5nkn")
+columns = 4
+rows = 1
+spacing = Vector2(60, 0)
+staggered = false
+shape = 1
+rect_size = Vector2(4, 22)

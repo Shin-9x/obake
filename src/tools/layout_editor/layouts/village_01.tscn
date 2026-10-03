@@ -1,0 +1,95 @@
+[gd_scene format=3 uid="uid://c4ntsbw8bvak0"]
+
+[ext_resource type="Script" uid="uid://wr1xm1ufr4e0" path="res://src/tools/layout_editor/layout_document.gd" id="1_uagp4"]
+[ext_resource type="Script" uid="uid://dl0veuy6ol4es" path="res://src/tools/layout_editor/moving_group_marker.gd" id="2_256w1"]
+[ext_resource type="Script" uid="uid://c8xyf8yleaqbj" path="res://src/tools/layout_editor/circle_pattern.gd" id="3_i37qu"]
+[ext_resource type="Script" uid="uid://c18xxja5btt3j" path="res://src/tools/layout_editor/peg_marker.gd" id="4_v08tx"]
+[ext_resource type="Script" uid="uid://p81dwr5cedpj" path="res://src/tools/layout_editor/arc_pattern.gd" id="5_4f66j"]
+[ext_resource type="Script" uid="uid://dxqwv3stwpeqi" path="res://src/tools/layout_editor/grid_pattern.gd" id="6_nhx3r"]
+[ext_resource type="Script" uid="uid://dtm0bsqti5om3" path="res://src/tools/layout_editor/wave_pattern.gd" id="7_lcdmh"]
+
+[node name="Village01" type="Node2D" unique_id=1557272787]
+script = ExtResource("1_uagp4")
+id = "village_01"
+biome = "haunted_village"
+
+[node name="Wheel" type="Node2D" parent="." unique_id=833639465]
+position = Vector2(180, 200)
+script = ExtResource("2_256w1")
+travel = Vector2(0, 0)
+
+[node name="Rim" type="Node2D" parent="Wheel" unique_id=1832368536]
+script = ExtResource("3_i37qu")
+radius = 55.0
+count = 10
+
+[node name="SpokeRight" type="Node2D" parent="Wheel" unique_id=1821330126]
+position = Vector2(25, 0)
+script = ExtResource("4_v08tx")
+shape = 1
+size = Vector2(20, 5)
+
+[node name="SpokeDown" type="Node2D" parent="Wheel" unique_id=32794608]
+position = Vector2(0, 25)
+rotation = 1.5707964
+script = ExtResource("4_v08tx")
+shape = 1
+size = Vector2(20, 5)
+
+[node name="SpokeLeft" type="Node2D" parent="Wheel" unique_id=142344733]
+position = Vector2(-25, 0)
+script = ExtResource("4_v08tx")
+shape = 1
+size = Vector2(20, 5)
+
+[node name="SpokeUp" type="Node2D" parent="Wheel" unique_id=1407955320]
+position = Vector2(0, -25)
+rotation = 1.5707964
+script = ExtResource("4_v08tx")
+shape = 1
+size = Vector2(20, 5)
+
+[node name="UpperArc" type="Node2D" parent="." unique_id=455437438]
+position = Vector2(180, 200)
+script = ExtResource("5_4f66j")
+radius = 100.0
+count = 9
+
+[node name="LowerArc" type="Node2D" parent="." unique_id=1786809680]
+position = Vector2(180, 200)
+script = ExtResource("5_4f66j")
+radius = 100.0
+from_degrees = 20.0
+to_degrees = 160.0
+count = 9
+
+[node name="LeftColumn" type="Node2D" parent="." unique_id=793360678]
+position = Vector2(25, 190)
+script = ExtResource("6_nhx3r")
+columns = 1
+rows = 7
+spacing = Vector2(0, 30)
+staggered = false
+
+[node name="RightColumn" type="Node2D" parent="." unique_id=166389083]
+position = Vector2(335, 190)
+script = ExtResource("6_nhx3r")
+columns = 1
+rows = 7
+spacing = Vector2(0, 30)
+staggered = false
+
+[node name="TopRow" type="Node2D" parent="." unique_id=1377121476]
+position = Vector2(180, 50)
+script = ExtResource("6_nhx3r")
+columns = 7
+rows = 1
+spacing = Vector2(45, 0)
+staggered = false
+
+[node name="BottomWave" type="Node2D" parent="." unique_id=1010698315]
+position = Vector2(180, 328)
+script = ExtResource("7_lcdmh")
+count = 9
+amplitude = 8.0
+cycles = 1.0

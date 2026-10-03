@@ -1,0 +1,69 @@
+[gd_scene format=3 uid="uid://ew4mm0q007i5"]
+
+[ext_resource type="Script" uid="uid://wr1xm1ufr4e0" path="res://src/tools/layout_editor/layout_document.gd" id="1_4vujt"]
+[ext_resource type="Script" uid="uid://p81dwr5cedpj" path="res://src/tools/layout_editor/arc_pattern.gd" id="2_twj0k"]
+[ext_resource type="Script" uid="uid://btimk7yhm2nko" path="res://src/tools/layout_editor/spiral_pattern.gd" id="3_8tyio"]
+[ext_resource type="Script" uid="uid://dxqwv3stwpeqi" path="res://src/tools/layout_editor/grid_pattern.gd" id="4_fw87u"]
+[ext_resource type="Script" uid="uid://dl0veuy6ol4es" path="res://src/tools/layout_editor/moving_group_marker.gd" id="5_bn011"]
+[ext_resource type="Script" uid="uid://c18xxja5btt3j" path="res://src/tools/layout_editor/peg_marker.gd" id="6_cvu00"]
+
+[node name="Bamboo03" type="Node2D" unique_id=1466181685]
+script = ExtResource("1_4vujt")
+id = "bamboo_03"
+
+[node name="TopArc" type="Node2D" parent="." unique_id=1901470928]
+position = Vector2(180, 0)
+script = ExtResource("2_twj0k")
+radius = 70.0
+from_degrees = 30.0
+to_degrees = 150.0
+
+[node name="Spiral" type="Node2D" parent="." unique_id=1406651513]
+position = Vector2(180, 190)
+script = ExtResource("3_8tyio")
+inner_radius = 34.0
+outer_radius = 110.0
+turns = 1.6
+count = 24
+
+[node name="LeftColumns" type="Node2D" parent="." unique_id=1629522508]
+position = Vector2(30, 190)
+script = ExtResource("4_fw87u")
+columns = 2
+rows = 6
+spacing = Vector2(24, 30)
+staggered = false
+
+[node name="RightColumns" type="Node2D" parent="." unique_id=566635234]
+position = Vector2(330, 190)
+script = ExtResource("4_fw87u")
+columns = 2
+rows = 6
+spacing = Vector2(24, 30)
+staggered = false
+
+[node name="BottomStalks" type="Node2D" parent="." unique_id=2064428764]
+position = Vector2(180, 325)
+script = ExtResource("5_bn011")
+motion = 1
+period_seconds = 4.0
+travel = Vector2(30, 0)
+
+[node name="Stalks" type="Node2D" parent="BottomStalks" unique_id=2084180162]
+script = ExtResource("4_fw87u")
+columns = 4
+rows = 1
+spacing = Vector2(73, 0)
+staggered = false
+shape = 1
+rect_size = Vector2(4, 22)
+
+[node name="LeftCorner" type="Node2D" parent="." unique_id=1568623706]
+position = Vector2(60, 40)
+script = ExtResource("6_cvu00")
+size = Vector2(26, 6)
+
+[node name="RightCorner" type="Node2D" parent="." unique_id=1001776330]
+position = Vector2(300, 40)
+script = ExtResource("6_cvu00")
+size = Vector2(26, 6)

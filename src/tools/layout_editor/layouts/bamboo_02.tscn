@@ -1,0 +1,97 @@
+[gd_scene format=3 uid="uid://cltbbeyq2pdqt"]
+
+[ext_resource type="Script" uid="uid://wr1xm1ufr4e0" path="res://src/tools/layout_editor/layout_document.gd" id="1_ao1ke"]
+[ext_resource type="Script" uid="uid://dxqwv3stwpeqi" path="res://src/tools/layout_editor/grid_pattern.gd" id="2_3i1jr"]
+[ext_resource type="Script" uid="uid://p81dwr5cedpj" path="res://src/tools/layout_editor/arc_pattern.gd" id="3_3a2yo"]
+[ext_resource type="Script" uid="uid://dl0veuy6ol4es" path="res://src/tools/layout_editor/moving_group_marker.gd" id="4_fwekj"]
+[ext_resource type="Script" uid="uid://dtm0bsqti5om3" path="res://src/tools/layout_editor/wave_pattern.gd" id="5_liob5"]
+[ext_resource type="Script" uid="uid://c18xxja5btt3j" path="res://src/tools/layout_editor/peg_marker.gd" id="6_kpjyb"]
+
+[node name="Bamboo02" type="Node2D" unique_id=390637496]
+script = ExtResource("1_ao1ke")
+id = "bamboo_02"
+
+[node name="TopRow" type="Node2D" parent="." unique_id=1428416914]
+position = Vector2(180, 55)
+script = ExtResource("2_3i1jr")
+columns = 6
+rows = 1
+spacing = Vector2(50, 0)
+staggered = false
+
+[node name="LeftArch" type="Node2D" parent="." unique_id=831966327]
+position = Vector2(90, 150)
+script = ExtResource("3_3a2yo")
+radius = 50.0
+
+[node name="MiddleArch" type="Node2D" parent="." unique_id=1040499982]
+position = Vector2(180, 125)
+script = ExtResource("3_3a2yo")
+radius = 50.0
+
+[node name="RightArch" type="Node2D" parent="." unique_id=1710092914]
+position = Vector2(270, 150)
+script = ExtResource("3_3a2yo")
+radius = 50.0
+
+[node name="Stalks" type="Node2D" parent="." unique_id=757837142]
+position = Vector2(180, 180)
+script = ExtResource("4_fwekj")
+motion = 1
+period_seconds = 3.0
+travel = Vector2(25, 0)
+
+[node name="Stalks" type="Node2D" parent="Stalks" unique_id=626799230]
+script = ExtResource("2_3i1jr")
+columns = 3
+rows = 1
+spacing = Vector2(90, 0)
+staggered = false
+shape = 1
+rect_size = Vector2(4, 22)
+
+[node name="Wave" type="Node2D" parent="." unique_id=5873039]
+position = Vector2(180, 225)
+script = ExtResource("5_liob5")
+width = 300.0
+
+[node name="Field" type="Node2D" parent="." unique_id=1718904166]
+position = Vector2(180, 292)
+script = ExtResource("2_3i1jr")
+columns = 7
+rows = 2
+spacing = Vector2(44, 30)
+
+[node name="LeftRamp" type="Node2D" parent="." unique_id=2016935681]
+position = Vector2(36, 330)
+rotation = 0.5235988
+script = ExtResource("6_kpjyb")
+shape = 1
+size = Vector2(26, 6)
+
+[node name="RightRamp" type="Node2D" parent="." unique_id=535981879]
+position = Vector2(324, 330)
+rotation = -0.5235988
+script = ExtResource("6_kpjyb")
+shape = 1
+size = Vector2(26, 6)
+
+[node name="Side" type="Node2D" parent="." unique_id=370065487]
+position = Vector2(20, 200)
+script = ExtResource("6_kpjyb")
+size = Vector2(26, 6)
+
+[node name="Side2" type="Node2D" parent="." unique_id=1056032982]
+position = Vector2(340, 200)
+script = ExtResource("6_kpjyb")
+size = Vector2(26, 6)
+
+[node name="Side3" type="Node2D" parent="." unique_id=758944364]
+position = Vector2(20, 250)
+script = ExtResource("6_kpjyb")
+size = Vector2(26, 6)
+
+[node name="Side4" type="Node2D" parent="." unique_id=1141562458]
+position = Vector2(340, 250)
+script = ExtResource("6_kpjyb")
+size = Vector2(26, 6)
