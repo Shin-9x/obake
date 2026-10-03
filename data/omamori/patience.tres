@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="OmamoriDefinition" format=3 uid="uid://delk62oqp0sq7"]
+
+[ext_resource type="Script" uid="uid://bwwvgrjlkyota" path="res://src/sim/effects/omamori/patience_effect.gd" id="1_ydml4"]
+[ext_resource type="Texture2D" uid="uid://0be1br5dgd28" path="res://assets/sprites/placeholder/omamori_patience.png" id="2_v3cy2"]
+[ext_resource type="Script" uid="uid://bcnj1dex28luw" path="res://data/definitions/omamori_definition.gd" id="3_e54cg"]
+
+[resource]
+script = ExtResource("3_e54cg")
+id = &"patience"
+name_key = "OMAMORI_PATIENCE"
+description_key = "OMAMORI_PATIENCE_DESC"
+rarity = 1
+icon = ExtResource("2_v3cy2")
+effect_script = ExtResource("1_ydml4")
+level_values = PackedInt32Array()
+params = Dictionary[StringName, int]({
+&"mult": 3000,
+&"pegs": 15
+})

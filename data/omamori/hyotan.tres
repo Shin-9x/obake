@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="OmamoriDefinition" format=3 uid="uid://doo4t6j7oypuu"]
+
+[ext_resource type="Script" uid="uid://dkshpefusvj8r" path="res://src/sim/effects/omamori/hyotan_effect.gd" id="1_gdi5d"]
+[ext_resource type="Texture2D" uid="uid://dyn1cmo1du0bf" path="res://assets/sprites/placeholder/omamori_hyotan.png" id="2_56ybt"]
+[ext_resource type="Script" uid="uid://bcnj1dex28luw" path="res://data/definitions/omamori_definition.gd" id="3_cqdif"]
+
+[resource]
+script = ExtResource("3_cqdif")
+id = &"hyotan"
+name_key = "OMAMORI_HYOTAN"
+description_key = "OMAMORI_HYOTAN_DESC"
+rarity = 3
+icon = ExtResource("2_56ybt")
+effect_script = ExtResource("1_gdi5d")
+level_values = PackedInt32Array()
+params = Dictionary[StringName, int]({
+&"shots": 1
+})

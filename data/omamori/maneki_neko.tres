@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="OmamoriDefinition" format=3 uid="uid://dtqv0hlrnwuht"]
+
+[ext_resource type="Script" uid="uid://q2qmw6v6mxv8" path="res://src/sim/effects/omamori/maneki_neko_effect.gd" id="1_vyakw"]
+[ext_resource type="Texture2D" uid="uid://c167i2ij3ibns" path="res://assets/sprites/placeholder/omamori_maneki_neko.png" id="2_mlxox"]
+[ext_resource type="Script" uid="uid://bcnj1dex28luw" path="res://data/definitions/omamori_definition.gd" id="3_6jwgt"]
+
+[resource]
+script = ExtResource("3_6jwgt")
+id = &"maneki_neko"
+name_key = "OMAMORI_MANEKI_NEKO"
+description_key = "OMAMORI_MANEKI_NEKO_DESC"
+rarity = 2
+icon = ExtResource("2_mlxox")
+effect_script = ExtResource("1_vyakw")
+level_values = PackedInt32Array()
+params = Dictionary[StringName, int]({
+&"interest_cap": 2
+})

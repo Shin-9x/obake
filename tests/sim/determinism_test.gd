@@ -12,6 +12,10 @@ const HASH_MULTIPLIER: int = 1_000_003
 const GOLDEN_CHAIN: int = 1289445351
 ## Hash chain of the same shots on a board with a water wheel and sliding stalks.
 const GOLDEN_MOVING_CHAIN: int = 24347088
+## Final total and hash chain of the same game with every ball, purchasable peg and a full set
+## of omamori in play, which locks the behaviour of all the items together.
+const GOLDEN_LOADOUT_TOTAL: int = 1085
+const GOLDEN_LOADOUT_CHAIN: int = 1425766894
 ## Final total and hash chain of a full [BoardGame] played with the same inputs.
 const GOLDEN_GAME_TOTAL: int = 890
 const GOLDEN_GAME_CHAIN: int = 407667046
@@ -56,6 +60,28 @@ func test_board_game_matches_golden_result() -> void:
 	assert_int(first["chain"]).is_equal(GOLDEN_GAME_CHAIN)
 
 
+func test_loaded_game_matches_golden_result() -> void:
+	var first: Dictionary[String, Variant] = _play_game(_full_loadout())
+	var second: Dictionary[String, Variant] = _play_game(_full_loadout())
+	assert_int(second["total"]).is_equal(first["total"])
+	assert_int(second["chain"]).is_equal(first["chain"])
+	assert_int(first["total"]).is_equal(GOLDEN_LOADOUT_TOTAL)
+	assert_int(first["chain"]).is_equal(GOLDEN_LOADOUT_CHAIN)
+
+
+func _full_loadout() -> LoadoutDefinition:
+	var loadout: LoadoutDefinition = LoadoutDefinition.new()
+	var files: PackedStringArray = DirAccess.get_files_at("res://data/balls")
+	files.sort()
+	for file: String in files:
+		loadout.balls.append(load("res://data/balls/" + file))
+	for id: String in ["chochin", "first_strike", "patience", "drum", "yata_mirror"]:
+		loadout.omamori.append(load("res://data/omamori/%s.tres" % id))
+	for id: String in ["coin_peg", "bell", "explosive_lantern", "torii", "kagami", "omikuji"]:
+		loadout.purchased_pegs.append(load("res://data/pegs/%s.tres" % id))
+	return loadout
+
+
 func _staggered_board() -> BoardSimulation:
 	var sim: BoardSimulation = BoardSimulation.new(TestBoards.gdd_config())
 	TestBoards.add_staggered_pegs(sim)
@@ -84,8 +110,8 @@ func _record_run(sim: BoardSimulation) -> Dictionary[String, Variant]:
 	return {"hashes": hashes, "events": events, "chain": chain}
 
 
-func _play_game() -> Dictionary[String, Variant]:
-	var game: BoardGame = TestBoards.staggered_game(BOARD_SEED)
+func _play_game(loadout: LoadoutDefinition = null) -> Dictionary[String, Variant]:
+	var game: BoardGame = TestBoards.staggered_game(BOARD_SEED, loadout)
 	var chain: int = 0
 	for shot: int in AIMS.size():
 		if not game.shoot(ShotInput.new(AIMS[shot], BUCKET_PHASES[shot])):

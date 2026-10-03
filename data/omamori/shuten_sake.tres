@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="OmamoriDefinition" format=3 uid="uid://d8fg1asfs6r6"]
+
+[ext_resource type="Script" uid="uid://bd8pmruk4daba" path="res://src/sim/effects/omamori/shuten_sake_effect.gd" id="1_wpmji"]
+[ext_resource type="Texture2D" uid="uid://7ficgknetqvb" path="res://assets/sprites/placeholder/omamori_shuten_sake.png" id="2_iivad"]
+[ext_resource type="Script" uid="uid://bcnj1dex28luw" path="res://data/definitions/omamori_definition.gd" id="3_hn0nf"]
+
+[resource]
+script = ExtResource("3_hn0nf")
+id = &"shuten_sake"
+name_key = "OMAMORI_SHUTEN_SAKE"
+description_key = "OMAMORI_SHUTEN_SAKE_DESC"
+rarity = 4
+icon = ExtResource("2_iivad")
+effect_script = ExtResource("1_wpmji")
+level_values = PackedInt32Array()
+params = Dictionary[StringName, int]({
+&"factor": 2000,
+&"shots": 2
+})

@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="OmamoriDefinition" format=3 uid="uid://bhqrcng88mdl2"]
+
+[ext_resource type="Script" uid="uid://c6jj5ox5es63u" path="res://src/sim/effects/omamori/magatama_effect.gd" id="1_54fgv"]
+[ext_resource type="Texture2D" uid="uid://bhfiw8soe36xe" path="res://assets/sprites/placeholder/omamori_magatama.png" id="2_t2bex"]
+[ext_resource type="Script" uid="uid://bcnj1dex28luw" path="res://data/definitions/omamori_definition.gd" id="3_4hmty"]
+
+[resource]
+script = ExtResource("3_4hmty")
+id = &"magatama"
+name_key = "OMAMORI_MAGATAMA"
+description_key = "OMAMORI_MAGATAMA_DESC"
+rarity = 2
+icon = ExtResource("2_t2bex")
+effect_script = ExtResource("1_54fgv")
+level_values = PackedInt32Array()
+params = Dictionary[StringName, int]({
+&"mult": 1000,
+&"reds": 3
+})

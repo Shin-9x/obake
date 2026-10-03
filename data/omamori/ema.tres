@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="OmamoriDefinition" format=3 uid="uid://bxhsr6b8lr0s1"]
+
+[ext_resource type="Script" uid="uid://c83cfimj7iyin" path="res://src/sim/effects/omamori/ema_effect.gd" id="1_tu36u"]
+[ext_resource type="Texture2D" uid="uid://cjeht66778kfl" path="res://assets/sprites/placeholder/omamori_ema.png" id="2_3lrod"]
+[ext_resource type="Script" uid="uid://bcnj1dex28luw" path="res://data/definitions/omamori_definition.gd" id="3_ghsr5"]
+
+[resource]
+script = ExtResource("3_ghsr5")
+id = &"ema"
+name_key = "OMAMORI_EMA"
+description_key = "OMAMORI_EMA_DESC"
+rarity = 3
+icon = ExtResource("2_3lrod")
+effect_script = ExtResource("1_tu36u")
+level_values = PackedInt32Array()
+params = Dictionary[StringName, int]({
+&"points": 2
+})

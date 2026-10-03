@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="OmamoriDefinition" format=3 uid="uid://c214s4qr8cart"]
+
+[ext_resource type="Script" uid="uid://vslkxldjoco2" path="res://src/sim/effects/omamori/first_strike_effect.gd" id="1_bym7n"]
+[ext_resource type="Texture2D" uid="uid://cygfbh5wqyk61" path="res://assets/sprites/placeholder/omamori_first_strike.png" id="2_f400x"]
+[ext_resource type="Script" uid="uid://bcnj1dex28luw" path="res://data/definitions/omamori_definition.gd" id="3_wvpj8"]
+
+[resource]
+script = ExtResource("3_wvpj8")
+id = &"first_strike"
+name_key = "OMAMORI_FIRST_STRIKE"
+description_key = "OMAMORI_FIRST_STRIKE_DESC"
+rarity = 1
+icon = ExtResource("2_f400x")
+effect_script = ExtResource("1_bym7n")
+level_values = PackedInt32Array()
+params = Dictionary[StringName, int]({
+&"factor": 5000
+})

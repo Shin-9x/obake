@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="OmamoriDefinition" format=3 uid="uid://1ia2ionv8myw"]
+
+[ext_resource type="Script" uid="uid://b6tyab23t7bja" path="res://src/sim/effects/omamori/tsukumogami_effect.gd" id="1_wmb0a"]
+[ext_resource type="Texture2D" uid="uid://dsgjs6sqk7c7y" path="res://assets/sprites/placeholder/omamori_tsukumogami.png" id="2_bpp52"]
+[ext_resource type="Script" uid="uid://bcnj1dex28luw" path="res://data/definitions/omamori_definition.gd" id="3_j5sdc"]
+
+[resource]
+script = ExtResource("3_j5sdc")
+id = &"tsukumogami"
+name_key = "OMAMORI_TSUKUMOGAMI"
+description_key = "OMAMORI_TSUKUMOGAMI_DESC"
+rarity = 4
+icon = ExtResource("2_bpp52")
+effect_script = ExtResource("1_wmb0a")
+level_values = PackedInt32Array()
+params = Dictionary[StringName, int]({
+&"copies": 2
+})

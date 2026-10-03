@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="OmamoriDefinition" format=3 uid="uid://dyn8eb6d5l2rp"]
+
+[ext_resource type="Script" uid="uid://dx66k43w4ikmw" path="res://src/sim/effects/omamori/yata_mirror_effect.gd" id="1_d025q"]
+[ext_resource type="Texture2D" uid="uid://c4cj480ls3udy" path="res://assets/sprites/placeholder/omamori_yata_mirror.png" id="2_3wrbw"]
+[ext_resource type="Script" uid="uid://bcnj1dex28luw" path="res://data/definitions/omamori_definition.gd" id="3_kolrs"]
+
+[resource]
+script = ExtResource("3_kolrs")
+id = &"yata_mirror"
+name_key = "OMAMORI_YATA_MIRROR"
+description_key = "OMAMORI_YATA_MIRROR_DESC"
+rarity = 2
+icon = ExtResource("2_3wrbw")
+effect_script = ExtResource("1_d025q")
+level_values = PackedInt32Array()
+params = Dictionary[StringName, int]({
+&"factor": 3000
+})

@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="OmamoriDefinition" format=3 uid="uid://cemkxfd4qygu8"]
+
+[ext_resource type="Script" uid="uid://2slemveeb1ug" path="res://src/sim/effects/omamori/shimenawa_effect.gd" id="1_yf8k1"]
+[ext_resource type="Texture2D" uid="uid://c56l6xgue7do2" path="res://assets/sprites/placeholder/omamori_shimenawa.png" id="2_sx7n3"]
+[ext_resource type="Script" uid="uid://bcnj1dex28luw" path="res://data/definitions/omamori_definition.gd" id="3_ys8mg"]
+
+[resource]
+script = ExtResource("3_ys8mg")
+id = &"shimenawa"
+name_key = "OMAMORI_SHIMENAWA"
+description_key = "OMAMORI_SHIMENAWA_DESC"
+rarity = 2
+icon = ExtResource("2_sx7n3")
+effect_script = ExtResource("1_yf8k1")
+level_values = PackedInt32Array()
+params = Dictionary[StringName, int]({
+&"bounces": 1
+})

@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="OmamoriDefinition" format=3 uid="uid://d2ffya1hrn5cu"]
+
+[ext_resource type="Script" uid="uid://jtkgv68xnw4d" path="res://src/sim/effects/omamori/kaeru_effect.gd" id="1_ld2ed"]
+[ext_resource type="Texture2D" uid="uid://3dup02nxm5dv" path="res://assets/sprites/placeholder/omamori_kaeru.png" id="2_c6tl4"]
+[ext_resource type="Script" uid="uid://bcnj1dex28luw" path="res://data/definitions/omamori_definition.gd" id="3_v2hce"]
+
+[resource]
+script = ExtResource("3_v2hce")
+id = &"kaeru"
+name_key = "OMAMORI_KAERU"
+description_key = "OMAMORI_KAERU_DESC"
+rarity = 1
+icon = ExtResource("2_c6tl4")
+effect_script = ExtResource("1_ld2ed")
+level_values = PackedInt32Array()
+params = Dictionary[StringName, int]({
+&"mon": 2
+})

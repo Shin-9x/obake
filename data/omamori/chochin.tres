@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="OmamoriDefinition" format=3 uid="uid://caj1xdgteckie"]
+
+[ext_resource type="Script" uid="uid://b8wf4wxqrv0an" path="res://src/sim/effects/omamori/chochin_effect.gd" id="1_60cii"]
+[ext_resource type="Texture2D" uid="uid://lt80gbdd2tif" path="res://assets/sprites/placeholder/omamori_chochin.png" id="2_oevn3"]
+[ext_resource type="Script" uid="uid://bcnj1dex28luw" path="res://data/definitions/omamori_definition.gd" id="3_mnkvx"]
+
+[resource]
+script = ExtResource("3_mnkvx")
+id = &"chochin"
+name_key = "OMAMORI_CHOCHIN"
+description_key = "OMAMORI_CHOCHIN_DESC"
+rarity = 1
+icon = ExtResource("2_oevn3")
+effect_script = ExtResource("1_60cii")
+level_values = PackedInt32Array()
+params = Dictionary[StringName, int]({
+&"points": 5
+})

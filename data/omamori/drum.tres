@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="OmamoriDefinition" format=3 uid="uid://b1ljjxhrrhp6k"]
+
+[ext_resource type="Script" uid="uid://bsw74qlxffetx" path="res://src/sim/effects/omamori/drum_effect.gd" id="1_hm3xh"]
+[ext_resource type="Texture2D" uid="uid://dcv6c0hv3wt2b" path="res://assets/sprites/placeholder/omamori_drum.png" id="2_upd4b"]
+[ext_resource type="Script" uid="uid://bcnj1dex28luw" path="res://data/definitions/omamori_definition.gd" id="3_moyuv"]
+
+[resource]
+script = ExtResource("3_moyuv")
+id = &"drum"
+name_key = "OMAMORI_DRUM"
+description_key = "OMAMORI_DRUM_DESC"
+rarity = 1
+icon = ExtResource("2_upd4b")
+effect_script = ExtResource("1_hm3xh")
+level_values = PackedInt32Array()
+params = Dictionary[StringName, int]({
+&"points": 5
+})
