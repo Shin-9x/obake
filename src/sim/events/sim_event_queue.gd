@@ -24,7 +24,9 @@ func clear() -> void:
 	_count = 0
 
 
-func push(kind: SimEvent.Kind, tick: int, ball: int, target: int, x: int, y: int) -> void:
+func push(
+	kind: SimEvent.Kind, tick: int, ball: int, target: int, x: int, y: int, amount: int = 0
+) -> void:
 	if _count == _pool.size():
 		_pool.append(SimEvent.new())
 	var event: SimEvent = _pool[_count]
@@ -34,4 +36,5 @@ func push(kind: SimEvent.Kind, tick: int, ball: int, target: int, x: int, y: int
 	event.target = target
 	event.x = x
 	event.y = y
+	event.amount = amount
 	_count += 1

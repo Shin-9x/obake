@@ -17,9 +17,9 @@ var _inc_hi: int = 0
 var _inc_lo: int = 0
 
 
-## Seeds the generator like the reference [code]pcg32_srandom(seed, sequence)[/code].
+## Seeds the generator like the reference [code]pcg32_srandom(initial_state, sequence)[/code].
 ## Generators with different [param sequence] values produce independent streams.
-func _init(seed: int = 0, sequence: int = 0) -> void:
+func _init(initial_state: int = 0, sequence: int = 0) -> void:
 	var sequence_hi: int = (sequence >> 32) & _MASK_32
 	var sequence_lo: int = sequence & _MASK_32
 	_inc_hi = ((sequence_hi << 1) | (sequence_lo >> 31)) & _MASK_32
@@ -27,7 +27,7 @@ func _init(seed: int = 0, sequence: int = 0) -> void:
 	_state_hi = 0
 	_state_lo = 0
 	_advance()
-	_add_to_state((seed >> 32) & _MASK_32, seed & _MASK_32)
+	_add_to_state((initial_state >> 32) & _MASK_32, initial_state & _MASK_32)
 	_advance()
 
 

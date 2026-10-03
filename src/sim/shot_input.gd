@@ -3,7 +3,11 @@ class_name ShotInput
 
 ## Aim in centidegrees from straight down; positive values aim to the right.
 var aim: int = 0
+## Bucket phase, in ticks, at the moment of the shot: the bucket keeps moving while the player
+## aims, so it is part of the input.
+var bucket_phase: int = 0
 
 
-func _init(aim_cd: int = 0) -> void:
+func _init(aim_cd: int = 0, phase: int = 0) -> void:
 	aim = aim_cd
+	bucket_phase = phase

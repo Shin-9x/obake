@@ -11,11 +11,12 @@ var _sim: BoardSimulation
 
 func before_test() -> void:
 	_config = TestBoards.gdd_config()
+	TestBoards.freeze_bucket(_config)
 	_sim = BoardSimulation.new(_config)
 
 
 func test_free_fall_follows_gravity() -> void:
-	_sim.launch(ShotInput.new(STRAIGHT_DOWN))
+	_sim.launch(_aimed(STRAIGHT_DOWN))
 	var ticks: int = 60
 	for i: int in ticks:
 		_sim.step()
@@ -29,7 +30,7 @@ func test_free_fall_follows_gravity() -> void:
 
 func test_ball_bounces_off_a_peg_with_restitution() -> void:
 	var peg: int = _sim.add_round_peg(_config.launcher_x, 100 * PX)
-	_sim.launch(ShotInput.new(STRAIGHT_DOWN))
+	_sim.launch(_aimed(STRAIGHT_DOWN))
 	var incoming: int = 0
 	while _sim.events.size() == 0:
 		incoming = _sim.balls[0].vy + _expected_gravity_step()
@@ -43,7 +44,7 @@ func test_ball_bounces_off_a_peg_with_restitution() -> void:
 
 
 func test_ball_bounces_off_the_right_wall() -> void:
-	_sim.launch(ShotInput.new(_config.aim_limit))
+	_sim.launch(_aimed(_config.aim_limit))
 	var bounce: SimEvent = _step_until(SimEvent.Kind.WALL_BOUNCE)
 	assert_object(bounce).is_not_null()
 	assert_int(bounce.target).is_equal(RIGHT_WALL)
@@ -54,8 +55,8 @@ func test_ball_bounces_off_the_right_wall() -> void:
 
 func test_aim_is_clamped_to_the_limit() -> void:
 	var clamped: BoardSimulation = BoardSimulation.new(_config)
-	_sim.launch(ShotInput.new(-_config.aim_limit))
-	clamped.launch(ShotInput.new(-3 * _config.aim_limit))
+	_sim.launch(_aimed(-_config.aim_limit))
+	clamped.launch(_aimed(-3 * _config.aim_limit))
 	for i: int in 30:
 		_sim.step()
 		clamped.step()
@@ -66,7 +67,7 @@ func test_aim_is_clamped_to_the_limit() -> void:
 func test_speed_never_exceeds_the_maximum() -> void:
 	_config.gravity = 10 * _config.gravity
 	var fast: BoardSimulation = BoardSimulation.new(_config)
-	fast.launch(ShotInput.new(STRAIGHT_DOWN))
+	fast.launch(_aimed(STRAIGHT_DOWN))
 	while fast.is_shot_active():
 		fast.step()
 		var ball: SimBall = fast.balls[0]
@@ -75,37 +76,36 @@ func test_speed_never_exceeds_the_maximum() -> void:
 
 
 func test_shot_resolves_when_the_ball_leaves_the_bottom() -> void:
-	_sim.launch(ShotInput.new(STRAIGHT_DOWN))
-	assert_bool(_sim.launch(ShotInput.new(STRAIGHT_DOWN))).is_false()
+	_sim.launch(_aimed(STRAIGHT_DOWN))
+	assert_bool(_sim.launch(_aimed(STRAIGHT_DOWN))).is_false()
 	var lost: SimEvent = _step_until(SimEvent.Kind.BALL_LOST)
 	assert_object(lost).is_not_null()
 	assert_int(lost.y).is_greater(_config.board_height)
 	var kinds: Array[int] = _event_kinds()
 	assert_int(kinds.back()).is_equal(SimEvent.Kind.SHOT_RESOLVED)
 	assert_bool(_sim.is_shot_active()).is_false()
-	assert_bool(_sim.launch(ShotInput.new(STRAIGHT_DOWN))).is_true()
+	assert_bool(_sim.launch(_aimed(STRAIGHT_DOWN))).is_true()
 
 
 func test_lit_pegs_are_removed_when_the_shot_ends() -> void:
-	# Off-centre: a ball dropped dead on top of a peg balances there until M2's stuck rule.
 	var peg: int = _sim.add_round_peg(_config.launcher_x + 3 * PX, 100 * PX)
-	TestBoards.run_shot(_sim, STRAIGHT_DOWN)
+	TestBoards.run_shot(_sim, STRAIGHT_DOWN, _away())
 	assert_bool(_sim.pegs[peg].removed).is_true()
 	_sim.events.clear()
-	TestBoards.run_shot(_sim, STRAIGHT_DOWN)
+	TestBoards.run_shot(_sim, STRAIGHT_DOWN, _away())
 	assert_array(_event_kinds()).not_contains([SimEvent.Kind.PEG_HIT])
 
 
 func test_untouched_pegs_stay() -> void:
 	var far: int = _sim.add_round_peg(20 * PX, 300 * PX)
-	TestBoards.run_shot(_sim, STRAIGHT_DOWN)
+	TestBoards.run_shot(_sim, STRAIGHT_DOWN, _away())
 	assert_bool(_sim.pegs[far].lit).is_false()
 	assert_bool(_sim.pegs[far].removed).is_false()
 
 
 func test_rotated_rect_peg_deflects_the_ball() -> void:
 	var peg: int = _sim.add_rect_peg(_config.launcher_x, 100 * PX, 20 * PX, 3 * PX, 3000)
-	_sim.launch(ShotInput.new(STRAIGHT_DOWN))
+	_sim.launch(_aimed(STRAIGHT_DOWN))
 	var hit: SimEvent = _step_until(SimEvent.Kind.PEG_HIT)
 	assert_object(hit).is_not_null()
 	assert_int(hit.target).is_equal(peg)
@@ -114,7 +114,7 @@ func test_rotated_rect_peg_deflects_the_ball() -> void:
 
 
 func test_shot_waits_for_every_ball_and_balls_pass_through_each_other() -> void:
-	_sim.launch(ShotInput.new(STRAIGHT_DOWN))
+	_sim.launch(_aimed(STRAIGHT_DOWN))
 	_sim.step()
 	var first: SimBall = _sim.balls[0]
 	# A second ball on top of the first, moving the opposite way horizontally.
@@ -131,6 +131,95 @@ func test_shot_waits_for_every_ball_and_balls_pass_through_each_other() -> void:
 			lost += 1
 	assert_int(lost).is_equal(2)
 	assert_int(_event_kinds().back()).is_equal(SimEvent.Kind.SHOT_RESOLVED)
+
+
+func test_bucket_catches_a_ball_dropping_between_its_rims() -> void:
+	_sim.launch(ShotInput.new(STRAIGHT_DOWN, 0))
+	var caught: SimEvent = _step_until(SimEvent.Kind.BUCKET_CATCH)
+	assert_object(caught).is_not_null()
+	assert_array(_event_kinds()).not_contains([SimEvent.Kind.BALL_LOST])
+	assert_int(_event_kinds().back()).is_equal(SimEvent.Kind.SHOT_RESOLVED)
+
+
+func test_ball_bounces_off_a_bucket_rim() -> void:
+	_config.launcher_x = _sim.bucket.x - _sim.bucket.half_width
+	var sim: BoardSimulation = BoardSimulation.new(_config)
+	sim.launch(ShotInput.new(STRAIGHT_DOWN, 0))
+	var bounced: bool = false
+	for i: int in TestBoards.MAX_SHOT_TICKS:
+		sim.step()
+		if sim.balls[0].vy < 0:
+			bounced = true
+			break
+	assert_bool(bounced).is_true()
+	assert_int(sim.balls[0].y).is_less(_config.bucket_y)
+
+
+func test_bucket_follows_the_shot_phase() -> void:
+	var phase: int = 1234
+	_sim.launch(ShotInput.new(STRAIGHT_DOWN, phase))
+	_sim.step()
+	assert_int(_sim.bucket.phase).is_equal(phase + 1)
+	assert_int(_sim.bucket.x).is_equal(_sim.bucket.x_at(phase + 1))
+
+
+func test_stuck_ball_clears_the_lit_pegs() -> void:
+	# Two pegs closer than the ball's diameter form a pocket; the ball starts at rest inside it.
+	var left: int = _sim.add_round_peg(_config.launcher_x - 6 * PX, 100 * PX)
+	var right: int = _sim.add_round_peg(_config.launcher_x + 6 * PX, 100 * PX)
+	_sim.launch(_aimed(STRAIGHT_DOWN))
+	var ball: SimBall = _sim.balls[0]
+	ball.y = 93 * PX
+	ball.vx = 0
+	ball.vy = 0
+	var cleared: SimEvent = _step_until(SimEvent.Kind.STUCK_CLEARED)
+	assert_object(cleared).is_not_null()
+	assert_int(cleared.tick).is_greater_equal(_config.stuck_ticks)
+	assert_bool(_sim.pegs[left].removed).is_true()
+	assert_bool(_sim.pegs[right].removed).is_true()
+	assert_object(_step_until(SimEvent.Kind.SHOT_RESOLVED)).is_not_null()
+
+
+func test_head_on_hit_is_nudged_sideways() -> void:
+	var peg: int = _sim.add_round_peg(_config.launcher_x, 100 * PX)
+	_sim.launch(_aimed(STRAIGHT_DOWN))
+	var hit: SimEvent = _step_until(SimEvent.Kind.PEG_HIT)
+	assert_int(hit.target).is_equal(peg)
+	assert_int(_sim.balls[0].vx).is_not_equal(0)
+	assert_object(_step_until(SimEvent.Kind.SHOT_RESOLVED)).is_not_null()
+	assert_array(_event_kinds()).not_contains([SimEvent.Kind.STUCK_CLEARED])
+
+
+func test_prediction_ends_at_the_first_real_contact() -> void:
+	_sim.add_round_peg(200 * PX, 150 * PX)
+	_sim.add_round_peg(120 * PX, 220 * PX)
+	var aim: int = 700
+	var points: PackedInt32Array = PackedInt32Array()
+	points.resize(2 * (BoardSimulation.PREDICTION_TICKS + 1))
+	var state_before: int = _sim.state_hash()
+	var count: int = _sim.predict_path(aim, 1, points)
+	assert_int(_sim.state_hash()).is_equal(state_before)
+	assert_int(points[0]).is_equal(_config.launcher_x)
+	_sim.launch(_aimed(aim))
+	var hit: SimEvent = _step_until(SimEvent.Kind.PEG_HIT)
+	assert_object(hit).is_not_null()
+	# One point per tick plus the launcher: the last point is the tick of the first contact.
+	assert_int(count - 1).is_equal(hit.tick)
+
+
+func test_prediction_is_capped_by_its_buffer() -> void:
+	var points: PackedInt32Array = PackedInt32Array()
+	points.resize(2 * 5)
+	assert_int(_sim.predict_path(0, 1, points)).is_equal(5)
+
+
+func _aimed(aim: int) -> ShotInput:
+	return ShotInput.new(aim, _away())
+
+
+## Phase that keeps the frozen bucket far from the launcher, so falling balls are lost.
+func _away() -> int:
+	return TestBoards.bucket_right(_config)
 
 
 func _expected_gravity_step() -> int:
