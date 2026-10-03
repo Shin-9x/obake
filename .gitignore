@@ -1,3 +1,12 @@
 # Godot 4+ specific ignores
 .godot/
 /android/
+
+# Generated from locale/*.csv by the translation importer
+*.translation
+
+# gdUnit4 test reports
+/reports/
+
+# Local Python environment for gdtoolkit
+/.venv/
