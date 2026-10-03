@@ -14,7 +14,7 @@ const GOLDEN_CHAIN: int = 1289445351
 const GOLDEN_MOVING_CHAIN: int = 24347088
 ## Final total and hash chain of a full [BoardGame] played with the same inputs.
 const GOLDEN_GAME_TOTAL: int = 890
-const GOLDEN_GAME_CHAIN: int = 1091070016
+const GOLDEN_GAME_CHAIN: int = 407667046
 
 
 func test_identical_inputs_produce_identical_runs() -> void:

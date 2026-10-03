@@ -32,6 +32,13 @@ func period() -> int:
 	return _period
 
 
+## Changes the distance between the rims; the swing narrows so the rims stay on the board.
+func set_width(width: int) -> void:
+	half_width = width / 2
+	_amplitude = maxi(0, _center - half_width - rim_radius)
+	x = x_at(phase)
+
+
 func set_phase(value: int) -> void:
 	phase = posmod(value, _period)
 	x = x_at(phase)

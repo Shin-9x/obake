@@ -20,6 +20,12 @@ var sin_angle: int = 0
 var lit: bool = false
 ## Cleared from the board at the end of a shot.
 var removed: bool = false
+## Bounce in permille, overriding the ball and the board; -1 keeps them.
+var restitution: int = -1
+## Goes dark at the end of a shot instead of being removed.
+var persistent: bool = false
+## Pulls balls that have an attraction.
+var attractor: bool = false
 
 ## Index of the moving group this peg belongs to, or -1 for a static peg.
 var group: int = -1

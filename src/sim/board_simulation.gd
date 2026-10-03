@@ -28,6 +28,8 @@ var pegs: Array[SimPeg] = []
 var walls: Array[SimWall] = []
 var groups: Array[MovingGroup] = []
 var bucket: Bucket
+## Index of the ball fired by the last [method launch].
+var launched_ball: int = -1
 
 var _config: BalanceConfig
 var _grid: SpatialGrid
@@ -36,6 +38,7 @@ var _ghost: SimBall = SimBall.new()
 var _gravity_step: int = 0
 var _stuck_speed_squared: int = 0
 var _shot_active: bool = false
+var _max_extent: int = 0
 
 
 func _init(config: BalanceConfig) -> void:
@@ -105,8 +108,8 @@ func launch(input: ShotInput) -> bool:
 	clock = input.board_clock
 	bucket.set_phase(clock)
 	_place_groups()
-	var index: int = spawn_ball(_config.launcher_x, _config.launcher_y, 0, 0)
-	_aim_ball(balls[index], input.aim)
+	launched_ball = spawn_ball(_config.launcher_x, _config.launcher_y, 0, 0)
+	_aim_ball(balls[launched_ball], input.aim)
 	_shot_active = true
 	return true
 
@@ -129,6 +132,7 @@ func spawn_ball(x: int, y: int, vx: int, vy: int) -> int:
 	ball.radius = _config.ball_radius
 	ball.active = true
 	ball.slow_ticks = 0
+	ball.clear_modifiers()
 	return index
 
 
@@ -151,6 +155,7 @@ func step() -> void:
 		var ball: SimBall = balls[index]
 		if not ball.active:
 			continue
+		_attract(ball)
 		_integrate(ball)
 		_collide_with_walls(index, ball)
 		_collide_with_pegs(index, ball)
@@ -158,6 +163,12 @@ func step() -> void:
 		if bucket.catches(ball.x, ball.y):
 			ball.active = false
 			events.push(SimEvent.Kind.BUCKET_CATCH, tick, index, -1, ball.x, ball.y)
+		elif ball.floor_bounces > 0 and ball.y + ball.radius >= _config.board_height:
+			ball.floor_bounces -= 1
+			ball.y = _config.board_height - ball.radius
+			ball.vy = -FixedMath.div_round(absi(ball.vy) * _wall_restitution(ball), _PERMILLE)
+			events.push(SimEvent.Kind.FLOOR_BOUNCE, tick, index, -1, ball.x, ball.y)
+			any_active = true
 		elif ball.y - ball.radius > _config.board_height:
 			ball.active = false
 			events.push(SimEvent.Kind.BALL_LOST, tick, index, -1, ball.x, ball.y)
@@ -194,6 +205,48 @@ func predict_path(aim: int, sample_ticks: int, out_points: PackedInt32Array) -> 
 	return count
 
 
+## Writes into [param out] the pegs still on the board whose surface lies within [param radius]
+## of ([param x], [param y]), in a stable order, and returns how many there are. [param out] must
+## have room for every peg.
+func pegs_within(x: int, y: int, radius: int, out: PackedInt32Array) -> int:
+	var count: int = 0
+	var reach: int = radius + _max_extent
+	_grid.query(x - reach, y - reach, x + reach, y + reach)
+	for result: int in _grid.result_count:
+		var index: int = _grid.results[result]
+		if _surface_within(pegs[index], x, y, radius):
+			out[count] = index
+			count += 1
+	for group: MovingGroup in groups:
+		if not group.overlaps(x - reach, y - reach, x + reach, y + reach):
+			continue
+		for index: int in group.pegs:
+			var peg: SimPeg = pegs[index]
+			if not peg.removed and _surface_within(peg, x, y, radius):
+				out[count] = index
+				count += 1
+	return count
+
+
+## Lights [param peg] as if a ball had touched it, without a [constant SimEvent.Kind.PEG_HIT].
+func mark_hit(peg: int) -> void:
+	pegs[peg].lit = true
+
+
+## Clears the lit pegs from the board; persistent pegs only go dark.
+func remove_lit_pegs() -> void:
+	for peg_index: int in pegs.size():
+		var peg: SimPeg = pegs[peg_index]
+		if not peg.lit or peg.removed:
+			continue
+		if peg.persistent:
+			peg.lit = false
+			continue
+		peg.removed = true
+		if peg.group < 0:
+			_grid.remove(peg_index)
+
+
 ## Order-sensitive hash of the full simulation state, for golden tests and desync checks.
 ## The clock is covered through the bucket phase and the positions of moving pegs.
 func state_hash() -> int:
@@ -217,6 +270,7 @@ func state_hash() -> int:
 func _add_peg(peg: SimPeg, group: int) -> int:
 	var index: int = pegs.size()
 	pegs.append(peg)
+	_max_extent = maxi(_max_extent, peg.extent)
 	if group < 0:
 		_grid.insert(index, peg.min_x, peg.min_y, peg.max_x, peg.max_y)
 		return index
@@ -300,7 +354,7 @@ func _collide_with_walls(ball_index: int, ball: SimBall) -> void:
 	for wall_index: int in walls.size():
 		if not Collision.circle_vs_wall(ball.x, ball.y, ball.radius, walls[wall_index], _contact):
 			continue
-		if _resolve_contact(ball, _config.wall_restitution, 0, 0):
+		if _resolve_contact(ball, _wall_restitution(ball), 0, 0):
 			events.push(SimEvent.Kind.WALL_BOUNCE, tick, ball_index, wall_index, ball.x, ball.y)
 
 
@@ -327,9 +381,22 @@ func _collide_with_pegs(ball_index: int, ball: SimBall) -> void:
 
 func _hit_peg(ball_index: int, ball: SimBall, peg_index: int) -> void:
 	var peg: SimPeg = pegs[peg_index]
+	if ball.ghost_count > 0 and ball.has_ghosted(peg_index):
+		return
 	if not _touches_peg(ball, peg):
 		return
-	var impact: bool = _resolve_contact(ball, _config.peg_restitution, peg.vx, peg.vy)
+	if ball.ghost_hits > 0 and ball.ghost_count < SimBall.GHOST_CAPACITY:
+		# Passes through, hitting the peg without bouncing.
+		ball.ghost_hits -= 1
+		ball.ghosted[ball.ghost_count] = peg_index
+		ball.ghost_count += 1
+		peg.lit = true
+		events.push(SimEvent.Kind.PEG_HIT, tick, ball_index, peg_index, ball.x, ball.y)
+		return
+	var restitution: int = peg.restitution
+	if restitution < 0:
+		restitution = ball.restitution if ball.restitution >= 0 else _config.peg_restitution
+	var impact: bool = _resolve_contact(ball, restitution, peg.vx, peg.vy)
 	if impact:
 		_nudge_head_on(ball, peg.vx, peg.vy)
 	# Any touch lights a peg; after that only real impacts are reported.
@@ -342,9 +409,9 @@ func _collide_with_rims(ball: SimBall) -> void:
 	if ball.y + ball.radius + bucket.rim_radius <= bucket.y:
 		return
 	if _touches_rim(ball, -1):
-		_resolve_contact(ball, _config.wall_restitution, 0, 0)
+		_resolve_contact(ball, _wall_restitution(ball), 0, 0)
 	if _touches_rim(ball, 1):
-		_resolve_contact(ball, _config.wall_restitution, 0, 0)
+		_resolve_contact(ball, _wall_restitution(ball), 0, 0)
 
 
 ## [param side] is -1 for the left rim and 1 for the right one.
@@ -384,6 +451,57 @@ func _touches_anything(ball: SimBall) -> bool:
 			if not peg.removed and _touches_peg(ball, peg):
 				return true
 	return _touches_rim(ball, -1) or _touches_rim(ball, 1)
+
+
+func _wall_restitution(ball: SimBall) -> int:
+	return ball.restitution if ball.restitution >= 0 else _config.wall_restitution
+
+
+## Accelerates a ball with an attraction towards the nearest attractor peg in range.
+func _attract(ball: SimBall) -> void:
+	var radius: int = ball.attraction_radius
+	if radius <= 0:
+		return
+	var best: int = -1
+	var best_squared: int = radius * radius
+	_grid.query(ball.x - radius, ball.y - radius, ball.x + radius, ball.y + radius)
+	for result: int in _grid.result_count:
+		var index: int = _grid.results[result]
+		var candidate: SimPeg = pegs[index]
+		if candidate.attractor:
+			var squared: int = _distance_squared(candidate, ball.x, ball.y)
+			if squared < best_squared or (squared == best_squared and index < best):
+				best = index
+				best_squared = squared
+	for group: MovingGroup in groups:
+		if not group.overlaps(ball.x - radius, ball.y - radius, ball.x + radius, ball.y + radius):
+			continue
+		for index: int in group.pegs:
+			var member: SimPeg = pegs[index]
+			if member.attractor and not member.removed:
+				var squared: int = _distance_squared(member, ball.x, ball.y)
+				if squared < best_squared or (squared == best_squared and index < best):
+					best = index
+					best_squared = squared
+	if best < 0:
+		return
+	var distance: int = FixedMath.isqrt(best_squared)
+	if distance == 0:
+		return
+	var pull: int = FixedMath.div_round(ball.attraction_strength, TICKS_PER_SECOND)
+	ball.vx += FixedMath.div_round((pegs[best].x - ball.x) * pull, distance)
+	ball.vy += FixedMath.div_round((pegs[best].y - ball.y) * pull, distance)
+
+
+static func _distance_squared(peg: SimPeg, x: int, y: int) -> int:
+	var dx: int = peg.x - x
+	var dy: int = peg.y - y
+	return dx * dx + dy * dy
+
+
+static func _surface_within(peg: SimPeg, x: int, y: int, radius: int) -> bool:
+	var reach: int = radius + peg.extent
+	return _distance_squared(peg, x, y) <= reach * reach
 
 
 ## Pushes the ball out along the contact normal and reflects its velocity relative to the
@@ -434,25 +552,16 @@ func _track_slowness(ball: SimBall) -> bool:
 
 ## GDD rule: a ball slow for too long removes the lit pegs, which frees it.
 func _clear_stuck() -> void:
-	_remove_lit_pegs()
+	remove_lit_pegs()
 	for ball: SimBall in balls:
 		ball.slow_ticks = 0
 	events.push(SimEvent.Kind.STUCK_CLEARED, tick, -1, -1, 0, 0)
 
 
 func _resolve_shot() -> void:
-	_remove_lit_pegs()
+	remove_lit_pegs()
 	_shot_active = false
 	events.push(SimEvent.Kind.SHOT_RESOLVED, tick, -1, -1, 0, 0)
-
-
-func _remove_lit_pegs() -> void:
-	for peg_index: int in pegs.size():
-		var peg: SimPeg = pegs[peg_index]
-		if peg.lit and not peg.removed:
-			peg.removed = true
-			if peg.group < 0:
-				_grid.remove(peg_index)
 
 
 static func _write_point(out_points: PackedInt32Array, index: int, ball: SimBall) -> int:

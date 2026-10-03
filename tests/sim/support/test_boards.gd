@@ -96,11 +96,12 @@ static func add_moving_pegs(sim: BoardSimulation) -> void:
 		sim.add_round_peg(x * PX, 250 * PX)
 
 
-static func staggered_game(board_seed: int) -> BoardGame:
+static func staggered_game(board_seed: int, loadout: LoadoutDefinition = null) -> BoardGame:
 	var config: BalanceConfig = gdd_config()
 	var sim: BoardSimulation = BoardSimulation.new(config)
 	add_staggered_pegs(sim)
-	return BoardGame.new(sim, config, gdd_pegs(), Pcg32.new(board_seed, RngStreams.Domain.BOARD))
+	var rng: Pcg32 = Pcg32.new(board_seed, RngStreams.Domain.BOARD)
+	return BoardGame.new(sim, config, gdd_pegs(), rng, loadout)
 
 
 ## Launches a shot and steps until it resolves. Returns the number of ticks simulated.

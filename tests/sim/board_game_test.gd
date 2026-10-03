@@ -26,10 +26,10 @@ func test_colouring_depends_only_on_the_seed() -> void:
 func test_each_lantern_scores_once_per_shot() -> void:
 	var game: BoardGame = _two_peg_game(BoardGame.Role.BLUE, BoardGame.Role.RED)
 	game.shoot(_shot())
-	game.score_hit(0, 1)
-	game.score_hit(0, 2)
-	game.score_hit(1, 3)
-	game.score_hit(1, 4)
+	game.score_hit(0)
+	game.score_hit(0)
+	game.score_hit(1)
+	game.score_hit(1)
 	assert_int(game.shot_points).is_equal(10)
 	assert_int(game.shot_mult).is_equal(2000)
 
@@ -37,21 +37,21 @@ func test_each_lantern_scores_once_per_shot() -> void:
 func test_gold_doubles_the_mult_reached_so_far() -> void:
 	var red_first: BoardGame = _two_peg_game(BoardGame.Role.RED, BoardGame.Role.GOLD)
 	red_first.shoot(_shot())
-	red_first.score_hit(0, 1)
-	red_first.score_hit(1, 2)
+	red_first.score_hit(0)
+	red_first.score_hit(1)
 	assert_int(red_first.shot_mult).is_equal(4000)
 	var gold_first: BoardGame = _two_peg_game(BoardGame.Role.RED, BoardGame.Role.GOLD)
 	gold_first.shoot(_shot())
-	gold_first.score_hit(1, 1)
-	gold_first.score_hit(0, 2)
+	gold_first.score_hit(1)
+	gold_first.score_hit(0)
 	assert_int(gold_first.shot_mult).is_equal(3000)
 
 
 func test_shot_scores_points_times_mult_and_resets_for_the_next_shot() -> void:
 	var game: BoardGame = _two_peg_game(BoardGame.Role.BLUE, BoardGame.Role.RED)
 	game.shoot(_shot())
-	game.score_hit(0, 1)
-	game.score_hit(1, 1)
+	game.score_hit(0)
+	game.score_hit(1)
 	_finish_shot(game)
 	assert_int(game.total).is_equal(20)
 	assert_array(_scoring_amounts(game, SimEvent.Kind.SHOT_SCORED)).contains_exactly([20])
@@ -63,8 +63,8 @@ func test_shot_scores_points_times_mult_and_resets_for_the_next_shot() -> void:
 func test_scoring_events_carry_peg_and_amount() -> void:
 	var game: BoardGame = _two_peg_game(BoardGame.Role.BLUE, BoardGame.Role.GOLD)
 	game.shoot(_shot())
-	game.score_hit(0, 1)
-	game.score_hit(1, 1)
+	game.score_hit(0)
+	game.score_hit(1)
 	assert_array(_scoring_amounts(game, SimEvent.Kind.SCORE_POINTS)).contains_exactly([10])
 	assert_array(_scoring_amounts(game, SimEvent.Kind.SCORE_MULT_TIMES)).contains_exactly([2000])
 
@@ -87,7 +87,7 @@ func test_matsuri_doubles_the_total_and_ends_the_board() -> void:
 	game.roles[0] = BoardGame.Role.RED
 	game.roles[1] = BoardGame.Role.BLUE
 	game.shoot(_shot(TestBoards.bucket_right(config)))
-	game.score_hit(1, 1)
+	game.score_hit(1)
 	_finish_shot(game)
 	assert_int(game.outcome).is_equal(BoardGame.Outcome.MATSURI)
 	assert_int(game.total).is_equal(40)
@@ -104,7 +104,7 @@ func test_reaching_the_target_wins_the_board() -> void:
 	game.roles[0] = BoardGame.Role.BLUE
 	game.roles[1] = BoardGame.Role.RED
 	game.shoot(_shot())
-	game.score_hit(0, 1)
+	game.score_hit(0)
 	_finish_shot(game)
 	assert_int(game.outcome).is_equal(BoardGame.Outcome.TARGET_REACHED)
 
@@ -139,12 +139,16 @@ func _shot(board_clock: int = 0) -> ShotInput:
 	return ShotInput.new(STRAIGHT_DOWN, board_clock)
 
 
-## Two pegs far from the ball's straight drop, with explicit roles.
+## Two pegs far from the ball's straight drop, with explicit roles, plus a red lantern out of
+## every path so that hitting both never ends the board by Matsuri.
 func _two_peg_game(first: BoardGame.Role, second: BoardGame.Role) -> BoardGame:
 	var config: BalanceConfig = TestBoards.gdd_config()
-	var game: BoardGame = _game_with_pegs(config, [Vector2i(20, 300), Vector2i(340, 300)])
+	var game: BoardGame = _game_with_pegs(
+		config, [Vector2i(20, 300), Vector2i(340, 300), Vector2i(340, 40)]
+	)
 	game.roles[0] = first
 	game.roles[1] = second
+	game.roles[2] = BoardGame.Role.RED
 	return game
 
 

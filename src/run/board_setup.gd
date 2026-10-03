@@ -6,7 +6,12 @@ class_name BoardSetup
 
 
 static func create_board(
-	config: BalanceConfig, base_pegs: BasePegs, layout: BoardLayout, board_seed: int
+	config: BalanceConfig,
+	base_pegs: BasePegs,
+	layout: BoardLayout,
+	board_seed: int,
+	loadout: LoadoutDefinition = null,
+	carry: RunCarry = null
 ) -> PlacedBoard:
 	var rng: Pcg32 = RngStreams.new(board_seed).stream(RngStreams.Domain.BOARD)
 	var placed: PlacedBoard = PlacedBoard.new()
@@ -30,7 +35,7 @@ static func create_board(
 		)
 		for peg: LayoutPeg in group.pegs:
 			_add_peg(simulation, peg, index, flip, width)
-	placed.game = BoardGame.new(simulation, config, base_pegs, rng)
+	placed.game = BoardGame.new(simulation, config, base_pegs, rng, loadout, carry)
 	return placed
 
 

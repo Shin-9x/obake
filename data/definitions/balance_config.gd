@@ -13,6 +13,8 @@ extends Resource
 @export var first_board_target: int = 800
 ## Applied to the board total when every red lantern is cleared.
 @export var matsuri_total_factor: int = 2000
+## Largest interest paid at the end of a board, in mon; omamori can raise it.
+@export var interest_cap: int = 5
 
 @export_group("Lantern colouring")
 ## Share of the board's pegs that become red lanterns.

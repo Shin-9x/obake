@@ -24,6 +24,20 @@ enum Kind {
 	SHOT_SCORED,
 	## [code]amount[/code] is the [enum BoardGame.Outcome].
 	BOARD_ENDED,
+	## [code]amount[/code] is the mon paid.
+	MON_GAINED,
+	## An explosion; [code]amount[/code] is its radius in milli-pixels.
+	AREA_HIT,
+	## [code]target[/code] has caught fire and will be hit shortly.
+	PEG_BURNING,
+	## [code]ball[/code] is a new ball split from the shot's ball.
+	BALL_SPLIT,
+	FLOOR_BOUNCE,
+	## A ball was drawn from the bag for the shot.
+	BALL_DRAWN,
+	## [code]target[/code] is the slot of the effect that acted: an omamori slot, or
+	## [constant Effect.BALL_SLOT] / [constant Effect.PEG_SLOT].
+	EFFECT_TRIGGERED,
 }
 
 var kind: Kind = Kind.PEG_HIT
