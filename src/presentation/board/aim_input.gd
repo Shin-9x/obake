@@ -11,7 +11,7 @@ signal shoot_requested
 ## A tenth of a degree.
 const FINE_STEP: int = 10
 ## Centidegrees of aim per viewport pixel of horizontal drag.
-const DRAG_SENSITIVITY: float = 20.0
+const DRAG_SENSITIVITY: float = 40.0
 ## Seconds before a held fine-aim control starts repeating, then between repeats.
 const REPEAT_DELAY: float = 0.35
 const REPEAT_INTERVAL: float = 0.04
