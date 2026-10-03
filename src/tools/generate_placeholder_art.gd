@@ -6,6 +6,63 @@ const OUTPUT_DIR: String = "res://assets/sprites/placeholder"
 const LANTERN_SIZE: int = 10
 const BALL_SIZE: int = 8
 
+## Ball sprites: fill, edge and a pattern drawn on top.
+const BALLS: Dictionary[String, Array] = {
+	"ball_heavy": [Color("#4b5563"), Color("#1f2937"), "highlight"],
+	"ball_taiko": [Color("#c0392b"), Color("#5c1a14"), "band"],
+	"ball_zeni": [Color("#d4a017"), Color("#6b4a10"), "hole"],
+	"ball_explosive": [Color("#2b2b2b"), Color("#000000"), "core"],
+	"ball_phantom": [Color("#e8f4ff", 0.45), Color("#ffffff", 0.7), "none"],
+	"ball_magnetic": [Color("#d63c3c"), Color("#3c6fd6"), "halves"],
+	"ball_daruma": [Color("#c8102e"), Color("#5a0a14"), "face"],
+	"ball_splitter": [Color("#3fa34d"), Color("#1d4d24"), "diagonal"],
+	"ball_onibi": [Color("#4fc3f7"), Color("#1565c0"), "core"],
+}
+## Purchasable peg sprites, drawn like lanterns: body, outline and highlight.
+const SPECIAL_PEGS: Dictionary[String, Array] = {
+	"peg_coin": [Color("#e0b030"), Color("#6b4a10"), Color("#fff2b0")],
+	"peg_bell": [Color("#f2d24b"), Color("#7a5c00"), Color("#fffbe0")],
+	"peg_explosive_lantern": [Color("#7a1f1f"), Color("#2a0a0a"), Color("#ff9a3c")],
+	"peg_torii": [Color("#d9381e"), Color("#1a1a1a"), Color("#ffb3a3")],
+	"peg_kagami": [Color("#c9d1d9"), Color("#5b6672"), Color("#ffffff")],
+	"peg_omikuji": [Color("#f5f0e6"), Color("#b22222"), Color("#ffffff")],
+}
+## Omamori icons: one colour each; the emblem varies with the position in this list.
+const OMAMORI: Array[String] = [
+	"chochin",
+	"first_strike",
+	"patience",
+	"kaeru",
+	"uchiwa",
+	"teru_teru_bozu",
+	"drum",
+	"maneki_neko",
+	"yata_mirror",
+	"magatama",
+	"shimenawa",
+	"hyotan",
+	"ema",
+	"shuten_sake",
+	"tsukumogami",
+]
+const OMAMORI_COLOURS: Array[Color] = [
+	Color("#e07a5f"),
+	Color("#3d405b"),
+	Color("#81b29a"),
+	Color("#4caf50"),
+	Color("#f2cc8f"),
+	Color("#bde0fe"),
+	Color("#a0522d"),
+	Color("#f4a261"),
+	Color("#c0c0c0"),
+	Color("#6a4c93"),
+	Color("#d4a373"),
+	Color("#e9c46a"),
+	Color("#8ecae6"),
+	Color("#9b2226"),
+	Color("#5e548e"),
+]
+
 const LANTERNS: Dictionary[String, Array] = {
 	"lantern_blue": [Color("#4a7ab5"), Color("#1f3552"), Color("#a9c8ea")],
 	"lantern_red": [Color("#c8453b"), Color("#5a1a17"), Color("#f2a49a")],
@@ -20,6 +77,14 @@ func _init() -> void:
 		var colours: Array = LANTERNS[lantern]
 		_save(_lantern(colours[0], colours[1], colours[2]), lantern)
 	_save(_ball(), "ball_hitodama")
+	for ball: String in BALLS:
+		var style: Array = BALLS[ball]
+		_save(_styled_ball(style[0], style[1], style[2]), ball)
+	for peg: String in SPECIAL_PEGS:
+		var colours: Array = SPECIAL_PEGS[peg]
+		_save(_lantern(colours[0], colours[1], colours[2]), peg)
+	for index: int in OMAMORI.size():
+		_save(_omamori(OMAMORI_COLOURS[index], index), "omamori_" + OMAMORI[index])
 	_save(_bucket(), "bucket")
 	_save(_launcher(), "launcher")
 	quit()
@@ -60,6 +125,63 @@ func _ball() -> Image:
 			elif distance > 1.6:
 				colour = Color("#bfe9ff")
 			image.set_pixel(x, y, colour)
+	return image
+
+
+## A ball with a fill, an edge and a simple pattern on top.
+func _styled_ball(fill: Color, edge: Color, pattern: String) -> Image:
+	var image: Image = _blank(BALL_SIZE, BALL_SIZE)
+	var centre: float = (BALL_SIZE - 1) / 2.0
+	for y: int in BALL_SIZE:
+		for x: int in BALL_SIZE:
+			var distance: float = Vector2(x - centre, y - centre).length()
+			if distance > centre + 0.5:
+				continue
+			var colour: Color = edge if distance > centre - 0.6 else fill
+			match pattern:
+				"band":
+					if y == 3 or y == 4:
+						colour = Color.WHITE
+				"hole":
+					if (x == 3 or x == 4) and (y == 3 or y == 4):
+						colour = Color(0, 0, 0, 0)
+				"core":
+					if distance < 1.6:
+						colour = Color("#ffd166")
+				"halves":
+					colour = fill if x < 4 else edge
+				"face":
+					if y >= 2 and y <= 4 and x >= 2 and x <= 5:
+						colour = Color("#fff4e0")
+				"diagonal":
+					if x == y:
+						colour = edge
+				"highlight":
+					if x == 2 and y == 2:
+						colour = Color("#9ca3af")
+			image.set_pixel(x, y, colour)
+	return image
+
+
+## An amulet bag with a knot on top and a small emblem picked by [param emblem].
+func _omamori(body: Color, emblem: int) -> Image:
+	var size: int = 16
+	var image: Image = _blank(size, size)
+	var outline: Color = body.darkened(0.5)
+	for y: int in range(3, 15):
+		for x: int in range(3, 13):
+			var corner: bool = (x == 3 or x == 12) and (y == 3 or y == 14)
+			if corner:
+				continue
+			var edge: bool = x == 3 or x == 12 or y == 3 or y == 14
+			image.set_pixel(x, y, outline if edge else body)
+	for x: int in range(6, 10):
+		image.set_pixel(x, 1, outline)
+		image.set_pixel(x, 2, Color("#f4e9c9"))
+	# A 3 x 3 emblem whose cells follow the bits of the item's position.
+	for cell: int in 9:
+		if (emblem + 1) & (1 << cell) != 0:
+			image.set_pixel(6 + cell % 3, 7 + cell / 3, Color("#f4e9c9"))
 	return image
 
 
