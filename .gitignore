@@ -10,3 +10,6 @@
 
 # Local Python environment for gdtoolkit
 /.venv/
+
+# Export output
+/build/
