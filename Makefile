@@ -3,7 +3,7 @@ PYTHON ?= python3
 VENV ?= .venv
 GD_SOURCES := src tests data
 
-.PHONY: setup format lint test check bench placeholder-art
+.PHONY: setup format lint test check bench placeholder-art layouts
 
 setup:
 	$(PYTHON) -m venv $(VENV)
@@ -34,3 +34,7 @@ bench:
 placeholder-art:
 	$(GODOT) --headless --path . -s res://src/tools/generate_placeholder_art.gd
 	$(GODOT) --headless --path . --import
+
+layouts:
+	$(GODOT) --headless --path . --import
+	$(GODOT) --headless --path . -s res://src/tools/export_layouts.gd
