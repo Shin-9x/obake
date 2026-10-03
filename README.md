@@ -17,7 +17,17 @@ make lint     # check formatting and run gdlint
 make test     # run the gdUnit4 test suite headless
 make check    # lint, then test
 make bench    # measure simulation cost per tick
+make placeholder-art  # regenerate the placeholder sprites
 ```
+
+## Controls
+
+| Action | Mouse and keyboard | Touch |
+| --- | --- | --- |
+| Aim | Move the mouse | Drag anywhere |
+| Fine aim | Mouse wheel, A/D or arrow keys | `<` `>` buttons |
+| Shoot | Left click or Enter | Shoot button |
+| Fast-forward | Hold Space or the right mouse button | Keep a finger on the screen |
 
 ## Layout
 

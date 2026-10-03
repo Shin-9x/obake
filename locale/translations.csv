@@ -1,2 +1,25 @@
 keys,en,it
 GAME_TITLE,Obake!,Obake!
+HUD_SHOTS,Shots,Tiri
+HUD_BALL,Ball,Pallina
+HUD_NEXT_BALL,Next,Prossima
+HUD_SEED,Seed,Seed
+HUD_SHOT,Shot,Tiro
+HUD_TOTAL,Total,Totale
+HUD_RED_LEFT,Red lanterns,Lanterne rosse
+HUD_OMAMORI,Omamori,Omamori
+BALL_HITODAMA,Hitodama,Hitodama
+PEG_BLUE_LANTERN,Blue lantern,Lanterna blu
+PEG_RED_LANTERN,Red lantern,Lanterna rossa
+PEG_GREEN_LANTERN,Green lantern,Lanterna verde
+PEG_GOLD_LANTERN,Gold lantern,Lanterna d'oro
+POPUP_MULT_ADD,+%s Mult,+%s Mult
+POPUP_MULT_TIMES,×%s Mult,×%s Mult
+POPUP_FREE_BALL,Free ball!,Pallina gratis!
+RESULT_TARGET,Target reached!,Obiettivo raggiunto!
+RESULT_MATSURI,Matsuri!,Matsuri!
+RESULT_FAILED,Out of shots,Tiri esauriti
+RESULT_TOTAL,Total: %d,Totale: %d
+RESULT_UNUSED_SHOTS,Unused shots: %d,Tiri non usati: %d
+BUTTON_PLAY_AGAIN,Play again,Gioca ancora
+BUTTON_SHOOT,Shoot,Tira
