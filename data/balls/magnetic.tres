@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="BallDefinition" format=3 uid="uid://c6d185c8idima"]
+
+[ext_resource type="Script" uid="uid://b6efddfta5fqo" path="res://src/sim/effects/balls/magnetic_effect.gd" id="1_jraod"]
+[ext_resource type="Texture2D" uid="uid://w52m8wjs7bfd" path="res://assets/sprites/placeholder/ball_magnetic.png" id="2_b64yf"]
+[ext_resource type="Script" uid="uid://bvi6uyl50g4fx" path="res://data/definitions/ball_definition.gd" id="3_7lsin"]
+
+[resource]
+script = ExtResource("3_7lsin")
+texture = ExtResource("2_b64yf")
+id = &"magnetic"
+name_key = "BALL_MAGNETIC"
+description_key = "BALL_MAGNETIC_DESC"
+rarity = 2
+icon = ExtResource("2_b64yf")
+effect_script = ExtResource("1_jraod")
+level_values = PackedInt32Array(30000, 40000, 50000)
+params = Dictionary[StringName, int]({
+&"strength": 400000
+})

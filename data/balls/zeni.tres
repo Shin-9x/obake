@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="BallDefinition" format=3 uid="uid://xc7a1cco287x"]
+
+[ext_resource type="Script" uid="uid://bif1vvpqvyyd2" path="res://src/sim/effects/balls/zeni_effect.gd" id="1_3jv46"]
+[ext_resource type="Texture2D" uid="uid://ynqy4wijgp4y" path="res://assets/sprites/placeholder/ball_zeni.png" id="2_1bt2h"]
+[ext_resource type="Script" uid="uid://bvi6uyl50g4fx" path="res://data/definitions/ball_definition.gd" id="3_aupyx"]
+
+[resource]
+script = ExtResource("3_aupyx")
+texture = ExtResource("2_1bt2h")
+id = &"zeni"
+name_key = "BALL_ZENI"
+description_key = "BALL_ZENI_DESC"
+rarity = 1
+icon = ExtResource("2_1bt2h")
+effect_script = ExtResource("1_3jv46")
+level_values = PackedInt32Array(10, 8, 6)
+params = Dictionary[StringName, int]({
+&"mon": 1
+})

@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="BallDefinition" format=3 uid="uid://cqm1hmcug36md"]
+
+[ext_resource type="Script" uid="uid://k2awb4d135hj" path="res://src/sim/effects/balls/heavy_effect.gd" id="1_x7td2"]
+[ext_resource type="Texture2D" uid="uid://cphguoyr3u1xc" path="res://assets/sprites/placeholder/ball_heavy.png" id="2_jlxsh"]
+[ext_resource type="Script" uid="uid://bvi6uyl50g4fx" path="res://data/definitions/ball_definition.gd" id="3_2wu7p"]
+
+[resource]
+script = ExtResource("3_2wu7p")
+texture = ExtResource("2_jlxsh")
+id = &"heavy"
+name_key = "BALL_HEAVY"
+description_key = "BALL_HEAVY_DESC"
+rarity = 1
+icon = ExtResource("2_jlxsh")
+effect_script = ExtResource("1_x7td2")
+level_values = PackedInt32Array(2000, 3000, 4000)
+params = Dictionary[StringName, int]({
+&"restitution": 500
+})

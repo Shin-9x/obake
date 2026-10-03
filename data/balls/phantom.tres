@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="BallDefinition" format=3 uid="uid://cupskb5pf54lr"]
+
+[ext_resource type="Script" uid="uid://cfqa32xlhfcvd" path="res://src/sim/effects/balls/phantom_effect.gd" id="1_ovh2q"]
+[ext_resource type="Texture2D" uid="uid://cbfhcpc4s3cxb" path="res://assets/sprites/placeholder/ball_phantom.png" id="2_6imr7"]
+[ext_resource type="Script" uid="uid://bvi6uyl50g4fx" path="res://data/definitions/ball_definition.gd" id="3_qhvf2"]
+
+[resource]
+script = ExtResource("3_qhvf2")
+texture = ExtResource("2_6imr7")
+id = &"phantom"
+name_key = "BALL_PHANTOM"
+description_key = "BALL_PHANTOM_DESC"
+rarity = 2
+icon = ExtResource("2_6imr7")
+effect_script = ExtResource("1_ovh2q")
+level_values = PackedInt32Array(2, 3, 4)

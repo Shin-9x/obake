@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="BallDefinition" format=3 uid="uid://gfwq8w3x8b7i"]
+
+[ext_resource type="Script" uid="uid://c5gx0ltuk6qa4" path="res://src/sim/effects/balls/daruma_effect.gd" id="1_n10jq"]
+[ext_resource type="Texture2D" uid="uid://i4vg0v5rcn0b" path="res://assets/sprites/placeholder/ball_daruma.png" id="2_bvwp5"]
+[ext_resource type="Script" uid="uid://bvi6uyl50g4fx" path="res://data/definitions/ball_definition.gd" id="3_3y37s"]
+
+[resource]
+script = ExtResource("3_3y37s")
+texture = ExtResource("2_bvwp5")
+id = &"daruma"
+name_key = "BALL_DARUMA"
+description_key = "BALL_DARUMA_DESC"
+rarity = 2
+icon = ExtResource("2_bvwp5")
+effect_script = ExtResource("1_n10jq")
+level_values = PackedInt32Array(1, 2, 3)

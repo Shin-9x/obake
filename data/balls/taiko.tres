@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="BallDefinition" format=3 uid="uid://pkfd8cpacb1u"]
+
+[ext_resource type="Script" uid="uid://b1xl0yxpasbtm" path="res://src/sim/effects/balls/taiko_effect.gd" id="1_k3tyf"]
+[ext_resource type="Texture2D" uid="uid://bci3kwp618crf" path="res://assets/sprites/placeholder/ball_taiko.png" id="2_rcxch"]
+[ext_resource type="Script" uid="uid://bvi6uyl50g4fx" path="res://data/definitions/ball_definition.gd" id="3_xrppc"]
+
+[resource]
+script = ExtResource("3_xrppc")
+texture = ExtResource("2_rcxch")
+id = &"taiko"
+name_key = "BALL_TAIKO"
+description_key = "BALL_TAIKO_DESC"
+rarity = 1
+icon = ExtResource("2_rcxch")
+effect_script = ExtResource("1_k3tyf")
+level_values = PackedInt32Array(3, 5, 8)
+params = Dictionary[StringName, int]({
+&"mult": 1000
+})

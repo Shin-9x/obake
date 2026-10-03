@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="BallDefinition" format=3 uid="uid://sofwthekutvh"]
+
+[ext_resource type="Texture2D" uid="uid://by1ou5gg1g0eu" path="res://assets/sprites/placeholder/ball_hitodama.png" id="1_x4r3a"]
+[ext_resource type="Script" uid="uid://bvi6uyl50g4fx" path="res://data/definitions/ball_definition.gd" id="2_28ohx"]
+
+[resource]
+script = ExtResource("2_28ohx")
+texture = ExtResource("1_x4r3a")
+id = &"hitodama"
+name_key = "BALL_HITODAMA"
+description_key = "BALL_HITODAMA_DESC"
+icon = ExtResource("1_x4r3a")
+level_values = PackedInt32Array()

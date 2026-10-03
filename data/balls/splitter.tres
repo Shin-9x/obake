@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="BallDefinition" format=3 uid="uid://djoamkch3vb4p"]
+
+[ext_resource type="Script" uid="uid://gb7t61f5soed" path="res://src/sim/effects/balls/splitter_effect.gd" id="1_aqyvj"]
+[ext_resource type="Texture2D" uid="uid://00l24t50ceqo" path="res://assets/sprites/placeholder/ball_splitter.png" id="2_dtw4q"]
+[ext_resource type="Script" uid="uid://bvi6uyl50g4fx" path="res://data/definitions/ball_definition.gd" id="3_3dcm8"]
+
+[resource]
+script = ExtResource("3_3dcm8")
+texture = ExtResource("2_dtw4q")
+id = &"splitter"
+name_key = "BALL_SPLITTER"
+description_key = "BALL_SPLITTER_DESC"
+rarity = 3
+icon = ExtResource("2_dtw4q")
+effect_script = ExtResource("1_aqyvj")
+level_values = PackedInt32Array(2, 3, 4)
+params = Dictionary[StringName, int]({
+&"spread": 1500
+})

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="BallDefinition" format=3 uid="uid://cn1pphy6ja5sx"]
+
+[ext_resource type="Script" uid="uid://be6xclw410p5n" path="res://src/sim/effects/balls/explosive_effect.gd" id="1_644kb"]
+[ext_resource type="Texture2D" uid="uid://bjxe7h8qrtigr" path="res://assets/sprites/placeholder/ball_explosive.png" id="2_wbojk"]
+[ext_resource type="Script" uid="uid://bvi6uyl50g4fx" path="res://data/definitions/ball_definition.gd" id="3_fps7u"]
+
+[resource]
+script = ExtResource("3_fps7u")
+texture = ExtResource("2_wbojk")
+id = &"explosive"
+name_key = "BALL_EXPLOSIVE"
+description_key = "BALL_EXPLOSIVE_DESC"
+rarity = 2
+icon = ExtResource("2_wbojk")
+effect_script = ExtResource("1_644kb")
+level_values = PackedInt32Array(16000, 22000, 28000)

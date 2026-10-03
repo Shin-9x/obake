@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="BallDefinition" format=3 uid="uid://dujkygwjf17sb"]
+
+[ext_resource type="Script" uid="uid://c8x0irbrveauy" path="res://src/sim/effects/balls/onibi_effect.gd" id="1_ybqni"]
+[ext_resource type="Texture2D" uid="uid://b5mwmpjvw0lx8" path="res://assets/sprites/placeholder/ball_onibi.png" id="2_0guj3"]
+[ext_resource type="Script" uid="uid://bvi6uyl50g4fx" path="res://data/definitions/ball_definition.gd" id="3_i62gs"]
+
+[resource]
+script = ExtResource("3_i62gs")
+texture = ExtResource("2_0guj3")
+id = &"onibi"
+name_key = "BALL_ONIBI"
+description_key = "BALL_ONIBI_DESC"
+rarity = 3
+icon = ExtResource("2_0guj3")
+effect_script = ExtResource("1_ybqni")
+level_values = PackedInt32Array(1, 2, 3)
+params = Dictionary[StringName, int]({
+&"delay": 36,
+&"radius": 40000
+})
