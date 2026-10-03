@@ -1,3 +1,4 @@
+@tool
 class_name Pcg32
 ## PCG32 (XSH RR) random generator, bit-compatible with the reference implementation.
 ##

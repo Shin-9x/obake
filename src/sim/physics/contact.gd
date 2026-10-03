@@ -1,3 +1,4 @@
+@tool
 class_name Contact
 ## Reusable result of a collision test.
 

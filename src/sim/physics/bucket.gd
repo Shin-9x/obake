@@ -1,3 +1,4 @@
+@tool
 class_name Bucket
 ## The bucket sliding along the bottom of the board. A ball caught in it makes the shot free.
 ##

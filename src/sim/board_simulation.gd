@@ -1,8 +1,13 @@
+@tool
 class_name BoardSimulation
 ## Deterministic simulation of one board at a fixed 120 Hz: balls, pegs, walls and the bucket.
 ##
-## Advance it with [method step] and read what happened from [member events]. Balls never collide
-## with each other. Presentation reads this state and must never write it.
+## Advance it with [method step] during a shot and [method idle_step] between shots, and read what
+## happened from [member events]. Balls never collide with each other. Presentation reads this
+## state and must never write it.
+##
+## Everything that moves on its own (the bucket and the moving groups) follows [member clock].
+## A shot sets the clock from its input, so time spent aiming never affects a replay.
 
 const TICKS_PER_SECOND: int = 120
 ## Longest flight the aim guide predicts.
@@ -13,11 +18,15 @@ const _PERMILLE: int = FixedMath.PERMILLE
 const _HASH_MODULUS: int = 2_147_483_647
 const _HASH_MULTIPLIER: int = 1_000_003
 
+## Ticks simulated in shots; event timestamps use it.
 var tick: int = 0
+## Board time that drives the bucket and the moving groups.
+var clock: int = 0
 var events: SimEventQueue = SimEventQueue.new()
 var balls: Array[SimBall] = []
 var pegs: Array[SimPeg] = []
 var walls: Array[SimWall] = []
+var groups: Array[MovingGroup] = []
 var bucket: Bucket
 
 var _config: BalanceConfig
@@ -42,18 +51,47 @@ func _init(config: BalanceConfig) -> void:
 	add_wall(0, 0, width, 0)
 
 
-func add_round_peg(x: int, y: int) -> int:
-	return _add_peg(SimPeg.create_round(x, y, _config.peg_radius))
+## Adds a round peg. With a [param group] index the peg moves with that group; its position is
+## then the base pose, where it sits when the group's phase is zero.
+func add_round_peg(x: int, y: int, group: int = -1) -> int:
+	return _add_peg(SimPeg.create_round(x, y, _config.peg_radius), group)
 
 
-func add_rect_peg(x: int, y: int, half_width: int, half_height: int, angle_cd: int) -> int:
-	return _add_peg(SimPeg.create_rect(x, y, half_width, half_height, angle_cd))
+func add_rect_peg(
+	x: int, y: int, half_width: int, half_height: int, angle_cd: int, group: int = -1
+) -> int:
+	return _add_peg(SimPeg.create_rect(x, y, half_width, half_height, angle_cd), group)
 
 
 ## Adds a one-sided wall; see [SimWall] for which side is playable.
 func add_wall(ax: int, ay: int, bx: int, by: int) -> int:
 	walls.append(SimWall.new(ax, ay, bx, by))
 	return walls.size() - 1
+
+
+## Adds an empty moving group and returns its index. [param pivot_x] and [param pivot_y] only
+## matter for rotation, [param travel_x] and [param travel_y] only for oscillation.
+func add_moving_group(
+	motion: MovingGroup.Motion,
+	pivot_x: int,
+	pivot_y: int,
+	travel_x: int,
+	travel_y: int,
+	period: int,
+	clockwise: bool,
+	phase_offset: int
+) -> int:
+	var group: MovingGroup = MovingGroup.new()
+	group.motion = motion
+	group.pivot_x = pivot_x
+	group.pivot_y = pivot_y
+	group.travel_x = travel_x
+	group.travel_y = travel_y
+	group.period = maxi(1, period)
+	group.clockwise = clockwise
+	group.phase_offset = phase_offset
+	groups.append(group)
+	return groups.size() - 1
 
 
 func is_shot_active() -> bool:
@@ -64,7 +102,9 @@ func is_shot_active() -> bool:
 func launch(input: ShotInput) -> bool:
 	if _shot_active:
 		return false
-	bucket.set_phase(input.bucket_phase)
+	clock = input.board_clock
+	bucket.set_phase(clock)
+	_place_groups()
 	var index: int = spawn_ball(_config.launcher_x, _config.launcher_y, 0, 0)
 	_aim_ball(balls[index], input.aim)
 	_shot_active = true
@@ -92,11 +132,19 @@ func spawn_ball(x: int, y: int, vx: int, vy: int) -> int:
 	return index
 
 
+## Advances the board between shots: the bucket and the moving groups keep going while the
+## player aims.
+func idle_step() -> void:
+	if _shot_active:
+		return
+	_advance_clock()
+
+
 func step() -> void:
 	if not _shot_active:
 		return
 	tick += 1
-	bucket.advance()
+	_advance_clock()
 	var any_active: bool = false
 	var stuck: bool = false
 	for index: int in balls.size():
@@ -123,8 +171,9 @@ func step() -> void:
 
 
 ## Flies a ghost ball along [param aim] until its first contact or until it leaves the board,
-## without changing any state. Writes x, y pairs (milli-pixels) every [param sample_ticks] ticks
-## into [param out_points], always ending with the last position, and returns the point count.
+## without changing any state. Moving pegs are taken where they are now. Writes x, y pairs
+## (milli-pixels) every [param sample_ticks] ticks into [param out_points], always ending with
+## the last position, and returns the point count.
 func predict_path(aim: int, sample_ticks: int, out_points: PackedInt32Array) -> int:
 	var capacity: int = out_points.size() / 2
 	if capacity == 0:
@@ -146,6 +195,7 @@ func predict_path(aim: int, sample_ticks: int, out_points: PackedInt32Array) -> 
 
 
 ## Order-sensitive hash of the full simulation state, for golden tests and desync checks.
+## The clock is covered through the bucket phase and the positions of moving pegs.
 func state_hash() -> int:
 	var result: int = _mix(0, tick)
 	result = _mix(result, bucket.phase)
@@ -158,14 +208,72 @@ func state_hash() -> int:
 		result = _mix(result, ball.slow_ticks)
 	for peg: SimPeg in pegs:
 		result = _mix(result, (1 if peg.lit else 0) + (2 if peg.removed else 0))
+		if peg.group >= 0:
+			result = _mix(result, peg.x)
+			result = _mix(result, peg.y)
 	return result
 
 
-func _add_peg(peg: SimPeg) -> int:
+func _add_peg(peg: SimPeg, group: int) -> int:
 	var index: int = pegs.size()
 	pegs.append(peg)
-	_grid.insert(index, peg.min_x, peg.min_y, peg.max_x, peg.max_y)
+	if group < 0:
+		_grid.insert(index, peg.min_x, peg.min_y, peg.max_x, peg.max_y)
+		return index
+	var moving: MovingGroup = groups[group]
+	peg.group = group
+	moving.pegs.append(index)
+	moving.cover(peg)
+	_move_group(moving, clock - 1, false)
+	_move_group(moving, clock, true)
 	return index
+
+
+func _advance_clock() -> void:
+	clock += 1
+	bucket.set_phase(clock)
+	for group: MovingGroup in groups:
+		_move_group(group, clock, true)
+
+
+## Puts every group where the clock says, with velocities from the tick before.
+func _place_groups() -> void:
+	for group: MovingGroup in groups:
+		_move_group(group, clock - 1, false)
+		_move_group(group, clock, true)
+
+
+## Places the pegs of [param group] at [param at_clock]. One sine and cosine per group; member
+## pegs only multiply, including rectangles, whose angle uses the angle-addition formulas.
+func _move_group(group: MovingGroup, at_clock: int, track_velocity: bool) -> void:
+	var angle: int = group.angle_at(at_clock)
+	var sine: int = Trig.sin_cd(angle)
+	if group.motion == MovingGroup.Motion.OSCILLATE:
+		var dx: int = FixedMath.div_round(group.travel_x * sine, _UNIT)
+		var dy: int = FixedMath.div_round(group.travel_y * sine, _UNIT)
+		for peg_index: int in group.pegs:
+			var peg: SimPeg = pegs[peg_index]
+			_place_peg(peg, peg.base_x + dx, peg.base_y + dy, track_velocity)
+		return
+	var cosine: int = Trig.cos_cd(angle)
+	for peg_index: int in group.pegs:
+		var peg: SimPeg = pegs[peg_index]
+		var offset_x: int = peg.base_x - group.pivot_x
+		var offset_y: int = peg.base_y - group.pivot_y
+		var x: int = group.pivot_x + FixedMath.div_round(offset_x * cosine - offset_y * sine, _UNIT)
+		var y: int = group.pivot_y + FixedMath.div_round(offset_x * sine + offset_y * cosine, _UNIT)
+		_place_peg(peg, x, y, track_velocity)
+		if peg.shape == SimPeg.Shape.RECT:
+			peg.angle_cd = peg.base_angle + angle
+			peg.cos_angle = FixedMath.div_round(peg.base_cos * cosine - peg.base_sin * sine, _UNIT)
+			peg.sin_angle = FixedMath.div_round(peg.base_sin * cosine + peg.base_cos * sine, _UNIT)
+
+
+func _place_peg(peg: SimPeg, x: int, y: int, track_velocity: bool) -> void:
+	peg.vx = (x - peg.x) * TICKS_PER_SECOND if track_velocity else 0
+	peg.vy = (y - peg.y) * TICKS_PER_SECOND if track_velocity else 0
+	peg.x = x
+	peg.y = y
 
 
 func _aim_ball(ball: SimBall, aim: int) -> void:
@@ -192,34 +300,51 @@ func _collide_with_walls(ball_index: int, ball: SimBall) -> void:
 	for wall_index: int in walls.size():
 		if not Collision.circle_vs_wall(ball.x, ball.y, ball.radius, walls[wall_index], _contact):
 			continue
-		if _resolve_contact(ball, _config.wall_restitution):
+		if _resolve_contact(ball, _config.wall_restitution, 0, 0):
 			events.push(SimEvent.Kind.WALL_BOUNCE, tick, ball_index, wall_index, ball.x, ball.y)
 
 
 func _collide_with_pegs(ball_index: int, ball: SimBall) -> void:
 	var radius: int = ball.radius
-	_grid.query(ball.x - radius, ball.y - radius, ball.x + radius, ball.y + radius)
+	var left: int = ball.x - radius
+	var top: int = ball.y - radius
+	var right: int = ball.x + radius
+	var bottom: int = ball.y + radius
+	_grid.query(left, top, right, bottom)
 	for result: int in _grid.result_count:
-		var peg_index: int = _grid.results[result]
-		var peg: SimPeg = pegs[peg_index]
-		if not _touches_peg(ball, peg):
+		_hit_peg(ball_index, ball, _grid.results[result])
+	for group: MovingGroup in groups:
+		if not group.overlaps(left, top, right, bottom):
 			continue
-		var impact: bool = _resolve_contact(ball, _config.peg_restitution)
-		if impact:
-			_nudge_head_on(ball)
-		# Any touch lights a peg; after that only real impacts are reported.
-		if impact or not peg.lit:
-			peg.lit = true
-			events.push(SimEvent.Kind.PEG_HIT, tick, ball_index, peg_index, ball.x, ball.y)
+		for peg_index: int in group.pegs:
+			var peg: SimPeg = pegs[peg_index]
+			var limit: int = radius + peg.extent
+			# Cheap reject before the exact test; most members are far from the ball.
+			if peg.removed or absi(peg.x - ball.x) >= limit or absi(peg.y - ball.y) >= limit:
+				continue
+			_hit_peg(ball_index, ball, peg_index)
+
+
+func _hit_peg(ball_index: int, ball: SimBall, peg_index: int) -> void:
+	var peg: SimPeg = pegs[peg_index]
+	if not _touches_peg(ball, peg):
+		return
+	var impact: bool = _resolve_contact(ball, _config.peg_restitution, peg.vx, peg.vy)
+	if impact:
+		_nudge_head_on(ball, peg.vx, peg.vy)
+	# Any touch lights a peg; after that only real impacts are reported.
+	if impact or not peg.lit:
+		peg.lit = true
+		events.push(SimEvent.Kind.PEG_HIT, tick, ball_index, peg_index, ball.x, ball.y)
 
 
 func _collide_with_rims(ball: SimBall) -> void:
 	if ball.y + ball.radius + bucket.rim_radius <= bucket.y:
 		return
 	if _touches_rim(ball, -1):
-		_resolve_contact(ball, _config.wall_restitution)
+		_resolve_contact(ball, _config.wall_restitution, 0, 0)
 	if _touches_rim(ball, 1):
-		_resolve_contact(ball, _config.wall_restitution)
+		_resolve_contact(ball, _config.wall_restitution, 0, 0)
 
 
 ## [param side] is -1 for the left rim and 1 for the right one.
@@ -243,20 +368,35 @@ func _touches_anything(ball: SimBall) -> bool:
 		if Collision.circle_vs_wall(ball.x, ball.y, ball.radius, wall, _contact):
 			return true
 	var radius: int = ball.radius
-	_grid.query(ball.x - radius, ball.y - radius, ball.x + radius, ball.y + radius)
+	var left: int = ball.x - radius
+	var top: int = ball.y - radius
+	var right: int = ball.x + radius
+	var bottom: int = ball.y + radius
+	_grid.query(left, top, right, bottom)
 	for result: int in _grid.result_count:
 		if _touches_peg(ball, pegs[_grid.results[result]]):
 			return true
+	for group: MovingGroup in groups:
+		if not group.overlaps(left, top, right, bottom):
+			continue
+		for peg_index: int in group.pegs:
+			var peg: SimPeg = pegs[peg_index]
+			if not peg.removed and _touches_peg(ball, peg):
+				return true
 	return _touches_rim(ball, -1) or _touches_rim(ball, 1)
 
 
-## Pushes the ball out along the contact normal and reflects the approaching velocity.
-## Returns true when the ball was moving into the obstacle.
-func _resolve_contact(ball: SimBall, restitution: int) -> bool:
+## Pushes the ball out along the contact normal and reflects its velocity relative to the
+## obstacle, so a moving peg carries the ball along. Returns true when they were closing in.
+func _resolve_contact(ball: SimBall, restitution: int, obstacle_vx: int, obstacle_vy: int) -> bool:
 	var contact: Contact = _contact
 	ball.x += FixedMath.div_round(contact.nx * contact.depth, _UNIT)
 	ball.y += FixedMath.div_round(contact.ny * contact.depth, _UNIT)
-	var approach: int = FixedMath.div_round(ball.vx * contact.nx + ball.vy * contact.ny, _UNIT)
+	var relative_x: int = ball.vx - obstacle_vx
+	var relative_y: int = ball.vy - obstacle_vy
+	var approach: int = FixedMath.div_round(
+		relative_x * contact.nx + relative_y * contact.ny, _UNIT
+	)
 	if approach >= 0:
 		return false
 	var impulse: int = FixedMath.div_round(approach * (_PERMILLE + restitution), _PERMILLE)
@@ -266,12 +406,16 @@ func _resolve_contact(ball: SimBall, restitution: int) -> bool:
 
 
 ## After a head-on rebound, pushes the ball slightly sideways, alternating sides by tick parity.
-func _nudge_head_on(ball: SimBall) -> void:
+func _nudge_head_on(ball: SimBall, obstacle_vx: int, obstacle_vy: int) -> void:
 	var contact: Contact = _contact
-	var sideways: int = FixedMath.div_round(ball.vy * contact.nx - ball.vx * contact.ny, _UNIT)
+	var relative_x: int = ball.vx - obstacle_vx
+	var relative_y: int = ball.vy - obstacle_vy
+	var sideways: int = FixedMath.div_round(
+		relative_y * contact.nx - relative_x * contact.ny, _UNIT
+	)
 	if absi(sideways) >= _config.head_on_tolerance:
 		return
-	var rebound: int = FixedMath.div_round(ball.vx * contact.nx + ball.vy * contact.ny, _UNIT)
+	var rebound: int = FixedMath.div_round(relative_x * contact.nx + relative_y * contact.ny, _UNIT)
 	var push: int = FixedMath.div_round(rebound * _config.head_on_nudge, _PERMILLE)
 	if tick % 2 == 1:
 		push = -push
@@ -307,7 +451,8 @@ func _remove_lit_pegs() -> void:
 		var peg: SimPeg = pegs[peg_index]
 		if peg.lit and not peg.removed:
 			peg.removed = true
-			_grid.remove(peg_index)
+			if peg.group < 0:
+				_grid.remove(peg_index)
 
 
 static func _write_point(out_points: PackedInt32Array, index: int, ball: SimBall) -> int:

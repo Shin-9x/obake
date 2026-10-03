@@ -1,3 +1,4 @@
+@tool
 class_name Collision
 ## Narrow-phase tests between a ball (a circle) and the board's obstacles.
 ##

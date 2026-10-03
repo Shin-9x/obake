@@ -18,6 +18,9 @@ extends Resource
 ## Share of the board's pegs that become red lanterns.
 @export var red_permille: int = 220
 @export var green_count: int = 2
+## Red lanterns are spread over a grid of zones, each getting its share of the board's reds.
+@export var colour_zone_columns: int = 3
+@export var colour_zone_rows: int = 3
 
 @export_group("Ball")
 @export var ball_radius: int = 4_000

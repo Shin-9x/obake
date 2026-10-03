@@ -1,3 +1,4 @@
+@tool
 class_name BoardGame
 ## One board played under the GDD rules: coloured lanterns, shots scored as points x mult,
 ## a limited number of shots, and victory by score target or by Matsuri.
@@ -72,6 +73,11 @@ func shoot(input: ShotInput) -> bool:
 	return true
 
 
+## Advances the board clock between shots; see [method BoardSimulation.idle_step].
+func idle_step() -> void:
+	simulation.idle_step()
+
+
 ## Advances the simulation one tick and applies the board rules to what happened.
 func step() -> void:
 	if not simulation.is_shot_active():
@@ -122,22 +128,64 @@ func _assign_roles() -> void:
 	roles.fill(Role.BLUE)
 	_scored.resize(count)
 	_candidates.resize(count)
-	var order: PackedInt32Array = PackedInt32Array()
-	order.resize(count)
-	for peg: int in count:
-		order[peg] = peg
-	for i: int in range(count - 1, 0, -1):
-		var j: int = _rng.next_below(i + 1)
-		var swapped: int = order[i]
-		order[i] = order[j]
-		order[j] = swapped
 	var reds: int = mini(count, FixedMath.div_round(count * _config.red_permille, _PERMILLE))
-	var greens: int = mini(count - reds, _config.green_count)
-	for i: int in reds:
-		roles[order[i]] = Role.RED
-	for i: int in range(reds, reds + greens):
-		roles[order[i]] = Role.GREEN
+	_assign_reds_by_zone(reds)
+	var available: int = 0
+	for peg: int in count:
+		if roles[peg] == Role.BLUE:
+			_candidates[available] = peg
+			available += 1
+	_candidates = _shuffled(_candidates, available)
+	for i: int in mini(available, _config.green_count):
+		roles[_candidates[i]] = Role.GREEN
 	_move_gold()
+
+
+## GDD: reds are stratified by zones so they spread across the board. Each zone gets the floor
+## of its proportional share; the reds left over go to the largest remainders, lowest zone first.
+func _assign_reds_by_zone(reds: int) -> void:
+	var count: int = roles.size()
+	if count == 0 or reds == 0:
+		return
+	var columns: int = maxi(1, _config.colour_zone_columns)
+	var rows: int = maxi(1, _config.colour_zone_rows)
+	var zone_pegs: Array[PackedInt32Array] = []
+	for zone: int in columns * rows:
+		zone_pegs.append(PackedInt32Array())
+	for peg_index: int in count:
+		var peg: SimPeg = simulation.pegs[peg_index]
+		var column: int = clampi(peg.base_x * columns / _config.board_width, 0, columns - 1)
+		var row: int = clampi(peg.base_y * rows / _config.board_height, 0, rows - 1)
+		zone_pegs[row * columns + column].append(peg_index)
+	var quotas: PackedInt32Array = PackedInt32Array()
+	var remainders: PackedInt32Array = PackedInt32Array()
+	var assigned: int = 0
+	for members: PackedInt32Array in zone_pegs:
+		quotas.append(reds * members.size() / count)
+		remainders.append(reds * members.size() % count)
+		assigned += quotas[quotas.size() - 1]
+	for extra: int in reds - assigned:
+		var best: int = 0
+		for zone: int in remainders.size():
+			if remainders[zone] > remainders[best]:
+				best = zone
+		quotas[best] += 1
+		remainders[best] = -1
+	for zone: int in zone_pegs.size():
+		var members: PackedInt32Array = _shuffled(zone_pegs[zone], zone_pegs[zone].size())
+		for i: int in quotas[zone]:
+			roles[members[i]] = Role.RED
+
+
+## Fisher-Yates over the first [param length] entries, drawing from the board stream. Packed
+## arrays are copied on write, so the shuffled array is returned rather than changed in place.
+func _shuffled(values: PackedInt32Array, length: int) -> PackedInt32Array:
+	for i: int in range(length - 1, 0, -1):
+		var j: int = _rng.next_below(i + 1)
+		var swapped: int = values[i]
+		values[i] = values[j]
+		values[j] = swapped
+	return values
 
 
 ## GDD: the single gold lantern moves to another blue lantern every shot.

@@ -1,3 +1,4 @@
+@tool
 class_name SimBall
 ## A ball in flight. Position in milli-pixels, velocity in milli-pixels per second.
 

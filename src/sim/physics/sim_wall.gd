@@ -1,3 +1,4 @@
+@tool
 class_name SimWall
 ## A one-sided wall segment from a to b, in milli-pixels.
 ##

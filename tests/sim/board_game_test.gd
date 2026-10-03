@@ -135,8 +135,8 @@ func test_gold_moves_every_shot_and_stays_unique() -> void:
 	assert_int(_gold_peg(replay)).is_equal(golds.back())
 
 
-func _shot(bucket_phase: int = 0) -> ShotInput:
-	return ShotInput.new(STRAIGHT_DOWN, bucket_phase)
+func _shot(board_clock: int = 0) -> ShotInput:
+	return ShotInput.new(STRAIGHT_DOWN, board_clock)
 
 
 ## Two pegs far from the ball's straight drop, with explicit roles.
@@ -193,3 +193,30 @@ func _scoring_amounts(game: BoardGame, kind: SimEvent.Kind) -> Array[int]:
 		if event.kind == kind:
 			amounts.append(event.amount)
 	return amounts
+
+
+func test_reds_are_shared_between_zones_in_proportion() -> void:
+	# A uniform 9 x 9 grid puts 9 pegs in each of the 3 x 3 zones; 22% of 81 is 18 reds, 2 each.
+	var config: BalanceConfig = TestBoards.gdd_config()
+	var positions: Array[Vector2i] = []
+	for row: int in 9:
+		for column: int in 9:
+			positions.append(Vector2i(20 + column * 40, 20 + row * 40))
+	var game: BoardGame = _game_with_pegs(config, positions)
+	var per_zone: Array[int] = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+	for peg: int in game.roles.size():
+		if game.roles[peg] == BoardGame.Role.RED:
+			var position: Vector2i = positions[peg]
+			per_zone[(position.y / 120) * 3 + position.x / 120] += 1
+	assert_array(per_zone).is_equal([2, 2, 2, 2, 2, 2, 2, 2, 2])
+
+
+func test_leftover_reds_go_to_the_largest_remainders() -> void:
+	# 10 pegs in the top-left zone and 1 in the centre: 22% of 11 is 2 reds, both top-left.
+	var config: BalanceConfig = TestBoards.gdd_config()
+	var positions: Array[Vector2i] = [Vector2i(180, 180)]
+	for index: int in 10:
+		positions.append(Vector2i(10 + index * 10, 60))
+	var game: BoardGame = _game_with_pegs(config, positions)
+	assert_int(game.roles[0]).is_not_equal(BoardGame.Role.RED)
+	assert_int(_count(game, BoardGame.Role.RED)).is_equal(2)

@@ -1,3 +1,4 @@
+@tool
 class_name Trig
 ## Sine and cosine of integer angles, read from a lookup table.
 ##

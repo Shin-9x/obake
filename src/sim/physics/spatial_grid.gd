@@ -1,3 +1,4 @@
+@tool
 class_name SpatialGrid
 ## Uniform-grid broad phase: finds the pegs whose bounds overlap a query box.
 ##

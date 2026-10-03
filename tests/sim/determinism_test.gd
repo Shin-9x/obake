@@ -10,14 +10,16 @@ const HASH_MULTIPLIER: int = 1_000_003
 ## Hash chain of every tick of [constant AIMS] on the staggered board. If a deliberate physics
 ## change alters it, update it in the same commit and explain why in the commit message.
 const GOLDEN_CHAIN: int = 1289445351
+## Hash chain of the same shots on a board with a water wheel and sliding stalks.
+const GOLDEN_MOVING_CHAIN: int = 24347088
 ## Final total and hash chain of a full [BoardGame] played with the same inputs.
-const GOLDEN_GAME_TOTAL: int = 610
-const GOLDEN_GAME_CHAIN: int = 1075776859
+const GOLDEN_GAME_TOTAL: int = 890
+const GOLDEN_GAME_CHAIN: int = 1091070016
 
 
 func test_identical_inputs_produce_identical_runs() -> void:
-	var first: Dictionary[String, Variant] = _record_run()
-	var second: Dictionary[String, Variant] = _record_run()
+	var first: Dictionary[String, Variant] = _record_run(_staggered_board())
+	var second: Dictionary[String, Variant] = _record_run(_staggered_board())
 	assert_array(second["hashes"]).is_equal(first["hashes"])
 	assert_array(second["events"]).is_equal(first["events"])
 
@@ -30,8 +32,19 @@ func test_every_shot_resolves() -> void:
 
 
 func test_run_matches_golden_hash() -> void:
-	var run: Dictionary[String, Variant] = _record_run()
+	var run: Dictionary[String, Variant] = _record_run(_staggered_board())
 	assert_int(run["chain"]).is_equal(GOLDEN_CHAIN)
+
+
+func test_moving_board_matches_golden_hash() -> void:
+	var sim: BoardSimulation = BoardSimulation.new(TestBoards.gdd_config())
+	TestBoards.add_moving_pegs(sim)
+	var first: Dictionary[String, Variant] = _record_run(sim)
+	sim = BoardSimulation.new(TestBoards.gdd_config())
+	TestBoards.add_moving_pegs(sim)
+	var second: Dictionary[String, Variant] = _record_run(sim)
+	assert_array(second["hashes"]).is_equal(first["hashes"])
+	assert_int(first["chain"]).is_equal(GOLDEN_MOVING_CHAIN)
 
 
 func test_board_game_matches_golden_result() -> void:
@@ -49,8 +62,7 @@ func _staggered_board() -> BoardSimulation:
 	return sim
 
 
-func _record_run() -> Dictionary[String, Variant]:
-	var sim: BoardSimulation = _staggered_board()
+func _record_run(sim: BoardSimulation) -> Dictionary[String, Variant]:
 	var hashes: PackedInt64Array = PackedInt64Array()
 	var events: PackedInt64Array = PackedInt64Array()
 	var chain: int = 0

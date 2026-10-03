@@ -1,3 +1,4 @@
+@tool
 class_name SimEventQueue
 ## Ordered, allocation-free queue of [SimEvent]s, cleared by whoever consumes them.
 

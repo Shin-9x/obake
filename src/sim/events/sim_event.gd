@@ -1,3 +1,4 @@
+@tool
 class_name SimEvent
 ## One event emitted by the simulation for presentation and run logic to consume.
 ##

@@ -1,3 +1,4 @@
+@tool
 class_name FixedMath
 ## Integer fixed-point helpers for the deterministic simulation.
 ##

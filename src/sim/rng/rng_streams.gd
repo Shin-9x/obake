@@ -1,3 +1,4 @@
+@tool
 class_name RngStreams
 ## One independent PCG32 stream per randomness domain of a run.
 ##
