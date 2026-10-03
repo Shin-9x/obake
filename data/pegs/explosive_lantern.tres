@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="PegDefinition" format=3 uid="uid://c1vqop1ck7m0f"]
+
+[ext_resource type="Script" uid="uid://je8ppbaint20" path="res://src/sim/effects/pegs/explosive_lantern_effect.gd" id="1_li00g"]
+[ext_resource type="Texture2D" uid="uid://bj0bv37jtfxmr" path="res://assets/sprites/placeholder/peg_explosive_lantern.png" id="2_rdtdm"]
+[ext_resource type="Script" uid="uid://22odkxg6kbgf" path="res://data/definitions/peg_definition.gd" id="3_l4x1j"]
+
+[resource]
+script = ExtResource("3_l4x1j")
+color = Color(0.47843137, 0.12156863, 0.12156863, 1)
+texture = ExtResource("2_rdtdm")
+id = &"explosive_lantern"
+name_key = "PEG_EXPLOSIVE_LANTERN"
+description_key = "PEG_EXPLOSIVE_LANTERN_DESC"
+rarity = 2
+icon = ExtResource("2_rdtdm")
+effect_script = ExtResource("1_li00g")
+level_values = PackedInt32Array()
+params = Dictionary[StringName, int]({
+&"radius": 20000
+})

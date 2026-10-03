@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="PegDefinition" format=3 uid="uid://bc018uen7pi2l"]
+
+[ext_resource type="Texture2D" uid="uid://bjdsm1yg4qopm" path="res://assets/sprites/placeholder/peg_torii.png" id="1_vxiwi"]
+[ext_resource type="Script" uid="uid://22odkxg6kbgf" path="res://data/definitions/peg_definition.gd" id="2_44ti1"]
+
+[resource]
+script = ExtResource("2_44ti1")
+points = 15
+restitution = 1300
+persistent = true
+color = Color(0.8509804, 0.21960784, 0.11764706, 1)
+texture = ExtResource("1_vxiwi")
+id = &"torii"
+name_key = "PEG_TORII"
+description_key = "PEG_TORII_DESC"
+rarity = 2
+icon = ExtResource("1_vxiwi")
+level_values = PackedInt32Array()

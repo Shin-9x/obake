@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="PegDefinition" format=3 uid="uid://dlnn3ufn2vo4x"]
+
+[ext_resource type="Texture2D" uid="uid://dhuyc1m3d4tbv" path="res://assets/sprites/placeholder/peg_kagami.png" id="1_3f5hw"]
+[ext_resource type="Script" uid="uid://22odkxg6kbgf" path="res://data/definitions/peg_definition.gd" id="2_jteu3"]
+
+[resource]
+script = ExtResource("2_jteu3")
+mult_factor = 1500
+color = Color(0.7882353, 0.81960785, 0.8509804, 1)
+texture = ExtResource("1_3f5hw")
+id = &"kagami"
+name_key = "PEG_KAGAMI"
+description_key = "PEG_KAGAMI_DESC"
+rarity = 3
+icon = ExtResource("1_3f5hw")
+level_values = PackedInt32Array()

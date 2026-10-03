@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="PegDefinition" format=3 uid="uid://ctndrnmb6vvw3"]
+
+[ext_resource type="Script" uid="uid://cutgeepgsr2ce" path="res://src/sim/effects/pegs/omikuji_effect.gd" id="1_0sc1b"]
+[ext_resource type="Texture2D" uid="uid://buokr2akyrs24" path="res://assets/sprites/placeholder/peg_omikuji.png" id="2_wgtki"]
+[ext_resource type="Script" uid="uid://22odkxg6kbgf" path="res://data/definitions/peg_definition.gd" id="3_jylj1"]
+
+[resource]
+script = ExtResource("3_jylj1")
+color = Color(0.9607843, 0.9411765, 0.9019608, 1)
+texture = ExtResource("2_wgtki")
+id = &"omikuji"
+name_key = "PEG_OMIKUJI"
+description_key = "PEG_OMIKUJI_DESC"
+rarity = 3
+icon = ExtResource("2_wgtki")
+effect_script = ExtResource("1_0sc1b")
+level_values = PackedInt32Array()
+params = Dictionary[StringName, int]({
+&"mon": 2,
+&"mult": 2000,
+&"points": 50
+})

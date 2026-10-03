@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="PegDefinition" format=3 uid="uid://ds1um3ippvyua"]
+
+[ext_resource type="Texture2D" uid="uid://ctop8scyu0f0h" path="res://assets/sprites/placeholder/peg_bell.png" id="1_ruone"]
+[ext_resource type="Script" uid="uid://22odkxg6kbgf" path="res://data/definitions/peg_definition.gd" id="2_xi0oi"]
+
+[resource]
+script = ExtResource("2_xi0oi")
+mult_add = 2000
+color = Color(0.9490196, 0.8235294, 0.29411766, 1)
+texture = ExtResource("1_ruone")
+id = &"bell"
+name_key = "PEG_BELL"
+description_key = "PEG_BELL_DESC"
+rarity = 1
+icon = ExtResource("1_ruone")
+level_values = PackedInt32Array()

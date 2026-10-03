@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="PegDefinition" format=3 uid="uid://caqj1c68kceb6"]
+
+[ext_resource type="Texture2D" uid="uid://cd0uakoebt30c" path="res://assets/sprites/placeholder/peg_coin.png" id="1_n3dxo"]
+[ext_resource type="Script" uid="uid://22odkxg6kbgf" path="res://data/definitions/peg_definition.gd" id="2_pu26h"]
+
+[resource]
+script = ExtResource("2_pu26h")
+mon = 1
+color = Color(0.8784314, 0.6901961, 0.1882353, 1)
+texture = ExtResource("1_n3dxo")
+id = &"coin_peg"
+name_key = "PEG_COIN_PEG"
+description_key = "PEG_COIN_PEG_DESC"
+rarity = 1
+icon = ExtResource("1_n3dxo")
+level_values = PackedInt32Array()
