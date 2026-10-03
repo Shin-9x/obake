@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="BasePegs" format=3 uid="uid://g1h6o52cewfr"]
+
+[ext_resource type="Resource" uid="uid://bjh126nrfeb43" path="res://data/pegs/blue_lantern.tres" id="1_phbr4"]
+[ext_resource type="Resource" uid="uid://de84uo0eb1x1" path="res://data/pegs/gold_lantern.tres" id="2_t4rqo"]
+[ext_resource type="Resource" uid="uid://bf58200iqjwje" path="res://data/pegs/green_lantern.tres" id="3_xyfpl"]
+[ext_resource type="Resource" uid="uid://c33wk3h4njq4u" path="res://data/pegs/red_lantern.tres" id="4_r0alr"]
+[ext_resource type="Script" uid="uid://bsciqriq1huic" path="res://data/definitions/base_pegs.gd" id="5_4iv3s"]
+
+[resource]
+script = ExtResource("5_4iv3s")
+blue = ExtResource("1_phbr4")
+red = ExtResource("4_r0alr")
+green = ExtResource("3_xyfpl")
+gold = ExtResource("2_t4rqo")

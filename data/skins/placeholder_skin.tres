@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="BoardSkin" format=3 uid="uid://dj4erydc54ypo"]
+
+[ext_resource type="Texture2D" uid="uid://by1ou5gg1g0eu" path="res://assets/sprites/placeholder/ball_hitodama.png" id="1_ntluh"]
+[ext_resource type="Texture2D" uid="uid://dq4som0w82qa8" path="res://assets/sprites/placeholder/bucket.png" id="2_mcmx4"]
+[ext_resource type="Texture2D" uid="uid://d2sji4352ansd" path="res://assets/sprites/placeholder/launcher.png" id="3_c8l3p"]
+[ext_resource type="Script" uid="uid://c8uubsr6dnwgf" path="res://data/definitions/board_skin.gd" id="4_qtaen"]
+
+[resource]
+script = ExtResource("4_qtaen")
+ball_texture = ExtResource("1_ntluh")
+bucket_texture = ExtResource("2_mcmx4")
+launcher_texture = ExtResource("3_c8l3p")

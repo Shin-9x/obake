@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="PegDefinition" format=3 uid="uid://c33wk3h4njq4u"]
+
+[ext_resource type="Script" uid="uid://22odkxg6kbgf" path="res://data/definitions/peg_definition.gd" id="1_twlij"]
+[ext_resource type="Texture2D" uid="uid://m4vbhiawo0yj" path="res://assets/sprites/placeholder/lantern_red.png" id="2_bqueg"]
+
+[resource]
+script = ExtResource("1_twlij")
+id = &"red_lantern"
+name_key = "PEG_RED_LANTERN"
+mult_add = 1000
+color = Color(0.78431374, 0.27058825, 0.23137255, 1)
+texture = ExtResource("2_bqueg")

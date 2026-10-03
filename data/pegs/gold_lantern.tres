@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="PegDefinition" format=3 uid="uid://de84uo0eb1x1"]
+
+[ext_resource type="Script" uid="uid://22odkxg6kbgf" path="res://data/definitions/peg_definition.gd" id="1_wle34"]
+[ext_resource type="Texture2D" uid="uid://p6lqno3t8hhi" path="res://assets/sprites/placeholder/lantern_gold.png" id="2_elsbj"]
+
+[resource]
+script = ExtResource("1_wle34")
+id = &"gold_lantern"
+name_key = "PEG_GOLD_LANTERN"
+mult_factor = 2000
+color = Color(0.8901961, 0.7019608, 0.25490198, 1)
+texture = ExtResource("2_elsbj")
