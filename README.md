@@ -18,7 +18,19 @@ make test     # run the gdUnit4 test suite headless
 make check    # lint, then test
 make bench    # measure simulation cost per tick
 make placeholder-art  # regenerate the placeholder sprites
+make layouts  # export every layout source scene to data/layouts
 ```
+
+## Board layouts
+
+Layouts are authored in the Godot editor. Each source scene in
+`src/tools/layout_editor/layouts/` has a `LayoutDocument` root whose children describe the
+board: `PegMarker` nodes, pattern generators (`ArcPattern`, `CirclePattern`, `SpiralPattern`,
+`GridPattern`, `WavePattern`) and `MovingGroupMarker` nodes for rotating or sliding groups.
+Move, rotate and duplicate them as usual; the scene dock warns about overlaps or pegs outside
+the board. Use **Bake into pegs** on a pattern to hand-tune its pegs, and **Export JSON** on the
+document (or `make layouts`) to write `data/layouts/<id>.json`, which the game loads. The test
+suite fails if a source scene and its JSON disagree.
 
 ## Controls
 

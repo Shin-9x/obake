@@ -11,16 +11,21 @@ const TICK_SECONDS: float = 1.0 / BoardSimulation.TICKS_PER_SECOND
 const MAX_TICKS_PER_FRAME: int = 12
 ## Display-only speed-up while fast-forward is held; the simulation is unchanged.
 const FAST_FORWARD_SPEED: float = 3.0
+## Ticks between aim guide refreshes while pegs move (10 Hz); predictions cost too much to
+## repeat every tick on low-end phones.
+const GUIDE_REFRESH_TICKS: int = 12
 const PX: float = 1000.0
 const POINTS_COLOR: Color = Color("#bfe0ff")
 const MULT_COLOR: Color = Color("#ff9a8a")
 const TIMES_COLOR: Color = Color("#ffd866")
 
 var game: BoardGame
+var placed: PlacedBoard
 var board_seed: int = 0
 
-var _idle_bucket: Bucket
+var _library: LayoutLibrary
 var _accumulator: float = 0.0
+var _guide_ticks: int = 0
 
 @onready var _view: BoardView = %BoardView
 @onready var _guide: AimGuide = %AimGuide
@@ -36,7 +41,7 @@ func _ready() -> void:
 	_board_background.color = SKIN.board_color
 	_guide.color = SKIN.guide_color
 	_hud.apply_skin(SKIN)
-	_idle_bucket = Bucket.new(BALANCE)
+	_library = LayoutLibrary.load_from()
 	_aim.aim_limit = BALANCE.aim_limit
 	_aim.board = _view
 	_aim.launcher_position = Vector2(BALANCE.launcher_x, BALANCE.launcher_y) / PX
@@ -49,13 +54,13 @@ func _ready() -> void:
 
 func start_board(seed_value: int) -> void:
 	board_seed = seed_value
-	game = BoardSetup.create_placeholder_board(BALANCE, BASE_PEGS, seed_value)
-	_idle_bucket.set_phase(0)
+	var layout: BoardLayout = BoardSetup.pick_layout(_library, seed_value)
+	placed = BoardSetup.create_board(BALANCE, BASE_PEGS, layout, seed_value)
+	game = placed.game
 	_view.setup(game, BALANCE, SKIN)
-	_view.bucket_source = _idle_bucket
 	_view.set_aim(_aim.aim)
 	_popups.hide_all()
-	_hud.show_board(game, seed_value)
+	_hud.show_board(placed, seed_value)
 	_accumulator = 0.0
 	_refresh_guide()
 
@@ -64,8 +69,7 @@ func start_board(seed_value: int) -> void:
 func shoot() -> void:
 	if not game.can_shoot():
 		return
-	game.shoot(ShotInput.new(_aim.aim, _idle_bucket.phase))
-	_view.bucket_source = game.simulation.bucket
+	game.shoot(ShotInput.new(_aim.aim, game.simulation.clock))
 	_guide.visible = false
 	_hud.update_shot(game)
 	_hud.update_counts(game)
@@ -85,14 +89,16 @@ func _process(delta: float) -> void:
 func _tick() -> void:
 	_view.capture_previous()
 	if not game.simulation.is_shot_active():
-		_idle_bucket.advance()
+		game.idle_step()
+		if not game.simulation.groups.is_empty():
+			_guide_ticks += 1
+			if _guide_ticks >= GUIDE_REFRESH_TICKS:
+				_guide_ticks = 0
+				_refresh_guide()
 		return
 	game.step()
 	_consume_events()
 	if not game.simulation.is_shot_active():
-		# Between shots the bucket keeps moving from where the shot left it.
-		_idle_bucket.set_phase(game.simulation.bucket.phase)
-		_view.bucket_source = _idle_bucket
 		_refresh_guide()
 
 

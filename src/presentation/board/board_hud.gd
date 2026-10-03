@@ -12,6 +12,7 @@ var _burst_age: float = -1.0
 
 @onready var _shots: Label = %ShotsValue
 @onready var _seed: Label = %SeedValue
+@onready var _layout: Label = %LayoutValue
 @onready var _shot: Label = %ShotValue
 @onready var _shot_total: Label = %ShotTotal
 @onready var _total: Label = %TotalValue
@@ -55,12 +56,15 @@ func apply_skin(skin: BoardSkin) -> void:
 	_right_panel.color = skin.panel_color
 
 
-func show_board(game: BoardGame, board_seed: int) -> void:
+func show_board(placed: PlacedBoard, board_seed: int) -> void:
 	_seed.text = "%X" % board_seed
+	_layout.text = placed.layout.id
+	if placed.mirrored:
+		_layout.text += " " + tr("HUD_MIRRORED")
 	_result.visible = false
 	_shot_total.text = ""
-	update_shot(game)
-	update_counts(game)
+	update_shot(placed.game)
+	update_counts(placed.game)
 
 
 func update_shot(game: BoardGame) -> void:

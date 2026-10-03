@@ -35,3 +35,19 @@ func test_play_again_starts_a_fresh_board() -> void:
 	assert_object(screen.game).is_not_same(first)
 	assert_int(screen.game.shots_left).is_equal(BoardScreen.BALANCE.shots_per_board)
 	assert_bool((screen.get_node("%ResultOverlay") as Control).visible).is_false()
+
+
+func test_board_keeps_moving_while_aiming() -> void:
+	var runner: GdUnitSceneRunner = scene_runner(SCENE)
+	var screen: BoardScreen = runner.scene() as BoardScreen
+	screen.start_board(SEED)
+	var simulation: BoardSimulation = screen.game.simulation
+	assert_array(simulation.groups).is_not_empty()
+	var peg: SimPeg = simulation.pegs[simulation.groups[0].pegs[0]]
+	var clock: int = simulation.clock
+	var where: Vector2i = Vector2i(peg.x, peg.y)
+	await runner.simulate_frames(30, 16)
+	assert_int(simulation.clock).is_greater(clock)
+	assert_that(Vector2i(peg.x, peg.y)).is_not_equal(where)
+	var layout: Label = screen.get_node("%LayoutValue") as Label
+	assert_str(layout.text).starts_with(screen.placed.layout.id)

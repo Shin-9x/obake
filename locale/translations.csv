@@ -4,6 +4,8 @@ HUD_SHOTS,Shots,Tiri
 HUD_BALL,Ball,Pallina
 HUD_NEXT_BALL,Next,Prossima
 HUD_SEED,Seed,Seed
+HUD_LAYOUT,Layout,Layout
+HUD_MIRRORED,(mirrored),(specchiato)
 HUD_SHOT,Shot,Tiro
 HUD_TOTAL,Total,Totale
 HUD_RED_LEFT,Red lanterns,Lanterne rosse

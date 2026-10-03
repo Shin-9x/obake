@@ -1,8 +1,9 @@
 extends SceneTree
-## Headless benchmark of the board simulation: about 65 pegs and 4 balls in flight per shot.
-## Run with `make bench`; it measures, it does not assert.
+## Headless benchmark of the board simulation on a shipped layout with a water wheel, with four
+## balls in flight per shot. Run with `make bench`; it measures, it does not assert.
 
 const PX: int = FixedMath.PX
+const LAYOUT: String = "village_01"
 const BOARDS: int = 50
 const SHOTS_PER_BOARD: int = 8
 const EXTRA_BALLS: int = 3
@@ -12,6 +13,8 @@ const FRAME_USEC: int = 16_667
 
 func _init() -> void:
 	var config: BalanceConfig = BalanceConfig.new()
+	var base_pegs: BasePegs = load("res://data/pegs/base_pegs.tres") as BasePegs
+	var layout: BoardLayout = LayoutLibrary.load_from().find(LAYOUT)
 	var rng: Pcg32 = Pcg32.new(1, 0)
 	var total_ticks: int = 0
 	var total_usec: int = 0
@@ -19,7 +22,9 @@ func _init() -> void:
 	var objects_before: int = 0
 	var objects_created_while_stepping: int = 0
 	for board: int in BOARDS:
-		var sim: BoardSimulation = _build_board(config)
+		var sim: BoardSimulation = (
+			BoardSetup.create_board(config, base_pegs, layout, board).game.simulation
+		)
 		for shot: int in SHOTS_PER_BOARD:
 			var aim: int = rng.next_below(2 * config.aim_limit + 1) - config.aim_limit
 			sim.launch(ShotInput.new(aim))
@@ -48,16 +53,3 @@ func _init() -> void:
 	print("Share of a 60 FPS frame: %.2f %%" % (200.0 * average / FRAME_USEC))
 	print("Objects created in step: %d" % objects_created_while_stepping)
 	quit()
-
-
-func _build_board(config: BalanceConfig) -> BoardSimulation:
-	var sim: BoardSimulation = BoardSimulation.new(config)
-	for row: int in 7:
-		var offset: int = 0 if row % 2 == 0 else 20
-		for column: int in 9:
-			var x: int = 20 + offset + column * 40
-			if x < 350:
-				sim.add_round_peg(x * PX, (90 + row * 32) * PX)
-	sim.add_rect_peg(90 * PX, 66 * PX, 12 * PX, 3 * PX, 3000)
-	sim.add_rect_peg(270 * PX, 66 * PX, 12 * PX, 3 * PX, -3000)
-	return sim

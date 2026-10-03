@@ -1,41 +1,51 @@
 class_name BoardSetup
-## Builds the boards of a run.
+## Turns an authored layout into a playable board for a seed.
 ##
-## Until layouts are authored as JSON (M3) every board uses one hardcoded placeholder layout.
-## Positions are computed with integer trigonometry so they match on every platform.
-
-const _PX: int = FixedMath.PX
+## GDD seeded variation, drawn from the board stream in this order: horizontal mirroring, the
+## starting phase of each moving group, then lantern colours. Peg positions are never randomised.
 
 
-static func create_placeholder_board(
-	config: BalanceConfig, base_pegs: BasePegs, run_seed: int
-) -> BoardGame:
+static func create_board(
+	config: BalanceConfig, base_pegs: BasePegs, layout: BoardLayout, board_seed: int
+) -> PlacedBoard:
+	var rng: Pcg32 = RngStreams.new(board_seed).stream(RngStreams.Domain.BOARD)
+	var placed: PlacedBoard = PlacedBoard.new()
+	placed.layout = layout
+	placed.mirrored = layout.mirrorable and rng.next_below(2) == 1
+	var width: int = config.board_width
+	var flip: bool = placed.mirrored
 	var simulation: BoardSimulation = BoardSimulation.new(config)
-	_add_placeholder_layout(simulation)
-	var streams: RngStreams = RngStreams.new(run_seed)
-	return BoardGame.new(simulation, config, base_pegs, streams.stream(RngStreams.Domain.BOARD))
+	for peg: LayoutPeg in layout.pegs:
+		_add_peg(simulation, peg, -1, flip, width)
+	for group: LayoutGroup in layout.groups:
+		var index: int = simulation.add_moving_group(
+			group.motion,
+			width - group.pivot_x if flip else group.pivot_x,
+			group.pivot_y,
+			-group.travel_x if flip else group.travel_x,
+			group.travel_y,
+			group.period,
+			group.clockwise != flip,
+			rng.next_below(group.period)
+		)
+		for peg: LayoutPeg in group.pegs:
+			_add_peg(simulation, peg, index, flip, width)
+	placed.game = BoardGame.new(simulation, config, base_pegs, rng)
+	return placed
 
 
-## About 65 pegs on a 360 px board: an arc under the launcher, two side columns, a staggered
-## field, a bottom row and four bars.
-static func _add_placeholder_layout(simulation: BoardSimulation) -> void:
-	# Arc of 11 pegs, centred on the launcher, from 35 to 145 degrees.
-	for step: int in 11:
-		var angle: int = 3500 + step * 1100
-		var x: int = 180 * _PX + FixedMath.div_round(120 * _PX * Trig.cos_cd(angle), FixedMath.UNIT)
-		var y: int = FixedMath.div_round(120 * _PX * Trig.sin_cd(angle), FixedMath.UNIT)
-		simulation.add_round_peg(x, y)
-	for row: int in 4:
-		simulation.add_round_peg(30 * _PX, (60 + row * 20) * _PX)
-		simulation.add_round_peg(330 * _PX, (60 + row * 20) * _PX)
-	for row: int in 5:
-		var first: int = 40 if row % 2 == 0 else 60
-		var last: int = 320 if row % 2 == 0 else 300
-		for x: int in range(first, last + 1, 40):
-			simulation.add_round_peg(x * _PX, (160 + row * 30) * _PX)
-	for x: int in [40, 140, 220, 320]:
-		simulation.add_round_peg(x * _PX, 310 * _PX)
-	simulation.add_rect_peg(100 * _PX, 135 * _PX, 12 * _PX, 3 * _PX, 2000)
-	simulation.add_rect_peg(260 * _PX, 135 * _PX, 12 * _PX, 3 * _PX, -2000)
-	simulation.add_rect_peg(90 * _PX, 330 * _PX, 14 * _PX, 2 * _PX, 2500)
-	simulation.add_rect_peg(270 * _PX, 330 * _PX, 14 * _PX, 2 * _PX, -2500)
+## Picks one of the library's layouts for [param run_seed] from the map stream.
+static func pick_layout(library: LayoutLibrary, run_seed: int) -> BoardLayout:
+	var rng: Pcg32 = RngStreams.new(run_seed).stream(RngStreams.Domain.MAP)
+	return library.layouts[rng.next_below(library.layouts.size())]
+
+
+static func _add_peg(
+	simulation: BoardSimulation, peg: LayoutPeg, group: int, flip: bool, width: int
+) -> void:
+	var x: int = width - peg.x if flip else peg.x
+	if peg.shape == SimPeg.Shape.ROUND:
+		simulation.add_round_peg(x, peg.y, group)
+	else:
+		var angle: int = -peg.angle if flip else peg.angle
+		simulation.add_rect_peg(x, peg.y, peg.half_width, peg.half_height, angle, group)

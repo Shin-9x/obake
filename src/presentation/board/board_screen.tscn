@@ -137,6 +137,15 @@ layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
 
+[node name="LayoutCaption" type="Label" parent="Hud/LeftPanel/Content"]
+layout_mode = 2
+text = "HUD_LAYOUT"
+
+[node name="LayoutValue" type="Label" parent="Hud/LeftPanel/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+auto_translate_mode = 2
+
 [node name="SeedCaption" type="Label" parent="Hud/LeftPanel/Content"]
 layout_mode = 2
 text = "HUD_SEED"
