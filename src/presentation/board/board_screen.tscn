@@ -6,6 +6,7 @@
 [ext_resource type="Script" uid="uid://cr7o2qvxqhf70" path="res://src/presentation/board/score_popups.gd" id="4_popups"]
 [ext_resource type="Script" uid="uid://b23dxxjgbabmh" path="res://src/presentation/board/board_hud.gd" id="5_hud"]
 [ext_resource type="Script" uid="uid://b86u1dyc308tv" path="res://src/presentation/board/aim_input.gd" id="6_aim"]
+[ext_resource type="Script" uid="uid://b7ktdf18bhrte" path="res://src/presentation/board/blast_rings.gd" id="7_blasts"]
 
 [node name="BoardScreen" type="Control"]
 layout_mode = 3
@@ -65,6 +66,10 @@ script = ExtResource("3_guide")
 unique_name_in_owner = true
 script = ExtResource("4_popups")
 
+[node name="BlastRings" type="Node2D" parent="Board"]
+unique_name_in_owner = true
+script = ExtResource("7_blasts")
+
 [node name="Hud" type="Control" parent="."]
 unique_name_in_owner = true
 layout_mode = 1
@@ -120,7 +125,20 @@ text = "0"
 layout_mode = 2
 text = "HUD_BALL"
 
-[node name="BallValue" type="Label" parent="Hud/LeftPanel/Content"]
+[node name="BallRow" type="HBoxContainer" parent="Hud/LeftPanel/Content"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="BallIcon" type="TextureRect" parent="Hud/LeftPanel/Content/BallRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="BallValue" type="Label" parent="Hud/LeftPanel/Content/BallRow"]
+unique_name_in_owner = true
 layout_mode = 2
 text = "BALL_HITODAMA"
 
@@ -128,7 +146,20 @@ text = "BALL_HITODAMA"
 layout_mode = 2
 text = "HUD_NEXT_BALL"
 
-[node name="NextValue" type="Label" parent="Hud/LeftPanel/Content"]
+[node name="NextRow" type="HBoxContainer" parent="Hud/LeftPanel/Content"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="NextIcon" type="TextureRect" parent="Hud/LeftPanel/Content/NextRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="NextValue" type="Label" parent="Hud/LeftPanel/Content/NextRow"]
+unique_name_in_owner = true
 layout_mode = 2
 text = "BALL_HITODAMA"
 
@@ -223,42 +254,50 @@ theme_override_colors/font_color = Color(1, 0.603922, 0.541176, 1)
 theme_override_font_sizes/font_size = 14
 text = "0"
 
+[node name="MonCaption" type="Label" parent="Hud/RightPanel/Content"]
+layout_mode = 2
+text = "HUD_MON"
+
+[node name="MonValue" type="Label" parent="Hud/RightPanel/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+auto_translate_mode = 2
+theme_override_colors/font_color = Color(1, 0.847059, 0.4, 1)
+theme_override_font_sizes/font_size = 14
+text = "+0"
+
 [node name="OmamoriCaption" type="Label" parent="Hud/RightPanel/Content"]
 layout_mode = 2
 text = "HUD_OMAMORI"
 
 [node name="OmamoriSlots" type="HBoxContainer" parent="Hud/RightPanel/Content"]
+unique_name_in_owner = true
 layout_mode = 2
 mouse_filter = 2
 
 [node name="Slot1" type="ColorRect" parent="Hud/RightPanel/Content/OmamoriSlots"]
 custom_minimum_size = Vector2(20, 20)
 layout_mode = 2
-mouse_filter = 2
 color = Color(0.180392, 0.203922, 0.286275, 1)
 
 [node name="Slot2" type="ColorRect" parent="Hud/RightPanel/Content/OmamoriSlots"]
 custom_minimum_size = Vector2(20, 20)
 layout_mode = 2
-mouse_filter = 2
 color = Color(0.180392, 0.203922, 0.286275, 1)
 
 [node name="Slot3" type="ColorRect" parent="Hud/RightPanel/Content/OmamoriSlots"]
 custom_minimum_size = Vector2(20, 20)
 layout_mode = 2
-mouse_filter = 2
 color = Color(0.180392, 0.203922, 0.286275, 1)
 
 [node name="Slot4" type="ColorRect" parent="Hud/RightPanel/Content/OmamoriSlots"]
 custom_minimum_size = Vector2(20, 20)
 layout_mode = 2
-mouse_filter = 2
 color = Color(0.180392, 0.203922, 0.286275, 1)
 
 [node name="Slot5" type="ColorRect" parent="Hud/RightPanel/Content/OmamoriSlots"]
 custom_minimum_size = Vector2(20, 20)
 layout_mode = 2
-mouse_filter = 2
 color = Color(0.180392, 0.203922, 0.286275, 1)
 
 [node name="TouchControls" type="Control" parent="Hud"]

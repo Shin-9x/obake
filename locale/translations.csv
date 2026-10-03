@@ -25,3 +25,66 @@ RESULT_TOTAL,Total: %d,Totale: %d
 RESULT_UNUSED_SHOTS,Unused shots: %d,Tiri non usati: %d
 BUTTON_PLAY_AGAIN,Play again,Gioca ancora
 BUTTON_SHOOT,Shoot,Tira
+HUD_MON,Mon,Mon
+POPUP_MON,+%d mon,+%d mon
+BALL_HITODAMA_DESC,No effect.,Nessun effetto.
+BALL_HEAVY,Heavy,Pesante
+BALL_HEAVY_DESC,Bounces softly; hit pegs score ×2/×3/×4 points.,Rimbalza poco; i peg colpiti danno ×2/×3/×4 punti.
+BALL_TAIKO,Taiko,Taiko
+BALL_TAIKO_DESC,"+1 mult per wall bounce, up to 3/5/8.","+1 mult per rimbalzo sul muro, fino a 3/5/8."
+BALL_ZENI,Zeni,Zeni
+BALL_ZENI_DESC,+1 mon every 10/8/6 pegs hit in its shot.,+1 mon ogni 10/8/6 peg colpiti nel suo tiro.
+BALL_EXPLOSIVE,Explosive,Esplosiva
+BALL_EXPLOSIVE_DESC,Its first impact hits every peg within 16/22/28 px.,Il primo impatto colpisce tutti i peg entro 16/22/28 px.
+BALL_PHANTOM,Phantom,Fantasma
+BALL_PHANTOM_DESC,"Passes through its first 2/3/4 pegs, hitting them.","Attraversa i primi 2/3/4 peg, colpendoli."
+BALL_MAGNETIC,Magnetic,Magnetica
+BALL_MAGNETIC_DESC,Pulled towards red lanterns within 30/40/50 px.,Attratta dalle lanterne rosse entro 30/40/50 px.
+BALL_DARUMA,Daruma,Daruma
+BALL_DARUMA_DESC,"When lost, returns to the top of the bag 1/2/3 times per board.",Quando va persa torna in cima alla borsa 1/2/3 volte per board.
+BALL_SPLITTER,Splitter,Scissione
+BALL_SPLITTER_DESC,Its first impact splits it into 2/3/4 balls.,Al primo impatto si divide in 2/3/4 palline.
+BALL_ONIBI,Onibi,Onibi
+BALL_ONIBI_DESC,"Every peg it hits sets fire to 1/2/3 neighbours, hit 0.3 s later.","Ogni peg che colpisce incendia 1/2/3 vicini, colpiti dopo 0,3 s."
+PEG_COIN_PEG,Coin peg,Peg moneta
+PEG_COIN_PEG_DESC,+1 mon.,+1 mon.
+PEG_BELL,Bell,Campana
+PEG_BELL_DESC,+2 mult.,+2 mult.
+PEG_EXPLOSIVE_LANTERN,Explosive lantern,Lanterna esplosiva
+PEG_EXPLOSIVE_LANTERN_DESC,Hits every peg within 20 px.,Colpisce tutti i peg entro 20 px.
+PEG_TORII,Torii,Torii
+PEG_TORII_DESC,"Bounces the ball with ×1.3 force, +15 points, never removed.","Rilancia la pallina con forza ×1,3, +15 punti, non viene mai rimosso."
+PEG_KAGAMI,Kagami,Kagami
+PEG_KAGAMI_DESC,×1.5 mult.,"×1,5 mult."
+PEG_OMIKUJI,Omikuji,Omikuji
+PEG_OMIKUJI_DESC,"A fortune: +50 points, +2 mult, +2 mon or nothing.","Un responso: +50 punti, +2 mult, +2 mon o niente."
+OMAMORI_CHOCHIN,Chōchin,Chōchin
+OMAMORI_CHOCHIN_DESC,Blue lanterns give +5 points.,Le lanterne blu danno +5 punti.
+OMAMORI_FIRST_STRIKE,First Strike,Primo colpo
+OMAMORI_FIRST_STRIKE_DESC,The first peg hit each shot scores ×5 points.,Il primo peg colpito in ogni tiro dà ×5 punti.
+OMAMORI_PATIENCE,Patience,Pazienza
+OMAMORI_PATIENCE_DESC,A shot hitting 15+ pegs gains +3 mult.,Un tiro che colpisce 15+ peg ottiene +3 mult.
+OMAMORI_KAERU,Kaeru,Kaeru
+OMAMORI_KAERU_DESC,+2 mon whenever the ball enters the bucket.,+2 mon ogni volta che la pallina entra nel secchio.
+OMAMORI_UCHIWA,Uchiwa,Uchiwa
+OMAMORI_UCHIWA_DESC,Bucket 50% wider.,Secchio più largo del 50%.
+OMAMORI_TERU_TERU_BOZU,Teru teru bōzu,Teru teru bōzu
+OMAMORI_TERU_TERU_BOZU_DESC,A shot with no red lantern gives the next shot +3 mult.,Un tiro senza lanterne rosse dà +3 mult al tiro successivo.
+OMAMORI_DRUM,Drum,Tamburo
+OMAMORI_DRUM_DESC,+5 points per wall bounce.,+5 punti per rimbalzo sul muro.
+OMAMORI_MANEKI_NEKO,Maneki-neko,Maneki-neko
+OMAMORI_MANEKI_NEKO_DESC,Interest cap raised from +5 to +7.,Tetto degli interessi alzato da +5 a +7.
+OMAMORI_YATA_MIRROR,Yata Mirror,Specchio Yata
+OMAMORI_YATA_MIRROR_DESC,Gold lanterns give ×3 instead of ×2.,Le lanterne d'oro danno ×3 invece di ×2.
+OMAMORI_MAGATAMA,Magatama,Magatama
+OMAMORI_MAGATAMA_DESC,+1 extra mult per 3 red lanterns hit in one shot.,+1 mult per ogni 3 lanterne rosse colpite in un tiro.
+OMAMORI_SHIMENAWA,Shimenawa,Shimenawa
+OMAMORI_SHIMENAWA_DESC,The first shot of each board bounces once off the bottom.,Il primo tiro di ogni board rimbalza una volta sul fondo.
+OMAMORI_HYOTAN,Hyōtan,Hyōtan
+OMAMORI_HYOTAN_DESC,+1 shot per board.,+1 tiro per board.
+OMAMORI_EMA,Ema,Ema
+OMAMORI_EMA_DESC,Each Matsuri gives all blue lanterns +2 points for the rest of the run.,Ogni Matsuri dà +2 punti a tutte le lanterne blu per il resto della run.
+OMAMORI_SHUTEN_SAKE,Shuten's Sake,Sake di Shuten
+OMAMORI_SHUTEN_SAKE_DESC,"Final mult of each shot ×2, −2 shots per board.","Mult finale di ogni tiro ×2, −2 tiri per board."
+OMAMORI_TSUKUMOGAMI,Tsukumogami,Tsukumogami
+OMAMORI_TSUKUMOGAMI_DESC,Each purchased peg appears twice.,Ogni peg acquistato compare due volte.

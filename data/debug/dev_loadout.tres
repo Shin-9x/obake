@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="LoadoutDefinition" format=3 uid="uid://bwwslsyjo2g6k"]
+
+[ext_resource type="Script" uid="uid://bvi6uyl50g4fx" path="res://data/definitions/ball_definition.gd" id="1_wroou"]
+[ext_resource type="Resource" uid="uid://sofwthekutvh" path="res://data/balls/hitodama.tres" id="2_23yfw"]
+[ext_resource type="Resource" uid="uid://cn1pphy6ja5sx" path="res://data/balls/explosive.tres" id="3_i53h8"]
+[ext_resource type="Resource" uid="uid://djoamkch3vb4p" path="res://data/balls/splitter.tres" id="4_cjixa"]
+[ext_resource type="Resource" uid="uid://dujkygwjf17sb" path="res://data/balls/onibi.tres" id="5_638kf"]
+[ext_resource type="Resource" uid="uid://c6d185c8idima" path="res://data/balls/magnetic.tres" id="6_6im81"]
+[ext_resource type="Script" uid="uid://bcnj1dex28luw" path="res://data/definitions/omamori_definition.gd" id="7_c48mq"]
+[ext_resource type="Resource" uid="uid://caj1xdgteckie" path="res://data/omamori/chochin.tres" id="8_jtk84"]
+[ext_resource type="Resource" uid="uid://c214s4qr8cart" path="res://data/omamori/first_strike.tres" id="9_ymo3o"]
+[ext_resource type="Resource" uid="uid://dyn8eb6d5l2rp" path="res://data/omamori/yata_mirror.tres" id="10_mo4rr"]
+[ext_resource type="Resource" uid="uid://delk62oqp0sq7" path="res://data/omamori/patience.tres" id="11_manyt"]
+[ext_resource type="Resource" uid="uid://b1ljjxhrrhp6k" path="res://data/omamori/drum.tres" id="12_prqna"]
+[ext_resource type="Script" uid="uid://22odkxg6kbgf" path="res://data/definitions/peg_definition.gd" id="13_ket6h"]
+[ext_resource type="Resource" uid="uid://ds1um3ippvyua" path="res://data/pegs/bell.tres" id="14_e4wrp"]
+[ext_resource type="Resource" uid="uid://bc018uen7pi2l" path="res://data/pegs/torii.tres" id="15_6qcmq"]
+[ext_resource type="Resource" uid="uid://ctndrnmb6vvw3" path="res://data/pegs/omikuji.tres" id="16_ih5ef"]
+[ext_resource type="Resource" uid="uid://c1vqop1ck7m0f" path="res://data/pegs/explosive_lantern.tres" id="17_r27ko"]
+[ext_resource type="Resource" uid="uid://caqj1c68kceb6" path="res://data/pegs/coin_peg.tres" id="18_06hna"]
+[ext_resource type="Resource" uid="uid://dlnn3ufn2vo4x" path="res://data/pegs/kagami.tres" id="19_e4f5w"]
+[ext_resource type="Script" uid="uid://f5oow6tpmgex" path="res://data/definitions/loadout_definition.gd" id="20_bg0n6"]
+
+[resource]
+script = ExtResource("20_bg0n6")
+balls = Array[ExtResource("1_wroou")]([ExtResource("2_23yfw"), ExtResource("2_23yfw"), ExtResource("2_23yfw"), ExtResource("2_23yfw"), ExtResource("2_23yfw"), ExtResource("2_23yfw"), ExtResource("3_i53h8"), ExtResource("4_cjixa"), ExtResource("5_638kf"), ExtResource("6_6im81")])
+ball_levels = PackedInt32Array()
+omamori = Array[ExtResource("7_c48mq")]([ExtResource("8_jtk84"), ExtResource("9_ymo3o"), ExtResource("10_mo4rr"), ExtResource("11_manyt"), ExtResource("12_prqna")])
+purchased_pegs = Array[ExtResource("13_ket6h")]([ExtResource("14_e4wrp"), ExtResource("15_6qcmq"), ExtResource("16_ih5ef"), ExtResource("17_r27ko"), ExtResource("18_06hna"), ExtResource("19_e4f5w")])

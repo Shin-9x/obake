@@ -10,12 +10,15 @@ extends Node2D
 const PX: float = 1000.0
 ## Brightening applied to lit lanterns.
 const LIT_TINT: Color = Color(1.6, 1.6, 1.6)
+## Ring drawn around pegs that are about to be hit by fire.
+const BURN_COLOUR: Color = Color("#ff7a2f")
 
 var _game: BoardGame
 var _skin: BoardSkin
 var _bucket_y: float = 0.0
 var _alpha: float = 0.0
 var _balls: Array[Sprite2D] = []
+var _ball_textures: Array[Texture2D] = []
 var _previous: PackedVector2Array = PackedVector2Array()
 var _was_active: PackedByteArray = PackedByteArray()
 var _peg_previous: PackedVector2Array = PackedVector2Array()
@@ -43,6 +46,7 @@ func setup(game: BoardGame, config: BalanceConfig, skin: BoardSkin) -> void:
 	_bucket_sprite.offset = Vector2(0, skin.bucket_texture.get_height() / 2.0)
 	for sprite: Sprite2D in _balls:
 		sprite.visible = false
+	_ball_textures.fill(skin.ball_texture)
 	_was_active.fill(0)
 	_peg_previous.resize(game.simulation.pegs.size())
 	capture_previous()
@@ -58,6 +62,21 @@ func set_aim(aim: int) -> void:
 
 func refresh_pegs() -> void:
 	queue_redraw()
+
+
+## Draws ball [param index] with [param texture], or the skin's default when it is null.
+func set_ball_texture(index: int, texture: Texture2D) -> void:
+	while _ball_textures.size() <= index:
+		_ball_textures.append(_skin.ball_texture)
+	_ball_textures[index] = texture if texture != null else _skin.ball_texture
+	if index < _balls.size():
+		_balls[index].texture = _ball_textures[index]
+
+
+## Gives ball [param child] the look of ball [param parent], for balls split from another.
+func copy_ball_texture(parent: int, child: int) -> void:
+	var texture: Texture2D = _ball_textures[parent] if parent < _ball_textures.size() else null
+	set_ball_texture(child, texture)
 
 
 ## Remembers where things are before the next simulation tick, for interpolation.
@@ -87,7 +106,10 @@ func render(alpha: float) -> void:
 	var balls: Array[SimBall] = simulation.balls
 	while _balls.size() < balls.size():
 		var sprite: Sprite2D = Sprite2D.new()
-		sprite.texture = _skin.ball_texture
+		var index: int = _balls.size()
+		sprite.texture = (
+			_ball_textures[index] if index < _ball_textures.size() else _skin.ball_texture
+		)
 		add_child(sprite)
 		_balls.append(sprite)
 	for index: int in _balls.size():
@@ -132,6 +154,8 @@ func _draw_peg(canvas: CanvasItem, index: int, centre: Vector2) -> void:
 	var peg: SimPeg = _game.simulation.pegs[index]
 	var definition: PegDefinition = _game.definition_of(index)
 	var tint: Color = LIT_TINT if peg.lit else Color.WHITE
+	if _game.is_burning(index):
+		canvas.draw_arc(centre, peg.extent / PX + 2.0, 0.0, TAU, 16, BURN_COLOUR, 1.0)
 	if peg.shape == SimPeg.Shape.ROUND:
 		var texture: Texture2D = definition.texture
 		canvas.draw_texture(texture, centre - texture.get_size() / 2.0, tint)

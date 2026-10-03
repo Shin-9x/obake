@@ -7,10 +7,21 @@ signal play_again_requested
 ## Seconds the shot total takes to settle after bursting.
 const BURST_TIME: float = 0.35
 const BURST_SCALE: float = 1.8
+## Seconds an omamori slot glows after its effect acts.
+const FLASH_TIME: float = 0.3
+const FLASH_TINT: Color = Color(1.8, 1.8, 1.4)
 
 var _burst_age: float = -1.0
+var _slot_ages: PackedFloat32Array = PackedFloat32Array()
+var _slots: Array[ColorRect] = []
 
 @onready var _shots: Label = %ShotsValue
+@onready var _ball: Label = %BallValue
+@onready var _ball_icon: TextureRect = %BallIcon
+@onready var _next: Label = %NextValue
+@onready var _next_icon: TextureRect = %NextIcon
+@onready var _mon: Label = %MonValue
+@onready var _slot_row: HBoxContainer = %OmamoriSlots
 @onready var _seed: Label = %SeedValue
 @onready var _layout: Label = %LayoutValue
 @onready var _shot: Label = %ShotValue
@@ -33,6 +44,15 @@ var _burst_age: float = -1.0
 func _ready() -> void:
 	_touch_controls.visible = DisplayServer.is_touchscreen_available()
 	_play_again.pressed.connect(play_again_requested.emit)
+	for child: Node in _slot_row.get_children():
+		_slots.append(child as ColorRect)
+		var icon: TextureRect = TextureRect.new()
+		icon.set_anchors_preset(Control.PRESET_FULL_RECT)
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_CENTERED
+		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		child.add_child(icon)
+	_slot_ages.resize(_slots.size())
+	_slot_ages.fill(-1.0)
 	set_process(false)
 
 
@@ -56,6 +76,35 @@ func apply_skin(skin: BoardSkin) -> void:
 	_right_panel.color = skin.panel_color
 
 
+## Shows the omamori of [param loadout] in their slots, with name and description as tooltip.
+func show_loadout(loadout: LoadoutDefinition) -> void:
+	for index: int in _slots.size():
+		var slot: ColorRect = _slots[index]
+		var icon: TextureRect = slot.get_child(0) as TextureRect
+		var charm: OmamoriDefinition = (
+			loadout.omamori[index] if index < loadout.omamori.size() else null
+		)
+		icon.texture = charm.icon if charm != null else null
+		slot.tooltip_text = (
+			"" if charm == null else tr(charm.name_key) + "\n" + tr(charm.description_key)
+		)
+		slot.modulate = Color.WHITE
+
+
+## Lights up omamori [param slot] for a moment after its effect acts.
+func flash_slot(slot: int) -> void:
+	if slot < 0 or slot >= _slots.size():
+		return
+	_slot_ages[slot] = 0.0
+	_slots[slot].modulate = FLASH_TINT
+	set_process(true)
+
+
+func update_bag(game: BoardGame) -> void:
+	_show_ball(game.bag.peek(0), _ball, _ball_icon)
+	_show_ball(game.bag.peek(1), _next, _next_icon)
+
+
 func show_board(placed: PlacedBoard, board_seed: int) -> void:
 	_seed.text = "%X" % board_seed
 	_layout.text = placed.layout.id
@@ -65,6 +114,7 @@ func show_board(placed: PlacedBoard, board_seed: int) -> void:
 	_shot_total.text = ""
 	update_shot(placed.game)
 	update_counts(placed.game)
+	update_bag(placed.game)
 
 
 func update_shot(game: BoardGame) -> void:
@@ -73,6 +123,7 @@ func update_shot(game: BoardGame) -> void:
 
 func update_counts(game: BoardGame) -> void:
 	_shots.text = str(game.shots_left)
+	_mon.text = "+%d" % game.mon_earned
 	_total.text = "%d / %d" % [game.total, game.target]
 	_red_left.text = str(game.red_remaining())
 
@@ -100,8 +151,29 @@ func show_result(game: BoardGame) -> void:
 
 
 func _process(delta: float) -> void:
-	_burst_age += delta
-	var progress: float = clampf(_burst_age / BURST_TIME, 0.0, 1.0)
-	_shot_total.scale = Vector2.ONE * lerpf(BURST_SCALE, 1.0, progress)
-	if progress >= 1.0:
+	var busy: bool = false
+	if _burst_age >= 0.0:
+		_burst_age += delta
+		var progress: float = clampf(_burst_age / BURST_TIME, 0.0, 1.0)
+		_shot_total.scale = Vector2.ONE * lerpf(BURST_SCALE, 1.0, progress)
+		if progress >= 1.0:
+			_burst_age = -1.0
+		else:
+			busy = true
+	for index: int in _slots.size():
+		if _slot_ages[index] < 0.0:
+			continue
+		_slot_ages[index] += delta
+		var fade: float = clampf(_slot_ages[index] / FLASH_TIME, 0.0, 1.0)
+		_slots[index].modulate = FLASH_TINT.lerp(Color.WHITE, fade)
+		if fade >= 1.0:
+			_slot_ages[index] = -1.0
+		else:
+			busy = true
+	if not busy:
 		set_process(false)
+
+
+func _show_ball(ball: BagBall, label: Label, icon: TextureRect) -> void:
+	label.text = tr(ball.definition.name_key) if ball != null else tr("BALL_HITODAMA")
+	icon.texture = ball.definition.texture if ball != null else null

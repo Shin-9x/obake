@@ -6,6 +6,8 @@ extends Control
 const BALANCE: BalanceConfig = preload("res://data/balance.tres")
 const BASE_PEGS: BasePegs = preload("res://data/pegs/base_pegs.tres")
 const SKIN: BoardSkin = preload("res://data/skins/placeholder_skin.tres")
+## Bag, omamori and purchased pegs used until the run arrives (M5); edit it in the Inspector.
+const DEV_LOADOUT: LoadoutDefinition = preload("res://data/debug/dev_loadout.tres")
 const TICK_SECONDS: float = 1.0 / BoardSimulation.TICKS_PER_SECOND
 ## Caps catch-up after a long frame, so a hitch never turns into a burst of ticks.
 const MAX_TICKS_PER_FRAME: int = 12
@@ -18,18 +20,22 @@ const PX: float = 1000.0
 const POINTS_COLOR: Color = Color("#bfe0ff")
 const MULT_COLOR: Color = Color("#ff9a8a")
 const TIMES_COLOR: Color = Color("#ffd866")
+const MON_COLOR: Color = Color("#ffe08a")
 
 var game: BoardGame
 var placed: PlacedBoard
 var board_seed: int = 0
 
 var _library: LayoutLibrary
+## Run-wide modifiers kept across boards of this session.
+var _carry: RunCarry = RunCarry.new()
 var _accumulator: float = 0.0
 var _guide_ticks: int = 0
 
 @onready var _view: BoardView = %BoardView
 @onready var _guide: AimGuide = %AimGuide
 @onready var _popups: ScorePopups = %ScorePopups
+@onready var _blasts: BlastRings = %BlastRings
 @onready var _hud: BoardHud = %Hud
 @onready var _aim: AimInput = %AimInput
 @onready var _background: ColorRect = %Background
@@ -55,11 +61,13 @@ func _ready() -> void:
 func start_board(seed_value: int) -> void:
 	board_seed = seed_value
 	var layout: BoardLayout = BoardSetup.pick_layout(_library, seed_value)
-	placed = BoardSetup.create_board(BALANCE, BASE_PEGS, layout, seed_value)
+	placed = BoardSetup.create_board(BALANCE, BASE_PEGS, layout, seed_value, DEV_LOADOUT, _carry)
 	game = placed.game
 	_view.setup(game, BALANCE, SKIN)
 	_view.set_aim(_aim.aim)
 	_popups.hide_all()
+	_blasts.clear()
+	_hud.show_loadout(DEV_LOADOUT)
 	_hud.show_board(placed, seed_value)
 	_accumulator = 0.0
 	_refresh_guide()
@@ -71,8 +79,10 @@ func shoot() -> void:
 		return
 	game.shoot(ShotInput.new(_aim.aim, game.simulation.clock))
 	_guide.visible = false
+	_consume_events()
 	_hud.update_shot(game)
 	_hud.update_counts(game)
+	_hud.update_bag(game)
 
 
 func _process(delta: float) -> void:
@@ -99,6 +109,7 @@ func _tick() -> void:
 	game.step()
 	_consume_events()
 	if not game.simulation.is_shot_active():
+		_hud.update_bag(game)
 		_refresh_guide()
 
 
@@ -112,17 +123,37 @@ func _consume_events() -> void:
 		match event.kind:
 			SimEvent.Kind.PEG_HIT, SimEvent.Kind.STUCK_CLEARED, SimEvent.Kind.SHOT_RESOLVED:
 				pegs_changed = true
+			SimEvent.Kind.PEG_BURNING:
+				pegs_changed = true
+			SimEvent.Kind.AREA_HIT:
+				_blasts.burst(event.x, event.y, event.amount)
+				pegs_changed = true
 			SimEvent.Kind.SCORE_POINTS:
 				_popups.show_text("+%d" % event.amount, at, POINTS_COLOR)
 				score_changed = true
+				pegs_changed = true
 			SimEvent.Kind.SCORE_MULT_ADD:
 				var added: String = BoardHud.format_mult(event.amount)
 				_popups.show_text(tr("POPUP_MULT_ADD") % added, at, MULT_COLOR)
 				score_changed = true
+				pegs_changed = true
 			SimEvent.Kind.SCORE_MULT_TIMES:
 				var factor: String = BoardHud.format_mult(event.amount)
 				_popups.show_text(tr("POPUP_MULT_TIMES") % factor, at, TIMES_COLOR)
 				score_changed = true
+				pegs_changed = true
+			SimEvent.Kind.MON_GAINED:
+				_popups.show_text(tr("POPUP_MON") % event.amount, at, MON_COLOR)
+				_hud.update_counts(game)
+			SimEvent.Kind.BALL_DRAWN:
+				var drawn: Texture2D = null
+				if game.shot_ball != null:
+					drawn = game.shot_ball.definition.texture
+				_view.set_ball_texture(event.ball, drawn)
+			SimEvent.Kind.BALL_SPLIT:
+				_view.copy_ball_texture(event.target, event.ball)
+			SimEvent.Kind.EFFECT_TRIGGERED:
+				_hud.flash_slot(event.target)
 			SimEvent.Kind.BUCKET_CATCH:
 				_popups.show_text(tr("POPUP_FREE_BALL"), at, POINTS_COLOR)
 				_hud.update_counts(game)

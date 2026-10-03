@@ -32,6 +32,13 @@ the board. Use **Bake into pegs** on a pattern to hand-tune its pegs, and **Expo
 document (or `make layouts`) to write `data/layouts/<id>.json`, which the game loads. The test
 suite fails if a source scene and its JSON disagree.
 
+## Playtesting items
+
+Until the run and its shop exist, the board uses `data/debug/dev_loadout.tres`: the bag, the
+omamori in slot order and the purchased pegs. Edit it in the Inspector to try other balls,
+omamori or pegs. Item definitions live in `data/balls/`, `data/pegs/` and `data/omamori/`, with
+their behaviour in `src/sim/effects/`.
+
 ## Controls
 
 | Action | Mouse and keyboard | Touch |
