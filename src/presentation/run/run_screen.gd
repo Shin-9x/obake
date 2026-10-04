@@ -10,12 +10,16 @@ const CONTENT: RunContent = preload("res://data/run_content.tres")
 const BASE_PEGS: BasePegs = preload("res://data/pegs/base_pegs.tres")
 const MAP_SKIN: MapSkin = preload("res://data/skins/map_skin.tres")
 const PROGRESSION: ProgressionDefinition = preload("res://data/progression.tres")
+const UI_SKIN: UiSkin = preload("res://data/skins/ui_skin.tres")
+const MARK_KEYS: Array[String] = ["MARK_SHUTEN", "MARK_HARD", "MARK_FESTIVAL"]
 const BOARD_SCENE: PackedScene = preload("res://src/presentation/board/board_screen.tscn")
 
 var run: Run
 var profile: Profile
 ## The screen on show.
 var current: Control
+## Unlock notes, drawn over every screen.
+var toasts: UnlockToasts
 
 var _library: LayoutLibrary
 
@@ -23,6 +27,9 @@ var _library: LayoutLibrary
 func _ready() -> void:
 	_library = LayoutLibrary.load_from()
 	profile = SaveService.load_profile()
+	toasts = UnlockToasts.new()
+	toasts.skin = UI_SKIN
+	add_child(toasts)
 	show_character_select()
 
 
@@ -33,6 +40,22 @@ func show_character_select() -> void:
 	screen.open(CONTENT, PROGRESSION, profile, SaveService.has_run())
 	screen.character_chosen.connect(_on_character_chosen)
 	screen.continue_requested.connect(continue_run)
+	screen.compendium_requested.connect(show_compendium)
+	screen.statistics_requested.connect(show_statistics)
+
+
+func show_compendium() -> void:
+	var screen: CompendiumScreen = CompendiumScreen.new()
+	_swap(screen)
+	screen.open(CONTENT, PROGRESSION, profile)
+	screen.closed.connect(show_character_select)
+
+
+func show_statistics() -> void:
+	var screen: StatisticsScreen = StatisticsScreen.new()
+	_swap(screen)
+	screen.open(CONTENT, PROGRESSION, profile)
+	screen.closed.connect(show_character_select)
 
 
 ## Starts a run with the items the profile has unlocked. A [param custom_seed] run earns no
@@ -115,6 +138,7 @@ func _swap(screen: Control) -> void:
 	current = screen
 	screen.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(screen)
+	move_child(toasts, -1)
 
 
 func _watch(watched: Run) -> void:
@@ -141,9 +165,12 @@ func _on_node_chosen(node: int) -> void:
 func _on_board_finished(_result: BoardResult) -> void:
 	if not run.finish_board():
 		return
-	Progression.check_board(PROGRESSION, profile, run)
+	for feat: FeatDefinition in Progression.check_board(PROGRESSION, profile, run):
+		toasts.announce(tr("TOAST_UNLOCKED") % tr(feat.unlocks.name_key), tr(feat.description_key))
 	if run.is_over():
-		Progression.finish_run(PROGRESSION, profile, run)
+		var character: CharacterDefinition = run.state.inventory.loadout.character
+		for mark: Profile.Mark in Progression.finish_run(PROGRESSION, profile, run):
+			toasts.announce(tr("TOAST_MARK") % tr(character.name_key), tr(MARK_KEYS[mark]))
 		SaveService.clear_run()
 	SaveService.save_profile(profile)
 	show_phase()

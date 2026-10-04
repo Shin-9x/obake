@@ -57,3 +57,4 @@ func _wipe() -> void:
 		return
 	for file: String in DirAccess.get_files_at(DIRECTORY):
 		DirAccess.remove_absolute(DIRECTORY.path_join(file))
+	DirAccess.remove_absolute(DIRECTORY)

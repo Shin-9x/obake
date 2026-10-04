@@ -21,7 +21,7 @@ const SMALL_SIZE: int = 8
 
 ## A full-screen background holding a centred page; the screen's content goes in the page.
 static func page(screen: Control) -> Control:
-	screen.set_anchors_preset(Control.PRESET_FULL_RECT)
+	screen.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var background: ColorRect = ColorRect.new()
 	background.color = BACKGROUND
 	background.set_anchors_preset(Control.PRESET_FULL_RECT)

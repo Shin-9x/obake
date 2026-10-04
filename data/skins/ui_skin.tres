@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="UiSkin" format=3 uid="uid://blqf51u748ri8"]
+
+[ext_resource type="Texture2D" uid="uid://flbonas28jtn" path="res://assets/sprites/placeholder/mascot_obo.png" id="1_atx2c"]
+[ext_resource type="Script" uid="uid://dscys2igl5qv7" path="res://data/definitions/ui_skin.gd" id="2_cpcsj"]
+
+[resource]
+script = ExtResource("2_cpcsj")
+mascot = ExtResource("1_atx2c")

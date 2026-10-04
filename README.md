@@ -42,6 +42,12 @@ boards, shops, shrines and yōkai events, each ending with a boss. Numbers such 
 prices and odds live in `data/balance.tres`; what a run can offer lives in
 `data/run_content.tres`.
 
+The run is saved after every action, so closing the game and pressing **Continue run** picks it
+up exactly where it was. Feats unlock locked items for later runs (`data/feats/`), beating
+Shuten-dōji opens Hard mode for that character, and the compendium and statistics are reached
+from the character screen. A typed seed replays a run but earns no feats or marks. Saves live in
+Godot's user data folder (`profile.json` and `run.json`).
+
 To try items on a single board, open `src/presentation/board/board_screen.tscn` and press
 **F6**: it plays random layouts with `data/debug/dev_loadout.tres` (character, bag, omamori in
 slot order and purchased pegs), which you can edit in the Inspector. Item, character and boss

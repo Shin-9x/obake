@@ -233,3 +233,28 @@ SEED_RANDOM,random,casuale
 MARK_SHUTEN,Mark: Shuten-dōji defeated,Marchio: Shuten-dōji sconfitto
 MARK_HARD,Mark: run won on Hard,Marchio: run vinta in Difficile
 MARK_FESTIVAL,Mark: Festival Night (a won run with Matsuri on 8 boards),Marchio: Notte di festa (una run vinta con Matsuri in 8 board)
+BUTTON_COMPENDIUM,Compendium,Compendio
+BUTTON_STATISTICS,Statistics,Statistiche
+COMPENDIUM_TITLE,Compendium,Compendio
+COMPENDIUM_BALLS,Balls,Palline
+COMPENDIUM_OMAMORI,Omamori,Omamori
+COMPENDIUM_PEGS,Pegs,Peg
+COMPENDIUM_BOSSES,Bosses,Boss
+COMPENDIUM_UNKNOWN,???,???
+COMPENDIUM_LOCKED,Locked. To unlock: %s,Bloccato. Per sbloccarlo: %s
+RARITY_BASE,Base,Base
+RARITY_COMMON,Common,Comune
+RARITY_UNCOMMON,Uncommon,Non comune
+RARITY_RARE,Rare,Raro
+RARITY_LEGENDARY,Legendary,Leggendario
+STATS_TITLE,Statistics,Statistiche
+STATS_RUNS,Runs played: %d,Run giocate: %d
+STATS_WINS,Runs won: %d,Run vinte: %d
+STATS_CHARACTER,"%s: %d runs, %d won","%s: %d run, %d vinte"
+STATS_BEST_SHOT,Best shot: %d,Miglior tiro: %d
+STATS_MATSURI,Matsuri: %d,Matsuri: %d
+STATS_BOARDS,Boards won: %d,Board vinte: %d
+STATS_FEATS,Feats: %d/%d,Feat: %d/%d
+STATS_DISCOVERED,Compendium: %d/%d,Compendio: %d/%d
+TOAST_UNLOCKED,Unlocked: %s,Sbloccato: %s
+TOAST_MARK,Mark earned by %s,Marchio guadagnato da %s

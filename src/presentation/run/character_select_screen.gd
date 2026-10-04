@@ -7,6 +7,8 @@ extends Control
 ## [param hard] is the card's Hard switch; [param seed_text] is what the player typed, if any.
 signal character_chosen(character: CharacterDefinition, hard: bool, seed_text: String)
 signal continue_requested
+signal compendium_requested
+signal statistics_requested
 
 const CARD_SIZE: Vector2 = Vector2(184, 262)
 const PORTRAIT_SIZE: Vector2 = Vector2(48, 48)
@@ -44,6 +46,12 @@ func open(
 	_seed.custom_minimum_size = Vector2(SEED_WIDTH, 0)
 	_seed.placeholder_text = "SEED_RANDOM"
 	footer.add_child(_seed)
+	var compendium: Button = UiKit.button("BUTTON_COMPENDIUM")
+	compendium.pressed.connect(compendium_requested.emit)
+	footer.add_child(compendium)
+	var statistics: Button = UiKit.button("BUTTON_STATISTICS")
+	statistics.pressed.connect(statistics_requested.emit)
+	footer.add_child(statistics)
 	if can_continue:
 		var resume: Button = UiKit.button("BUTTON_CONTINUE_RUN")
 		resume.pressed.connect(continue_requested.emit)

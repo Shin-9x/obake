@@ -22,7 +22,9 @@ func after_test() -> void:
 func test_a_run_starts_with_the_choice_of_a_character() -> void:
 	var screen: RunScreen = scene_runner(SCENE).scene() as RunScreen
 	assert_object(screen.current).is_instanceof(CharacterSelectScreen)
-	var cards: Array[Node] = Screens.find_all(screen.current, Button)
+	var cards: Array[Node] = Screens.find_all(screen.current, Button).filter(
+		func(node: Node) -> bool: return (node as Button).text.is_empty()
+	)
 	assert_array(cards).has_size(3)
 	(cards[2] as Button).pressed.emit()
 	assert_object(screen.current).is_instanceof(MapScreen)
@@ -95,6 +97,7 @@ func test_board_feats_reach_the_profile_and_a_lost_run_clears_its_save() -> void
 	screen.run.game.result = result
 	(screen.current as BoardScreen).board_finished.emit(result)
 	assert_bool(screen.profile.has_feat(&"thirty_pegs")).is_true()
+	assert_int(screen.toasts.pending()).is_equal(1)
 	assert_int(screen.profile.runs).is_equal(1)
 	assert_bool(SaveService.has_run()).is_false()
 	assert_bool(SaveService.load_profile().has_feat(&"thirty_pegs")).is_true()
@@ -110,7 +113,7 @@ func test_hard_mode_shows_once_earned_and_a_typed_seed_counts_for_nothing() -> v
 	(switches[0] as CheckBox).button_pressed = true
 	(Screens.find_all(screen.current, LineEdit)[0] as LineEdit).text = "BEEF"
 	var cards: Array[Node] = Screens.find_all(screen.current, Button).filter(
-		func(node: Node) -> bool: return not node is CheckBox
+		func(node: Node) -> bool: return (node as Button).text.is_empty()
 	)
 	(cards[1] as Button).pressed.emit()
 	assert_bool(screen.run.run_log.options.hard).is_true()
@@ -118,11 +121,22 @@ func test_hard_mode_shows_once_earned_and_a_typed_seed_counts_for_nothing() -> v
 	assert_int(screen.run.state.run_seed).is_equal(0xBEEF)
 
 
+func test_the_compendium_and_the_statistics_open_and_close() -> void:
+	var screen: RunScreen = scene_runner(SCENE).scene() as RunScreen
+	Screens.button(screen.current, "BUTTON_COMPENDIUM").pressed.emit()
+	assert_object(screen.current).is_instanceof(CompendiumScreen)
+	Screens.button(screen.current, "BUTTON_BACK").pressed.emit()
+	assert_object(screen.current).is_instanceof(CharacterSelectScreen)
+	Screens.button(screen.current, "BUTTON_STATISTICS").pressed.emit()
+	assert_object(screen.current).is_instanceof(StatisticsScreen)
+
+
 func _wipe() -> void:
 	if not DirAccess.dir_exists_absolute(SAVES):
 		return
 	for file: String in DirAccess.get_files_at(SAVES):
 		DirAccess.remove_absolute(SAVES.path_join(file))
+	DirAccess.remove_absolute(SAVES)
 
 
 func _started() -> RunScreen:

@@ -39,6 +39,7 @@ const MARKS: Dictionary[String, Array] = {
 	"mark_festival": [Color("#6b4a10"), Color("#ffd866")],
 }
 const MARK_SIZE: int = 12
+const MASCOT_SIZE: int = 24
 const BOSS_SIZE: int = 48
 ## Character portraits: head, ears or headgear, and the colour across the eyes.
 const PORTRAITS: Dictionary[String, Array] = {
@@ -112,6 +113,7 @@ func _init() -> void:
 		_save(_map_icon(node), "map_" + node)
 	for mark: String in MARKS:
 		_save(_mark(MARKS[mark][0], MARKS[mark][1]), mark)
+	_save(_mascot(), "mascot_obo")
 	for index: int in OMAMORI.size():
 		_save(_omamori(OMAMORI_COLOURS[index], index), "omamori_" + OMAMORI[index])
 	_save(_bucket(), "bucket")
@@ -393,6 +395,44 @@ func _map_icon(node: String) -> Image:
 				image.set_pixel(12 - step / 2, 4 - step, Color("#f4e9c9"))
 			image.set_pixel(6, 8, Color("#ffeb3b"))
 			image.set_pixel(9, 8, Color("#ffeb3b"))
+	return image
+
+
+## Obo, the chōchin-obake: a paper lantern with one big eye and its tongue hanging out.
+func _mascot() -> Image:
+	var image: Image = _blank(MASCOT_SIZE, MASCOT_SIZE)
+	var paper: Color = Color("#f2c46b")
+	var rib: Color = Color("#c98f3a")
+	var ink: Color = Color("#2a1a10")
+	for y: int in range(3, 21):
+		for x: int in range(3, 21):
+			var shape: float = pow((x - 11.5) / 8.5, 2) + pow((y - 11.5) / 9.0, 2)
+			if shape > 1.0:
+				continue
+			var colour: Color = paper
+			if shape > 0.82:
+				colour = ink
+			elif y % 4 == 0:
+				colour = rib
+			image.set_pixel(x, y, colour)
+	for x: int in range(8, 16):
+		image.set_pixel(x, 1, ink)
+		image.set_pixel(x, 2, ink)
+		image.set_pixel(x, 21, ink)
+		image.set_pixel(x, 22, ink)
+	for y: int in range(6, 13):
+		for x: int in range(8, 16):
+			var eye: float = Vector2(x - 11.5, y - 9.0).length()
+			if eye <= 3.6:
+				image.set_pixel(x, y, ink if eye > 2.9 else Color.WHITE)
+	for y: int in range(8, 11):
+		image.set_pixel(12, y, ink)
+		image.set_pixel(13, y, ink)
+	for x: int in range(9, 15):
+		image.set_pixel(x, 15, ink)
+	for y: int in range(16, 21):
+		image.set_pixel(13, y, Color("#e0475b"))
+		image.set_pixel(14, y, Color("#e0475b"))
 	return image
 
 
