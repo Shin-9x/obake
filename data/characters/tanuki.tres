@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="CharacterDefinition" format=3 uid="uid://cwxwah2jrhiu8"]
+
+[ext_resource type="Script" uid="uid://cfryotwakw2oj" path="res://src/sim/effects/characters/tanuki_effect.gd" id="1_jy3lx"]
+[ext_resource type="Texture2D" uid="uid://tnbgvqs1figm" path="res://assets/sprites/placeholder/portrait_tanuki.png" id="2_b2rtl"]
+[ext_resource type="Resource" uid="uid://caqj1c68kceb6" path="res://data/pegs/coin_peg.tres" id="3_vyn53"]
+[ext_resource type="Script" uid="uid://cqply7piwfcks" path="res://data/definitions/character_definition.gd" id="4_00nxk"]
+[ext_resource type="Script" uid="uid://bvi6uyl50g4fx" path="res://data/definitions/ball_definition.gd" id="5_qd8un"]
+[ext_resource type="Resource" uid="uid://sofwthekutvh" path="res://data/balls/hitodama.tres" id="6_66i7h"]
+[ext_resource type="Resource" uid="uid://xc7a1cco287x" path="res://data/balls/zeni.tres" id="7_4ts2s"]
+
+[resource]
+script = ExtResource("4_00nxk")
+portrait = ExtResource("2_b2rtl")
+power_key = "CHARACTER_TANUKI_POWER"
+passive_key = "CHARACTER_TANUKI_PASSIVE"
+starting_balls = Array[ExtResource("5_qd8un")]([ExtResource("6_66i7h"), ExtResource("6_66i7h"), ExtResource("6_66i7h"), ExtResource("6_66i7h"), ExtResource("6_66i7h"), ExtResource("6_66i7h"), ExtResource("7_4ts2s")])
+power_peg = ExtResource("3_vyn53")
+id = &"tanuki"
+name_key = "CHARACTER_TANUKI"
+description_key = "CHARACTER_TANUKI_DESC"
+icon = ExtResource("2_b2rtl")
+effect_script = ExtResource("1_jy3lx")
+level_values = PackedInt32Array()
+params = Dictionary[StringName, int]({
+&"count": 3,
+&"shop_extra_balls": 1
+})

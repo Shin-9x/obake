@@ -8,3 +8,5 @@ extends ItemDefinition
 @export var power_key: String = ""
 @export var passive_key: String = ""
 @export var starting_balls: Array[BallDefinition] = []
+## Peg the power places on the board, if it places any.
+@export var power_peg: PegDefinition

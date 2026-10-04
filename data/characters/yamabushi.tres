@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="CharacterDefinition" format=3 uid="uid://dj85kb5e8w0ou"]
+
+[ext_resource type="Script" uid="uid://c6k0uasesxjvl" path="res://src/sim/effects/characters/yamabushi_effect.gd" id="1_5qk7g"]
+[ext_resource type="Texture2D" uid="uid://er0cnwan1ko5" path="res://assets/sprites/placeholder/portrait_yamabushi.png" id="2_xnqsr"]
+[ext_resource type="Script" uid="uid://cqply7piwfcks" path="res://data/definitions/character_definition.gd" id="3_tbjb3"]
+[ext_resource type="Script" uid="uid://bvi6uyl50g4fx" path="res://data/definitions/ball_definition.gd" id="4_gy8cc"]
+[ext_resource type="Resource" uid="uid://sofwthekutvh" path="res://data/balls/hitodama.tres" id="5_15bv0"]
+[ext_resource type="Resource" uid="uid://cn1pphy6ja5sx" path="res://data/balls/explosive.tres" id="6_48pcv"]
+[ext_resource type="Resource" uid="uid://pkfd8cpacb1u" path="res://data/balls/taiko.tres" id="7_7xlfj"]
+
+[resource]
+script = ExtResource("3_tbjb3")
+portrait = ExtResource("2_xnqsr")
+power_key = "CHARACTER_YAMABUSHI_POWER"
+passive_key = "CHARACTER_YAMABUSHI_PASSIVE"
+starting_balls = Array[ExtResource("4_gy8cc")]([ExtResource("5_15bv0"), ExtResource("5_15bv0"), ExtResource("5_15bv0"), ExtResource("5_15bv0"), ExtResource("5_15bv0"), ExtResource("5_15bv0"), ExtResource("6_48pcv"), ExtResource("7_7xlfj")])
+id = &"yamabushi"
+name_key = "CHARACTER_YAMABUSHI"
+description_key = "CHARACTER_YAMABUSHI_DESC"
+icon = ExtResource("2_xnqsr")
+effect_script = ExtResource("1_5qk7g")
+level_values = PackedInt32Array()
+params = Dictionary[StringName, int]({
+&"contacts": 3,
+&"shots": 2
+})

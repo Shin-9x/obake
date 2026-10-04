@@ -26,7 +26,15 @@ const SPECIAL_PEGS: Dictionary[String, Array] = {
 	"peg_torii": [Color("#d9381e"), Color("#1a1a1a"), Color("#ffb3a3")],
 	"peg_kagami": [Color("#c9d1d9"), Color("#5b6672"), Color("#ffffff")],
 	"peg_omikuji": [Color("#f5f0e6"), Color("#b22222"), Color("#ffffff")],
+	"peg_kitsunebi": [Color("#5fe0c8"), Color("#1f6b5c"), Color("#e6fff9")],
 }
+## Character portraits: head, ears or headgear, and the colour across the eyes.
+const PORTRAITS: Dictionary[String, Array] = {
+	"portrait_yamabushi": [Color("#e8c39e"), "cap", Color("#e8c39e"), Color("#f4f1ea")],
+	"portrait_kitsune": [Color("#e07b39"), "pointed", Color("#e07b39"), Color("#fbeee0")],
+	"portrait_tanuki": [Color("#8b6a4f"), "round", Color("#3b2a20"), Color("#d9c3a5")],
+}
+const PORTRAIT_SIZE: int = 32
 ## Omamori icons: one colour each; the emblem varies with the position in this list.
 const OMAMORI: Array[String] = [
 	"chochin",
@@ -83,6 +91,9 @@ func _init() -> void:
 	for peg: String in SPECIAL_PEGS:
 		var colours: Array = SPECIAL_PEGS[peg]
 		_save(_lantern(colours[0], colours[1], colours[2]), peg)
+	for portrait: String in PORTRAITS:
+		var look: Array = PORTRAITS[portrait]
+		_save(_portrait(look[0], look[1], look[2], look[3]), portrait)
 	for index: int in OMAMORI.size():
 		_save(_omamori(OMAMORI_COLOURS[index], index), "omamori_" + OMAMORI[index])
 	_save(_bucket(), "bucket")
@@ -182,6 +193,55 @@ func _omamori(body: Color, emblem: int) -> Image:
 	for cell: int in 9:
 		if (emblem + 1) & (1 << cell) != 0:
 			image.set_pixel(6 + cell % 3, 7 + cell / 3, Color("#f4e9c9"))
+	return image
+
+
+## A face looking out of the frame: head, ears or a cap, eyes on a band of [param band] and a
+## lighter muzzle or robe of [param light].
+func _portrait(head: Color, top: String, band: Color, light: Color) -> Image:
+	var image: Image = _blank(PORTRAIT_SIZE, PORTRAIT_SIZE)
+	var centre: Vector2 = Vector2(15.5, 18.5)
+	var outline: Color = head.darkened(0.55)
+	var eye: Color = Color("#f4f1ea") if band.get_luminance() < 0.3 else Color("#1a1a1a")
+	for y: int in PORTRAIT_SIZE:
+		for x: int in PORTRAIT_SIZE:
+			var distance: float = Vector2(x, y).distance_to(centre)
+			if distance > 11.5:
+				continue
+			var colour: Color = head
+			if distance > 10.5:
+				colour = outline
+			elif y >= 21:
+				colour = light
+			elif y >= 15 and y <= 18:
+				colour = band
+			image.set_pixel(x, y, colour)
+	for side: int in [-1, 1]:
+		var eye_x: int = 16 + side * 4 - (1 if side < 0 else 0)
+		image.set_pixel(eye_x, 16, eye)
+		image.set_pixel(eye_x, 17, eye)
+		match top:
+			"pointed":
+				for row: int in 6:
+					for width: int in range(0, 6 - row):
+						var ear_x: int = 16 + side * (6 + width) - (1 if side < 0 else 0)
+						image.set_pixel(ear_x, 3 + row + 3, outline if width == 5 - row else head)
+			"round":
+				for dy: int in range(-2, 3):
+					for dx: int in range(-2, 3):
+						if dx * dx + dy * dy <= 5:
+							image.set_pixel(
+								16 + side * 8 + dx - (1 if side < 0 else 0), 8 + dy, outline
+							)
+	if top == "cap":
+		for y: int in range(4, 9):
+			for x: int in range(12 - (y - 4) / 2, 20 + (y - 4) / 2):
+				image.set_pixel(x, y, Color("#1a1a1a"))
+		for x: int in [11, 14, 17, 20]:
+			image.set_pixel(x, 24, Color("#d94f4f"))
+			image.set_pixel(x, 25, Color("#d94f4f"))
+	image.set_pixel(15, 22, outline)
+	image.set_pixel(16, 22, outline)
 	return image
 
 

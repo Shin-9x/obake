@@ -103,7 +103,7 @@ func test_omamori_match_the_gdd() -> void:
 
 
 func test_effect_scripts_extend_effect() -> void:
-	for folder: String in ["balls", "pegs", "omamori"]:
+	for folder: String in ["balls", "pegs", "omamori", "characters"]:
 		for file: String in DirAccess.get_files_at("res://data/" + folder):
 			var item: ItemDefinition = load("res://data/%s/%s" % [folder, file]) as ItemDefinition
 			if item == null or item.effect_script == null:

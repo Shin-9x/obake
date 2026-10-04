@@ -90,3 +90,17 @@ OMAMORI_TSUKUMOGAMI,Tsukumogami,Tsukumogami
 OMAMORI_TSUKUMOGAMI_DESC,Each purchased peg appears twice.,Ogni peg acquistato compare due volte.
 POPUP_MULT_SUB,−%s Mult,−%s Mult
 POPUP_POINTS_TIMES,×%s points,×%s punti
+CHARACTER_YAMABUSHI,Yamabushi,Yamabushi
+CHARACTER_YAMABUSHI_DESC,A mountain ascetic who reads the path of every shot.,Un asceta di montagna che legge la traiettoria di ogni tiro.
+CHARACTER_YAMABUSHI_POWER,Green lantern: the aim guide follows the ball to its 3rd contact for the next 2 shots.,Lanterna verde: la guida di mira segue la pallina fino al 3° contatto per i 2 tiri successivi.
+CHARACTER_YAMABUSHI_PASSIVE,No passive.,Nessuna passiva.
+CHARACTER_KITSUNE,Kitsune,Kitsune
+CHARACTER_KITSUNE_DESC,A fox spirit who lights the board with foxfire.,Uno spirito volpe che accende la board di fuochi fatui.
+CHARACTER_KITSUNE_POWER,"Green lantern: 3 random blue lanterns become kitsunebi (+1 mult each, not red).","Lanterna verde: 3 lanterne blu a caso diventano kitsunebi (+1 mult ciascuna, non rosse)."
+CHARACTER_KITSUNE_PASSIVE,Red lanterns also give +5 points.,Le lanterne rosse danno anche +5 punti.
+CHARACTER_TANUKI,Tanuki,Tanuki
+CHARACTER_TANUKI_DESC,A shape-shifting raccoon dog with a nose for coin.,Un cane procione mutaforma con il fiuto per le monete.
+CHARACTER_TANUKI_POWER,Green lantern: 3 random blue lanterns become coin pegs.,Lanterna verde: 3 lanterne blu a caso diventano peg moneta.
+CHARACTER_TANUKI_PASSIVE,The shop offers one extra ball; the bag starts one ball smaller.,Il negozio offre una pallina in più; la borsa parte con una pallina in meno.
+PEG_KITSUNEBI,Kitsunebi,Kitsunebi
+PEG_KITSUNEBI_DESC,+1 mult. Not a red lantern.,+1 mult. Non è una lanterna rossa.

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="PegDefinition" format=3 uid="uid://ll5o1yt4exk1"]
+
+[ext_resource type="Texture2D" uid="uid://btrsag0gyvd7v" path="res://assets/sprites/placeholder/peg_kitsunebi.png" id="1_uqpo2"]
+[ext_resource type="Script" uid="uid://22odkxg6kbgf" path="res://data/definitions/peg_definition.gd" id="2_nr6sw"]
+
+[resource]
+script = ExtResource("2_nr6sw")
+mult_add = 1000
+color = Color(0.37254903, 0.8784314, 0.78431374, 1)
+texture = ExtResource("1_uqpo2")
+id = &"kitsunebi"
+name_key = "PEG_KITSUNEBI"
+description_key = "PEG_KITSUNEBI_DESC"
+icon = ExtResource("1_uqpo2")
+level_values = PackedInt32Array()

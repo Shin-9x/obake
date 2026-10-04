@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="CharacterDefinition" format=3 uid="uid://cv6idjpr0v1en"]
+
+[ext_resource type="Script" uid="uid://bf74ivggfn1eq" path="res://src/sim/effects/characters/kitsune_effect.gd" id="1_fprdm"]
+[ext_resource type="Texture2D" uid="uid://cj3noel6ft2lg" path="res://assets/sprites/placeholder/portrait_kitsune.png" id="2_jbpfy"]
+[ext_resource type="Resource" uid="uid://ll5o1yt4exk1" path="res://data/pegs/kitsunebi.tres" id="3_aedjn"]
+[ext_resource type="Script" uid="uid://cqply7piwfcks" path="res://data/definitions/character_definition.gd" id="4_rrhew"]
+[ext_resource type="Script" uid="uid://bvi6uyl50g4fx" path="res://data/definitions/ball_definition.gd" id="5_fq5ce"]
+[ext_resource type="Resource" uid="uid://sofwthekutvh" path="res://data/balls/hitodama.tres" id="6_rr7xd"]
+[ext_resource type="Resource" uid="uid://cupskb5pf54lr" path="res://data/balls/phantom.tres" id="7_hy8i4"]
+
+[resource]
+script = ExtResource("4_rrhew")
+portrait = ExtResource("2_jbpfy")
+power_key = "CHARACTER_KITSUNE_POWER"
+passive_key = "CHARACTER_KITSUNE_PASSIVE"
+starting_balls = Array[ExtResource("5_fq5ce")]([ExtResource("6_rr7xd"), ExtResource("6_rr7xd"), ExtResource("6_rr7xd"), ExtResource("6_rr7xd"), ExtResource("6_rr7xd"), ExtResource("6_rr7xd"), ExtResource("7_hy8i4"), ExtResource("7_hy8i4")])
+power_peg = ExtResource("3_aedjn")
+id = &"kitsune"
+name_key = "CHARACTER_KITSUNE"
+description_key = "CHARACTER_KITSUNE_DESC"
+icon = ExtResource("2_jbpfy")
+effect_script = ExtResource("1_fprdm")
+level_values = PackedInt32Array()
+params = Dictionary[StringName, int]({
+&"count": 3,
+&"red_points": 5
+})

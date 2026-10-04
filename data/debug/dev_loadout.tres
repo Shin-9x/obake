@@ -20,9 +20,11 @@
 [ext_resource type="Resource" uid="uid://caqj1c68kceb6" path="res://data/pegs/coin_peg.tres" id="18_06hna"]
 [ext_resource type="Resource" uid="uid://dlnn3ufn2vo4x" path="res://data/pegs/kagami.tres" id="19_e4f5w"]
 [ext_resource type="Script" uid="uid://f5oow6tpmgex" path="res://data/definitions/loadout_definition.gd" id="20_bg0n6"]
+[ext_resource type="Resource" uid="uid://cv6idjpr0v1en" path="res://data/characters/kitsune.tres" id="21_kitsu"]
 
 [resource]
 script = ExtResource("20_bg0n6")
+character = ExtResource("21_kitsu")
 balls = Array[ExtResource("1_wroou")]([ExtResource("2_23yfw"), ExtResource("2_23yfw"), ExtResource("2_23yfw"), ExtResource("2_23yfw"), ExtResource("2_23yfw"), ExtResource("2_23yfw"), ExtResource("3_i53h8"), ExtResource("4_cjixa"), ExtResource("5_638kf"), ExtResource("6_6im81")])
 ball_levels = PackedInt32Array()
 omamori = Array[ExtResource("7_c48mq")]([ExtResource("8_jtk84"), ExtResource("9_ymo3o"), ExtResource("10_mo4rr"), ExtResource("11_manyt"), ExtResource("12_prqna")])
