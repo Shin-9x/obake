@@ -32,7 +32,8 @@ static func board(
 	positions: Array,
 	loadout: LoadoutDefinition = null,
 	settings: BalanceConfig = null,
-	board_seed: int = SEED
+	board_seed: int = SEED,
+	rules: BoardRules = null
 ) -> BoardGame:
 	var used: BalanceConfig = settings if settings != null else config()
 	var simulation: BoardSimulation = BoardSimulation.new(used)
@@ -40,8 +41,16 @@ static func board(
 		simulation.add_round_peg(position.x * PX, position.y * PX)
 	simulation.add_round_peg(SPARE.x * PX, SPARE.y * PX)
 	var rng: Pcg32 = Pcg32.new(board_seed, RngStreams.Domain.BOARD)
-	var game: BoardGame = BoardGame.new(simulation, used, TestBoards.gdd_pegs(), rng, loadout)
-	game.roles[positions.size()] = BoardGame.Role.RED
+	var game: BoardGame = BoardGame.new(
+		simulation, used, TestBoards.gdd_pegs(), rng, loadout, null, rules
+	)
+	var spare: int = positions.size()
+	if game.roles[spare] == BoardGame.Role.GOLD and spare > 0:
+		# The gold would turn the spare back to blue when it moves, ending the board in a
+		# Matsuri; it starts on the first peg instead.
+		game._gold = 0
+		game.roles[0] = BoardGame.Role.GOLD
+	game.roles[spare] = BoardGame.Role.RED
 	return game
 
 
@@ -84,6 +93,22 @@ static func probe_omamori(params: Dictionary = {}) -> OmamoriDefinition:
 	charm.effect_script = Probe
 	charm.params.assign(params)
 	return charm
+
+
+static func probe_character(params: Dictionary = {}) -> CharacterDefinition:
+	var character: CharacterDefinition = CharacterDefinition.new()
+	character.id = &"probe_character"
+	character.effect_script = Probe
+	character.params.assign(params)
+	return character
+
+
+static func probe_boss(params: Dictionary = {}) -> BossDefinition:
+	var boss: BossDefinition = BossDefinition.new()
+	boss.id = &"probe_boss"
+	boss.effect_script = Probe
+	boss.params.assign(params)
+	return boss
 
 
 static func probe_peg(script: GDScript = Probe) -> PegDefinition:

@@ -35,9 +35,13 @@ enum Kind {
 	FLOOR_BOUNCE,
 	## A ball was drawn from the bag for the shot.
 	BALL_DRAWN,
-	## [code]target[/code] is the slot of the effect that acted: an omamori slot, or
-	## [constant Effect.BALL_SLOT] / [constant Effect.PEG_SLOT].
+	## [code]target[/code] is the slot of the effect that acted: an omamori slot, or one of the
+	## negative slot constants of [Effect].
 	EFFECT_TRIGGERED,
+	## [code]amount[/code] is the factor applied to the shot's points, in permille.
+	SCORE_POINTS_TIMES,
+	## [code]target[/code] has become another kind of peg.
+	PEG_TRANSFORMED,
 }
 
 var kind: Kind = Kind.PEG_HIT

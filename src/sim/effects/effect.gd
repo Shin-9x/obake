@@ -1,19 +1,22 @@
 @tool
 class_name Effect
 extends RefCounted
-## Base of every item behaviour: balls, purchasable pegs, omamori and, later, character powers.
+## Base of every board behaviour: balls, purchasable pegs, omamori, characters and bosses.
 ##
 ## Subclasses override only the hooks they need and act only through [BoardGame]'s effect API.
-## Hooks run in a fixed order: the shot's ball, then the hit peg, then omamori by slot.
+## Hooks run in a fixed order: the shot's ball, the hit peg, the character, the boss, then omamori
+## by slot.
 
 ## [member slot] of a ball's effect.
 const BALL_SLOT: int = -1
 ## [member slot] of a purchased peg's effect.
 const PEG_SLOT: int = -2
+const CHARACTER_SLOT: int = -3
+const BOSS_SLOT: int = -4
 
 var definition: ItemDefinition
 var level: int = 1
-## Omamori slot, or [constant BALL_SLOT] / [constant PEG_SLOT].
+## Omamori slot, or one of the negative slot constants.
 var slot: int = BALL_SLOT
 
 
@@ -52,6 +55,11 @@ func on_peg_hit(_game: BoardGame, _hit: PegHit) -> void:
 	pass
 
 
+## A green lantern was hit and scored: the character power acts here.
+func on_power(_game: BoardGame, _hit: PegHit) -> void:
+	pass
+
+
 func on_wall_bounce(_game: BoardGame) -> void:
 	pass
 
@@ -61,6 +69,11 @@ func on_bucket(_game: BoardGame) -> void:
 
 
 func on_shot_end(_game: BoardGame) -> void:
+	pass
+
+
+## The shot has been scored and the board goes on; the gold lantern has already moved.
+func on_shot_scored(_game: BoardGame) -> void:
 	pass
 
 

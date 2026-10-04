@@ -88,3 +88,5 @@ OMAMORI_SHUTEN_SAKE,Shuten's Sake,Sake di Shuten
 OMAMORI_SHUTEN_SAKE_DESC,"Final mult of each shot ×2, −2 shots per board.","Mult finale di ogni tiro ×2, −2 tiri per board."
 OMAMORI_TSUKUMOGAMI,Tsukumogami,Tsukumogami
 OMAMORI_TSUKUMOGAMI_DESC,Each purchased peg appears twice.,Ogni peg acquistato compare due volte.
+POPUP_MULT_SUB,−%s Mult,−%s Mult
+POPUP_POINTS_TIMES,×%s points,×%s punti

@@ -4,9 +4,9 @@ class_name BoardGame
 ## of balls, items acting through effects, a limited number of shots, and victory by score
 ## target or by Matsuri.
 ##
-## The board seed, the loadout and the shot inputs fully determine a game, which makes it
-## replayable. Effects change the game only through the methods of the effect API below; hooks run
-## for the shot's ball, then the hit peg, then the omamori in slot order.
+## The board seed, the loadout, the rules and the shot inputs fully determine a game, which makes
+## it replayable. Effects change the game only through the methods of the effect API below; hooks
+## run for the shot's ball, the hit peg, the character, the boss, then the omamori in slot order.
 
 enum Outcome { PLAYING, TARGET_REACHED, MATSURI, FAILED }
 ## SPECIAL marks a purchased peg, which carries its own definition.
@@ -48,13 +48,19 @@ var shot_red_hits: int = 0
 var shot_wall_bounces: int = 0
 ## The shot's ball, or one of its splits, was caught by the bucket.
 var shot_caught: bool = false
+## Lowest mult a shot can drop to, in permille.
+var mult_floor: int = 0
+## Shots still to come that show the extended aim guide, and how many contacts it follows.
+var extended_guide_shots: int = 0
+var extended_guide_contacts: int = 1
 
 var _config: BalanceConfig
 var _rng: Pcg32
 var _definitions: Array[PegDefinition] = []
 var _peg_definitions: Array[PegDefinition] = []
 var _peg_effects: Array[Effect] = []
-var _omamori: Array[Effect] = []
+## Character, boss, then omamori in slot order: the effects that act on every hit.
+var _effects: Array[Effect] = []
 var _scored: PackedByteArray = PackedByteArray()
 var _candidates: PackedInt32Array = PackedInt32Array()
 var _gold: int = -1
@@ -85,7 +91,8 @@ func _init(
 	base_pegs: BasePegs,
 	rng: Pcg32,
 	loadout: LoadoutDefinition = null,
-	run_carry: RunCarry = null
+	run_carry: RunCarry = null,
+	rules: BoardRules = null
 ) -> void:
 	simulation = board
 	events = board.events
@@ -95,6 +102,9 @@ func _init(
 	_definitions = [base_pegs.blue, base_pegs.red, base_pegs.green, base_pegs.gold, null]
 	shots_left = config.shots_per_board
 	target = config.first_board_target
+	if rules != null:
+		target = rules.target if rules.target > 0 else target
+		shots_left += rules.shot_delta
 	var count: int = board.pegs.size()
 	_peg_definitions.resize(count)
 	_peg_effects.resize(count)
@@ -110,16 +120,18 @@ func _init(
 	if loadout != null:
 		for index: int in loadout.balls.size():
 			balls.append(BagBall.new(loadout.balls[index], loadout.level_of(index)))
+		_add_effect(Effect.create(loadout.character, 1, Effect.CHARACTER_SLOT))
+	if rules != null:
+		_add_effect(Effect.create(rules.boss, 1, Effect.BOSS_SLOT))
+	if loadout != null:
 		for slot: int in loadout.omamori.size():
-			var charm: Effect = Effect.create(loadout.omamori[slot], 1, slot)
-			if charm != null:
-				_omamori.append(charm)
+			_add_effect(Effect.create(loadout.omamori[slot], 1, slot))
 	bag = BallBag.new(balls, rng)
 	for ball: BagBall in balls:
 		if ball.effect != null:
 			ball.effect.on_board_start(self)
-	for charm: Effect in _omamori:
-		charm.on_board_start(self)
+	for effect: Effect in _effects:
+		effect.on_board_start(self)
 	shots_left = maxi(1, shots_left)
 	if loadout != null:
 		_place_purchased(loadout.purchased_pegs)
@@ -168,6 +180,7 @@ func shoot(input: ShotInput) -> bool:
 	_keep_on_top = false
 	shots_left -= 1
 	shots_fired += 1
+	extended_guide_shots = maxi(0, extended_guide_shots - 1)
 	shot_ball = bag.draw()
 	simulation.launch(input)
 	var ball: SimBall = launched_ball()
@@ -178,8 +191,8 @@ func shoot(input: ShotInput) -> bool:
 		events.push(SimEvent.Kind.SCORE_MULT_ADD, simulation.tick, -1, -1, ball.x, ball.y, bonus)
 	if shot_ball != null and shot_ball.effect != null:
 		shot_ball.effect.on_shot_start(self)
-	for charm: Effect in _omamori:
-		charm.on_shot_start(self)
+	for effect: Effect in _effects:
+		effect.on_shot_start(self)
 	return true
 
 
@@ -237,15 +250,21 @@ func add_points(amount: int, x: int, y: int) -> void:
 	events.push(SimEvent.Kind.SCORE_POINTS, simulation.tick, -1, -1, x, y, amount)
 
 
+## [param factor] in permille.
+func multiply_points(factor: int, x: int, y: int) -> void:
+	shot_points = FixedMath.div_round(shot_points * factor, _PERMILLE)
+	events.push(SimEvent.Kind.SCORE_POINTS_TIMES, simulation.tick, -1, -1, x, y, factor)
+
+
 ## [param amount] in permille.
 func add_mult(amount: int, x: int, y: int) -> void:
-	shot_mult += amount
+	shot_mult = maxi(mult_floor, shot_mult + amount)
 	events.push(SimEvent.Kind.SCORE_MULT_ADD, simulation.tick, -1, -1, x, y, amount)
 
 
 ## [param factor] in permille.
 func multiply_mult(factor: int, x: int, y: int) -> void:
-	shot_mult = FixedMath.div_round(shot_mult * factor, _PERMILLE)
+	shot_mult = maxi(mult_floor, FixedMath.div_round(shot_mult * factor, _PERMILLE))
 	events.push(SimEvent.Kind.SCORE_MULT_TIMES, simulation.tick, -1, -1, x, y, factor)
 
 
@@ -330,6 +349,39 @@ func place_special(peg: int, definition: PegDefinition) -> void:
 	sim_peg.attractor = false
 
 
+## Turns up to [param count] random [param role] pegs that are still unlit into
+## [param definition] pegs, and returns how many it turned.
+func transform_random(role: Role, count: int, definition: PegDefinition) -> int:
+	var turned: int = 0
+	for pick: int in count:
+		var available: int = 0
+		for peg: int in roles.size():
+			var candidate: SimPeg = simulation.pegs[peg]
+			if roles[peg] == role and not candidate.lit and not candidate.removed:
+				_candidates[available] = peg
+				available += 1
+		if available == 0:
+			break
+		var chosen: int = _candidates[_rng.next_below(available)]
+		place_special(chosen, definition)
+		var where: SimPeg = simulation.pegs[chosen]
+		events.push(SimEvent.Kind.PEG_TRANSFORMED, simulation.tick, -1, chosen, where.x, where.y)
+		turned += 1
+	return turned
+
+
+## Shows the aim guide up to [param contacts] contacts for the next [param shots] shots, on top
+## of any extension still running.
+func extend_guide(shots: int, contacts: int) -> void:
+	extended_guide_shots += shots
+	extended_guide_contacts = maxi(extended_guide_contacts, contacts)
+
+
+## Contacts the aim guide follows for the shot being aimed.
+func guide_contacts() -> int:
+	return extended_guide_contacts if extended_guide_shots > 0 else 1
+
+
 ## The shot's ball goes back on top of the bag instead of being discarded.
 func keep_ball_on_top() -> void:
 	_keep_on_top = true
@@ -371,8 +423,8 @@ func _score(peg: int, source: PegHit.Source, ball: int) -> void:
 		shot_ball.effect.on_peg_hit(self, hit)
 	if _peg_effects[peg] != null:
 		_peg_effects[peg].on_peg_hit(self, hit)
-	for charm: Effect in _omamori:
-		charm.on_peg_hit(self, hit)
+	for effect: Effect in _effects:
+		effect.on_peg_hit(self, hit)
 	var where: SimPeg = simulation.pegs[peg]
 	var tick: int = simulation.tick
 	var points: int = FixedMath.div_round(
@@ -382,15 +434,18 @@ func _score(peg: int, source: PegHit.Source, ball: int) -> void:
 		shot_points += points
 		events.push(SimEvent.Kind.SCORE_POINTS, tick, -1, peg, where.x, where.y, points)
 	if hit.mult_add != 0:
-		shot_mult += hit.mult_add
+		shot_mult = maxi(mult_floor, shot_mult + hit.mult_add)
 		events.push(SimEvent.Kind.SCORE_MULT_ADD, tick, -1, peg, where.x, where.y, hit.mult_add)
 	if hit.mult_factor != _PERMILLE:
-		shot_mult = FixedMath.div_round(shot_mult * hit.mult_factor, _PERMILLE)
+		shot_mult = maxi(mult_floor, FixedMath.div_round(shot_mult * hit.mult_factor, _PERMILLE))
 		events.push(
 			SimEvent.Kind.SCORE_MULT_TIMES, tick, -1, peg, where.x, where.y, hit.mult_factor
 		)
 	if hit.mon != 0:
 		add_mon(hit.mon, where.x, where.y)
+	if hit.role == Role.GREEN:
+		for effect: Effect in _effects:
+			effect.on_power(self, hit)
 
 
 func _drain_areas() -> void:
@@ -435,18 +490,23 @@ func _burn_due_pegs(now: int) -> void:
 		score_hit(peg, PegHit.Source.FIRE, -1)
 
 
+func _add_effect(effect: Effect) -> void:
+	if effect != null:
+		_effects.append(effect)
+
+
 func _dispatch_wall_bounce() -> void:
 	if shot_ball != null and shot_ball.effect != null:
 		shot_ball.effect.on_wall_bounce(self)
-	for charm: Effect in _omamori:
-		charm.on_wall_bounce(self)
+	for effect: Effect in _effects:
+		effect.on_wall_bounce(self)
 
 
 func _dispatch_bucket() -> void:
 	if shot_ball != null and shot_ball.effect != null:
 		shot_ball.effect.on_bucket(self)
-	for charm: Effect in _omamori:
-		charm.on_bucket(self)
+	for effect: Effect in _effects:
+		effect.on_bucket(self)
 
 
 func _resolve_shot() -> void:
@@ -455,11 +515,11 @@ func _resolve_shot() -> void:
 	simulation.remove_lit_pegs()
 	if shot_ball != null and shot_ball.effect != null:
 		shot_ball.effect.on_shot_end(self)
-	for charm: Effect in _omamori:
-		charm.on_shot_end(self)
+	for effect: Effect in _effects:
+		effect.on_shot_end(self)
 	var tick: int = simulation.tick
 	if _end_mult_factor != _PERMILLE:
-		shot_mult = FixedMath.div_round(shot_mult * _end_mult_factor, _PERMILLE)
+		shot_mult = maxi(mult_floor, FixedMath.div_round(shot_mult * _end_mult_factor, _PERMILLE))
 		events.push(SimEvent.Kind.SCORE_MULT_TIMES, tick, -1, -1, 0, 0, _end_mult_factor)
 	var score: int = FixedMath.div_round(shot_points * shot_mult, _PERMILLE)
 	total += score
@@ -474,6 +534,8 @@ func _resolve_shot() -> void:
 		outcome = Outcome.FAILED
 	else:
 		_move_gold()
+		for effect: Effect in _effects:
+			effect.on_shot_scored(self)
 	if outcome != Outcome.PLAYING:
 		_finish_board(tick)
 
@@ -495,8 +557,8 @@ func _finish_board(tick: int) -> void:
 	result.total = total
 	result.shots_left = shots_left
 	result.interest_cap = _config.interest_cap
-	for charm: Effect in _omamori:
-		charm.on_board_end(self, result)
+	for effect: Effect in _effects:
+		effect.on_board_end(self, result)
 	result.mon_earned = mon_earned
 	events.push(SimEvent.Kind.BOARD_ENDED, tick, -1, -1, 0, 0, outcome)
 

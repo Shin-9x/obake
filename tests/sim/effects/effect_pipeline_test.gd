@@ -164,3 +164,66 @@ func test_board_end_reports_result_to_effects() -> void:
 	assert_int(game.result.mon_earned).is_equal(3)
 	assert_int(game.result.interest_cap).is_equal(settings.interest_cap)
 	assert_array(Probe.journal).contains(["0:board_end"])
+
+
+func test_character_and_boss_hooks_run_between_the_peg_and_omamori() -> void:
+	var loadout: LoadoutDefinition = Harness.loadout(
+		[Harness.probe_ball()], [Harness.probe_omamori()]
+	)
+	loadout.character = Harness.probe_character()
+	var rules: BoardRules = BoardRules.new(0, 0, Harness.probe_boss())
+	var game: BoardGame = Harness.board(Harness.ROW, loadout, null, Harness.SEED, rules)
+	game.place_special(0, Harness.probe_peg())
+	assert_array(Probe.journal).is_equal(
+		["-1:board_start", "-3:board_start", "-4:board_start", "0:board_start"]
+	)
+	Probe.journal.clear()
+	Harness.shoot(game)
+	game.score_hit(0)
+	assert_array(Probe.journal).is_equal(
+		[
+			"-1:shot_start",
+			"-3:shot_start",
+			"-4:shot_start",
+			"0:shot_start",
+			"-1:peg_hit",
+			"-2:peg_hit",
+			"-3:peg_hit",
+			"-4:peg_hit",
+			"0:peg_hit"
+		]
+	)
+
+
+func test_the_power_acts_when_a_green_lantern_scores() -> void:
+	var loadout: LoadoutDefinition = Harness.loadout()
+	loadout.character = Harness.probe_character()
+	var game: BoardGame = Harness.board(Harness.ROW, loadout)
+	Harness.all_blue(game)
+	game.roles[1] = BoardGame.Role.GREEN
+	Harness.shoot(game)
+	Probe.journal.clear()
+	game.score_hit(0)
+	assert_array(Probe.journal).is_equal(["-3:peg_hit"])
+	game.score_hit(1)
+	assert_array(Probe.journal).is_equal(["-3:peg_hit", "-3:peg_hit", "-3:power"])
+	assert_int(game.shot_points).is_equal(20)
+
+
+func test_shot_scored_runs_only_while_the_board_goes_on() -> void:
+	var loadout: LoadoutDefinition = Harness.loadout()
+	loadout.character = Harness.probe_character()
+	var game: BoardGame = Harness.board(Harness.ROW, loadout)
+	Harness.shoot(game)
+	Harness.finish(game)
+	assert_array(Probe.journal).contains(["-3:shot_scored"])
+	Probe.journal.clear()
+	var last: BoardGame = Harness.board(
+		Harness.ROW, loadout, null, Harness.SEED, BoardRules.new(0, -7)
+	)
+	Probe.journal.clear()
+	Harness.shoot(last)
+	Harness.finish(last)
+	assert_int(last.outcome).is_equal(BoardGame.Outcome.FAILED)
+	assert_array(Probe.journal).not_contains(["-3:shot_scored"])
+	assert_array(Probe.journal).contains(["-3:board_end"])

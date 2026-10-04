@@ -133,9 +133,16 @@ func _consume_events() -> void:
 				score_changed = true
 				pegs_changed = true
 			SimEvent.Kind.SCORE_MULT_ADD:
-				var added: String = BoardHud.format_mult(event.amount)
-				_popups.show_text(tr("POPUP_MULT_ADD") % added, at, MULT_COLOR)
+				var added: String = BoardHud.format_mult(absi(event.amount))
+				var key: String = "POPUP_MULT_ADD" if event.amount >= 0 else "POPUP_MULT_SUB"
+				_popups.show_text(tr(key) % added, at, MULT_COLOR)
 				score_changed = true
+				pegs_changed = true
+			SimEvent.Kind.SCORE_POINTS_TIMES:
+				var scaled: String = BoardHud.format_mult(event.amount)
+				_popups.show_text(tr("POPUP_POINTS_TIMES") % scaled, at, POINTS_COLOR)
+				score_changed = true
+			SimEvent.Kind.PEG_TRANSFORMED:
 				pegs_changed = true
 			SimEvent.Kind.SCORE_MULT_TIMES:
 				var factor: String = BoardHud.format_mult(event.amount)

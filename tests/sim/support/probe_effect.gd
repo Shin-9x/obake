@@ -23,6 +23,10 @@ func on_peg_hit(_game: BoardGame, hit: PegHit) -> void:
 		)
 
 
+func on_power(_game: BoardGame, _hit: PegHit) -> void:
+	journal.append("%d:power" % slot)
+
+
 func on_wall_bounce(_game: BoardGame) -> void:
 	journal.append("%d:wall_bounce" % slot)
 
@@ -37,6 +41,10 @@ func on_shot_end(game: BoardGame) -> void:
 		game.multiply_final_mult(param(&"final_factor"))
 	if definition.params.has(&"mult_add"):
 		game.add_mult(param(&"mult_add"), 0, 0)
+
+
+func on_shot_scored(_game: BoardGame) -> void:
+	journal.append("%d:shot_scored" % slot)
 
 
 func on_board_end(_game: BoardGame, _result: BoardResult) -> void:
