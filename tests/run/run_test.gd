@@ -37,7 +37,7 @@ func test_layouts_do_not_repeat_on_a_floor() -> void:
 func test_a_won_board_pays_and_offers_three_balls() -> void:
 	var run: Run = _run()
 	_enter(run, MapNode.Kind.BOARD)
-	run.finish_board(_result(BoardGame.Outcome.TARGET_REACHED, 2))
+	Fixtures.finish(run, BoardGame.Outcome.TARGET_REACHED, 2)
 	assert_int(run.phase).is_equal(Run.Phase.REWARD)
 	# 4 mon held: no interest; win 4 and two unused shots.
 	assert_int(run.state.mon).is_equal(10)
@@ -53,7 +53,7 @@ func test_a_won_board_pays_and_offers_three_balls() -> void:
 func test_skipping_the_ball_pays_two_mon() -> void:
 	var run: Run = _run()
 	_enter(run, MapNode.Kind.BOARD)
-	run.finish_board(_result(BoardGame.Outcome.TARGET_REACHED, 0))
+	Fixtures.finish(run, BoardGame.Outcome.TARGET_REACHED, 0)
 	var mon: int = run.state.mon
 	run.skip_ball()
 	assert_int(run.state.mon).is_equal(mon + 2)
@@ -64,7 +64,7 @@ func test_an_elite_board_offers_a_ball_then_an_omamori() -> void:
 	var run: Run = _run()
 	_enter(run, MapNode.Kind.ELITE)
 	assert_int(run.board.rules.target).is_equal(1200)
-	run.finish_board(_result(BoardGame.Outcome.TARGET_REACHED, 0))
+	Fixtures.finish(run, BoardGame.Outcome.TARGET_REACHED, 0)
 	assert_bool(run.take_omamori(0)).is_false()
 	run.take_ball(0)
 	assert_int(run.phase).is_equal(Run.Phase.REWARD)
@@ -79,7 +79,7 @@ func test_a_full_set_of_slots_needs_an_omamori_to_replace() -> void:
 	for id: String in ["chochin", "drum", "kaeru", "uchiwa", "patience"]:
 		run.state.inventory.add_omamori(Fixtures.omamori(id))
 	_enter(run, MapNode.Kind.ELITE)
-	run.finish_board(_result(BoardGame.Outcome.TARGET_REACHED, 0))
+	Fixtures.finish(run, BoardGame.Outcome.TARGET_REACHED, 0)
 	run.skip_ball()
 	var offered: OmamoriDefinition = run.omamori_choices[0]
 	assert_bool(run.take_omamori(0)).is_false()
@@ -92,7 +92,7 @@ func test_beating_a_boss_offers_omamori_and_opens_the_next_floor() -> void:
 	_enter_boss(run)
 	assert_object(run.board.rules.boss).is_same(run.content.floor_bosses[0])
 	assert_str(run.board.layout.id).is_equal("jorogumo")
-	run.finish_board(_result(BoardGame.Outcome.MATSURI, 0))
+	Fixtures.finish(run, BoardGame.Outcome.MATSURI, 0)
 	assert_array(run.ball_choices).is_empty()
 	assert_array(run.omamori_choices).has_size(3)
 	run.skip_omamori()
@@ -114,14 +114,14 @@ func test_beating_the_last_boss_wins_the_run() -> void:
 	var run: Run = _run()
 	run.state.floor_index = 3
 	_enter_boss(run)
-	run.finish_board(_result(BoardGame.Outcome.TARGET_REACHED, 0))
+	Fixtures.finish(run, BoardGame.Outcome.TARGET_REACHED, 0)
 	assert_int(run.phase).is_equal(Run.Phase.VICTORY)
 
 
 func test_losing_a_board_ends_the_run() -> void:
 	var run: Run = _run()
 	_enter(run, MapNode.Kind.BOARD)
-	run.finish_board(_result(BoardGame.Outcome.FAILED, 0))
+	Fixtures.finish(run, BoardGame.Outcome.FAILED, 0)
 	assert_int(run.phase).is_equal(Run.Phase.DEFEAT)
 
 
@@ -130,7 +130,7 @@ func test_the_kappa_pays_on_a_matsuri_and_forgets_the_bet_otherwise() -> void:
 		var run: Run = _run()
 		run.state.bet = 15
 		_enter(run, MapNode.Kind.BOARD)
-		run.finish_board(_result(outcome, 0))
+		Fixtures.finish(run, outcome, 0)
 		var wager: int = 15 if outcome == BoardGame.Outcome.MATSURI else 0
 		assert_int(run.payout.wager).is_equal(wager)
 		assert_int(run.state.bet).is_equal(0)
@@ -159,13 +159,7 @@ func test_shops_shrines_and_events_return_to_the_map() -> void:
 
 
 func _run() -> Run:
-	return Run.start(
-		Fixtures.config(),
-		Fixtures.content(),
-		LayoutLibrary.load_from(),
-		Fixtures.character("yamabushi"),
-		Fixtures.SEED
-	)
+	return Fixtures.run()
 
 
 ## Turns the first reachable node into [param kind] and enters it.
@@ -179,11 +173,3 @@ func _enter_boss(run: Run) -> void:
 	var map: FloorMap = run.state.current_map()
 	run.state.node = map.steps[map.steps.size() - 2][0]
 	assert_bool(run.choose_node(map.boss())).is_true()
-
-
-func _result(outcome: BoardGame.Outcome, shots_left: int) -> BoardResult:
-	var result: BoardResult = BoardResult.new()
-	result.outcome = outcome
-	result.shots_left = shots_left
-	result.interest_cap = 5
-	return result

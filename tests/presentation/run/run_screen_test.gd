@@ -34,14 +34,14 @@ func test_a_board_node_plays_the_board_then_shows_the_rewards() -> void:
 	assert_int(board.game.target).is_equal(800)
 	assert_bool((board.get_node("%CharacterRow") as Control).visible).is_true()
 	assert_bool((board.get_node("%BossBox") as Control).visible).is_false()
-	board.board_finished.emit(_result(BoardGame.Outcome.TARGET_REACHED))
+	_end_board(screen, BoardGame.Outcome.TARGET_REACHED)
 	assert_object(screen.current).is_instanceof(RewardScreen)
 
 
 func test_a_lost_board_ends_the_run_and_a_new_run_can_start() -> void:
 	var screen: RunScreen = _started()
 	screen._on_node_chosen(screen.run.reachable_nodes()[0])
-	(screen.current as BoardScreen).board_finished.emit(_result(BoardGame.Outcome.FAILED))
+	_end_board(screen, BoardGame.Outcome.FAILED)
 	assert_object(screen.current).is_instanceof(RunEndScreen)
 	Screens.button(screen.current, "BUTTON_NEW_RUN").pressed.emit()
 	assert_object(screen.current).is_instanceof(CharacterSelectScreen)
@@ -64,8 +64,11 @@ func _started() -> RunScreen:
 	return screen
 
 
-func _result(outcome: BoardGame.Outcome) -> BoardResult:
+## Ends the board on screen with [param outcome] without simulating it, then continues.
+func _end_board(screen: RunScreen, outcome: BoardGame.Outcome) -> void:
 	var result: BoardResult = BoardResult.new()
 	result.outcome = outcome
 	result.interest_cap = 5
-	return result
+	screen.run.game.outcome = outcome
+	screen.run.game.result = result
+	(screen.current as BoardScreen).board_finished.emit(result)

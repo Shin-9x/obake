@@ -5,13 +5,7 @@ const Fixtures: GDScript = preload("res://tests/run/support/run_fixtures.gd")
 
 
 static func run(character: String = "yamabushi") -> Run:
-	return Run.start(
-		Fixtures.config(),
-		Fixtures.content(),
-		LayoutLibrary.load_from(),
-		Fixtures.character(character),
-		Fixtures.SEED
-	)
+	return Fixtures.run(character)
 
 
 ## Turns the first reachable node into [param kind] and enters it.
@@ -23,10 +17,7 @@ static func enter(played: Run, kind: MapNode.Kind) -> void:
 
 static func win(played: Run, kind: MapNode.Kind) -> void:
 	enter(played, kind)
-	var result: BoardResult = BoardResult.new()
-	result.outcome = BoardGame.Outcome.TARGET_REACHED
-	result.interest_cap = 5
-	played.finish_board(result)
+	Fixtures.finish(played, BoardGame.Outcome.TARGET_REACHED)
 
 
 ## Every descendant of [param node] that is a [param type], in tree order.

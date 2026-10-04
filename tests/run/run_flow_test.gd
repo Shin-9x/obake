@@ -55,5 +55,10 @@ func test_the_first_floor_matches_its_golden_result() -> void:
 
 func _run(config: BalanceConfig, character: CharacterDefinition) -> Run:
 	return Run.start(
-		config, Fixtures.content(), LayoutLibrary.load_from(), character, Fixtures.SEED
+		config,
+		Fixtures.content(),
+		LayoutLibrary.load_from(),
+		Fixtures.base_pegs(),
+		character,
+		Fixtures.SEED
 	)

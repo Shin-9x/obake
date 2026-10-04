@@ -46,19 +46,19 @@ func _show_offers() -> void:
 	_body.add_child(UiKit.label("SHOP_TITLE", UiKit.TITLE_SIZE))
 	var first: HBoxContainer = UiKit.row(8)
 	for index: int in shop.balls.size():
-		first.add_child(_offer_card(shop.balls[index], true, _buy.bind(shop.buy_ball, index)))
+		first.add_child(_offer_card(shop.balls[index], true, _buy.bind(_run.buy_ball, index)))
 	_body.add_child(first)
 	var second: HBoxContainer = UiKit.row(8)
 	var room: bool = _run.state.inventory.free_slots() > 0
 	for index: int in shop.omamori.size():
 		var card: ItemCard = _offer_card(
-			shop.omamori[index], room, _buy.bind(shop.buy_omamori, index)
+			shop.omamori[index], room, _buy.bind(_run.buy_omamori, index)
 		)
 		if not room:
 			card.tooltip_text = tr("SHOP_NO_SLOT")
 		second.add_child(card)
 	for index: int in shop.pegs.size():
-		second.add_child(_offer_card(shop.pegs[index], true, _buy.bind(shop.buy_peg, index)))
+		second.add_child(_offer_card(shop.pegs[index], true, _buy.bind(_run.buy_peg, index)))
 	_body.add_child(second)
 	var services: HBoxContainer = UiKit.row(8)
 	var reroll: Button = UiKit.button(tr("SHOP_REROLL") % shop.reroll_price(), false)
@@ -132,18 +132,18 @@ func _buy(purchase: Callable, index: int) -> void:
 
 
 func _reroll() -> void:
-	_run.shop.reroll()
+	_run.reroll()
 	_refresh()
 
 
 func _upgrade(index: int) -> void:
-	_run.shop.upgrade_ball(index)
+	_run.upgrade_ball(index)
 	_mode = Mode.BUY
 	_refresh()
 
 
 func _sell(slot: int) -> void:
-	_run.shop.sell_omamori(slot)
+	_run.sell_omamori(slot)
 	_mode = Mode.BUY
 	_refresh()
 

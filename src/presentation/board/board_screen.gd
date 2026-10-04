@@ -31,6 +31,9 @@ const MON_COLOR: Color = Color("#ffe08a")
 
 ## Plays random development boards when true; the run sets it to false before adding the screen.
 var standalone: bool = true
+## Fires shots for a run, which logs them: called with the aim and the board clock. Without it
+## shots go straight to the board.
+var shooter: Callable
 var game: BoardGame
 var placed: PlacedBoard
 var board_seed: int = 0
@@ -118,7 +121,10 @@ func _show(
 func shoot() -> void:
 	if not game.can_shoot():
 		return
-	game.shoot(ShotInput.new(_aim.aim, game.simulation.clock))
+	if shooter.is_valid():
+		shooter.call(_aim.aim, game.simulation.clock)
+	else:
+		game.shoot(ShotInput.new(_aim.aim, game.simulation.clock))
 	_guide.visible = false
 	_consume_events()
 	_hud.update_shot(game)

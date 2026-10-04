@@ -30,7 +30,7 @@ func show_character_select() -> void:
 
 
 func start_run(character: CharacterDefinition, seed_value: int) -> void:
-	run = Run.start(BALANCE, CONTENT, _library, character, seed_value)
+	run = Run.start(BALANCE, CONTENT, _library, BASE_PEGS, character, seed_value)
 	show_phase()
 
 
@@ -74,16 +74,11 @@ func show_phase() -> void:
 func _show_board() -> void:
 	var board: BoardScreen = BOARD_SCENE.instantiate() as BoardScreen
 	board.standalone = false
+	board.shooter = run.shoot
 	_swap(board)
 	var spec: BoardSpec = run.board
 	var inventory: Inventory = run.state.inventory
-	board.play(
-		spec.create(BALANCE, BASE_PEGS, inventory, run.state.carry),
-		spec.board_seed,
-		inventory.loadout,
-		inventory.slots,
-		spec.rules.boss
-	)
+	board.play(run.placed, spec.board_seed, inventory.loadout, inventory.slots, spec.rules.boss)
 	board.board_finished.connect(_on_board_finished)
 
 
@@ -105,8 +100,8 @@ func _on_node_chosen(node: int) -> void:
 		show_phase()
 
 
-func _on_board_finished(result: BoardResult) -> void:
-	run.finish_board(result)
+func _on_board_finished(_result: BoardResult) -> void:
+	run.finish_board()
 	show_phase()
 
 
