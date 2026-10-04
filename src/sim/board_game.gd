@@ -39,8 +39,14 @@ var shot_ball: BagBall
 ## Shots fired on this board, free ones included.
 var shots_fired: int = 0
 var mon_earned: int = 0
-## Highest score of a single shot on this board.
+## Records of this board, for feats: the best single shot by score, by pegs and red lanterns hit
+## and by mult (permille), the balls caught by the bucket and the special balls fired.
 var best_shot: int = 0
+var best_shot_pegs: int = 0
+var best_shot_reds: int = 0
+var best_shot_mult: int = 0
+var bucket_catches: int = 0
+var special_balls_fired: int = 0
 ## Mult added when the next shot starts, in permille.
 var next_shot_mult_bonus: int = 0
 ## Copies placed of every purchased peg.
@@ -185,6 +191,8 @@ func shoot(input: ShotInput) -> bool:
 	shots_fired += 1
 	extended_guide_shots = maxi(0, extended_guide_shots - 1)
 	shot_ball = bag.draw()
+	if shot_ball != null and shot_ball.definition.rarity != ItemDefinition.Rarity.BASE:
+		special_balls_fired += 1
 	simulation.launch(input)
 	var ball: SimBall = launched_ball()
 	events.push(
@@ -221,6 +229,7 @@ func step() -> void:
 				_dispatch_wall_bounce()
 			SimEvent.Kind.BUCKET_CATCH:
 				shot_caught = true
+				bucket_catches += 1
 				# GDD: a ball caught by the bucket returns to the bag, so the shot is free.
 				if not _refunded:
 					_refunded = true
@@ -598,6 +607,9 @@ func _resolve_shot() -> void:
 	var score: int = FixedMath.div_round(shot_points * shot_mult, _PERMILLE)
 	total += score
 	best_shot = maxi(best_shot, score)
+	best_shot_pegs = maxi(best_shot_pegs, shot_pegs_hit)
+	best_shot_reds = maxi(best_shot_reds, shot_red_hits)
+	best_shot_mult = maxi(best_shot_mult, shot_mult)
 	events.push(SimEvent.Kind.SHOT_SCORED, tick, -1, -1, 0, 0, score)
 	_return_ball()
 	if red_remaining() == 0:
@@ -632,6 +644,12 @@ func _finish_board(tick: int) -> void:
 	result.total = total
 	result.shots_left = shots_left
 	result.best_shot = best_shot
+	result.best_shot_pegs = best_shot_pegs
+	result.best_shot_reds = best_shot_reds
+	result.best_shot_mult = best_shot_mult
+	result.bucket_catches = bucket_catches
+	result.shots_fired = shots_fired
+	result.special_balls_fired = special_balls_fired
 	result.interest_cap = _config.interest_cap
 	for effect: Effect in _effects:
 		effect.on_board_end(self, result)
