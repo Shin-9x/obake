@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="EventDefinition" format=3 uid="uid://cgsp040ua3mpv"]
+
+[ext_resource type="Script" uid="uid://bngfnqhsqkpu6" path="res://src/run/events/abandoned_temple_event.gd" id="1_ncix6"]
+[ext_resource type="Script" uid="uid://5n8ddyrc0giq" path="res://data/definitions/event_definition.gd" id="2_0gt7t"]
+
+[resource]
+script = ExtResource("2_0gt7t")
+id = &"abandoned_temple"
+title_key = "EVENT_TEMPLE"
+text_key = "EVENT_TEMPLE_TEXT"
+event_script = ExtResource("1_ncix6")

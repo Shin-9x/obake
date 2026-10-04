@@ -8,6 +8,7 @@ extends Resource
 @export var floor_biomes: PackedStringArray = PackedStringArray()
 ## Boss at the end of each floor, from the first.
 @export var floor_bosses: Array[BossDefinition] = []
+@export var events: Array[EventDefinition] = []
 @export var balls: Array[BallDefinition] = []
 @export var omamori: Array[OmamoriDefinition] = []
 @export var pegs: Array[PegDefinition] = []

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EventDefinition" format=3 uid="uid://b4cibef88ygpu"]
+
+[ext_resource type="Script" uid="uid://cc2dskrnsmo3q" path="res://src/run/events/traveller_event.gd" id="1_ossvq"]
+[ext_resource type="Script" uid="uid://5n8ddyrc0giq" path="res://data/definitions/event_definition.gd" id="2_i2hap"]
+
+[resource]
+script = ExtResource("2_i2hap")
+id = &"traveller"
+title_key = "EVENT_TRAVELLER"
+text_key = "EVENT_TRAVELLER_TEXT"
+event_script = ExtResource("1_ossvq")
+params = Dictionary[StringName, int]({
+&"price": 8
+})

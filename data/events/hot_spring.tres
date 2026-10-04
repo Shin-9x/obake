@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="EventDefinition" format=3 uid="uid://bb5tjx84b56ft"]
+
+[ext_resource type="Script" uid="uid://cywvbo8l8veps" path="res://src/run/events/hot_spring_event.gd" id="1_msf5x"]
+[ext_resource type="Script" uid="uid://5n8ddyrc0giq" path="res://data/definitions/event_definition.gd" id="2_ehge7"]
+
+[resource]
+script = ExtResource("2_ehge7")
+id = &"hot_spring"
+title_key = "EVENT_SPRING"
+text_key = "EVENT_SPRING_TEXT"
+event_script = ExtResource("1_msf5x")

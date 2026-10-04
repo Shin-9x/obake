@@ -114,3 +114,31 @@ BOSS_SHUTEN_DOJI,Shuten-dōji,Shuten-dōji
 BOSS_SHUTEN_DOJI_RULE,Oni pegs take away 1 mult; three in one shot halve its points.,I peg oni tolgono 1 mult; tre in un tiro ne dimezzano i punti.
 PEG_ONI,Oni,Oni
 PEG_ONI_DESC,−1 mult. Three in one shot halve its points.,−1 mult. Tre in un tiro ne dimezzano i punti.
+EVENT_LEAVE,Walk away,Vai via
+EVENT_LEFT,You go on your way.,Prosegui per la tua strada.
+EVENT_KAPPA,The gambling kappa,Il kappa giocatore
+EVENT_KAPPA_TEXT,"A kappa by the river rattles a cucumber full of dice. ""Bet %d mon. Matsuri on your next board, and I pay you %d.""","Un kappa sulla riva agita un cetriolo pieno di dadi. «Scommetti %d mon. Se fai Matsuri nella prossima board, te ne pago %d.»"
+EVENT_KAPPA_BET,Bet %d mon,Scommetti %d mon
+EVENT_KAPPA_BET_DONE,The kappa pockets your coins with a wet grin.,Il kappa intasca le monete con un ghigno bagnato.
+EVENT_TEMPLE,The abandoned temple,Il tempio abbandonato
+EVENT_TEMPLE_TEXT,"Moss covers the altar of a forgotten temple. You may leave an offering, or take what the monks left behind.","Il muschio copre l'altare di un tempio dimenticato. Puoi lasciare un'offerta, o prendere ciò che i monaci hanno lasciato."
+EVENT_TEMPLE_REMOVE,Leave a ball as an offering,Lascia una pallina in offerta
+EVENT_TEMPLE_TAKE,Take a common omamori,Prendi un omamori comune
+EVENT_TEMPLE_REMOVED,The ball rolls away into the dark of the temple.,La pallina rotola via nel buio del tempio.
+EVENT_TEMPLE_TAKEN,Among the dust you find an omamori.,Tra la polvere trovi un omamori.
+EVENT_FOX,The fox merchant,Il mercante volpe
+EVENT_FOX_TEXT,"A fox in a merchant's coat bows low. ""Give me one of your charms, and take a finer one in return.""","Una volpe in abito da mercante si inchina. «Dammi uno dei tuoi amuleti e prendine uno più pregiato in cambio.»"
+EVENT_FOX_TRADE,Trade an omamori,Scambia un omamori
+EVENT_FOX_TRADED,The fox's tail twitches. The trade is done.,La coda della volpe ha un fremito. Lo scambio è fatto.
+EVENT_KASA,Kasa-obake's bridge,Il ponte del kasa-obake
+EVENT_KASA_TEXT,"A one-eyed umbrella hops onto the bridge. ""Cross with me and carry one more charm, but shoot one ball fewer on every board.""","Un ombrello con un occhio solo salta sul ponte. «Attraversa con me e porterai un amuleto in più, ma tirerai una pallina in meno su ogni board.»"
+EVENT_KASA_CROSS,"Cross the bridge (+1 omamori slot, −1 shot per board)","Attraversa il ponte (+1 slot omamori, −1 tiro per board)"
+EVENT_KASA_CROSSED,The umbrella twirls and vanishes. Your charm cord feels longer.,L'ombrello piroetta e svanisce. Il cordino degli amuleti sembra più lungo.
+EVENT_SPRING,The hot spring,La sorgente termale
+EVENT_SPRING_TEXT,Steam rises from a hidden spring. One of your balls could soak in its waters.,Da una sorgente nascosta sale il vapore. Una delle tue palline potrebbe immergersi nelle sue acque.
+EVENT_SPRING_UPGRADE,Upgrade a ball,Potenzia una pallina
+EVENT_SPRING_UPGRADED,The ball comes out of the water glowing.,La pallina esce dall'acqua tutta luminosa.
+EVENT_TRAVELLER,The mysterious traveller,Il viaggiatore misterioso
+EVENT_TRAVELLER_TEXT,"A traveller in a straw hat opens a lacquered box. ""A rare ball for %d mon. Which one? Fate decides.""","Un viaggiatore con il cappello di paglia apre una scatola laccata. «Una pallina rara per %d mon. Quale? Lo decide il destino.»"
+EVENT_TRAVELLER_BUY,Pay %d mon,Paga %d mon
+EVENT_TRAVELLER_BOUGHT,The traveller hands you a ball and is gone.,Il viaggiatore ti porge una pallina e scompare.

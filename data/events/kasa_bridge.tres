@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EventDefinition" format=3 uid="uid://b5s60lnvk5j8x"]
+
+[ext_resource type="Script" uid="uid://bk6xtf603mj7m" path="res://src/run/events/kasa_bridge_event.gd" id="1_6532j"]
+[ext_resource type="Script" uid="uid://5n8ddyrc0giq" path="res://data/definitions/event_definition.gd" id="2_nwsjr"]
+
+[resource]
+script = ExtResource("2_nwsjr")
+id = &"kasa_bridge"
+title_key = "EVENT_KASA"
+text_key = "EVENT_KASA_TEXT"
+event_script = ExtResource("1_6532j")
+params = Dictionary[StringName, int]({
+&"shots": 1,
+&"slots": 1
+})

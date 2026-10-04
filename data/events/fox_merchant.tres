@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="EventDefinition" format=3 uid="uid://qmybbvphdgfj"]
+
+[ext_resource type="Script" uid="uid://671u4ewfayb7" path="res://src/run/events/fox_merchant_event.gd" id="1_p82s1"]
+[ext_resource type="Script" uid="uid://5n8ddyrc0giq" path="res://data/definitions/event_definition.gd" id="2_gknyo"]
+
+[resource]
+script = ExtResource("2_gknyo")
+id = &"fox_merchant"
+title_key = "EVENT_FOX"
+text_key = "EVENT_FOX_TEXT"
+event_script = ExtResource("1_p82s1")

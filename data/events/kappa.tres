@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EventDefinition" format=3 uid="uid://dsamjjhhtw1qj"]
+
+[ext_resource type="Script" uid="uid://ctsdhpqjvb0o" path="res://src/run/events/kappa_event.gd" id="1_ghlqk"]
+[ext_resource type="Script" uid="uid://5n8ddyrc0giq" path="res://data/definitions/event_definition.gd" id="2_7v04a"]
+
+[resource]
+script = ExtResource("2_7v04a")
+id = &"kappa"
+title_key = "EVENT_KAPPA"
+text_key = "EVENT_KAPPA_TEXT"
+event_script = ExtResource("1_ghlqk")
+params = Dictionary[StringName, int]({
+&"bet": 5,
+&"winnings": 15
+})
