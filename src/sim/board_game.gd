@@ -39,6 +39,8 @@ var shot_ball: BagBall
 ## Shots fired on this board, free ones included.
 var shots_fired: int = 0
 var mon_earned: int = 0
+## Highest score of a single shot on this board.
+var best_shot: int = 0
 ## Mult added when the next shot starts, in permille.
 var next_shot_mult_bonus: int = 0
 ## Copies placed of every purchased peg.
@@ -595,6 +597,7 @@ func _resolve_shot() -> void:
 		events.push(SimEvent.Kind.SCORE_MULT_TIMES, tick, -1, -1, 0, 0, _end_mult_factor)
 	var score: int = FixedMath.div_round(shot_points * shot_mult, _PERMILLE)
 	total += score
+	best_shot = maxi(best_shot, score)
 	events.push(SimEvent.Kind.SHOT_SCORED, tick, -1, -1, 0, 0, score)
 	_return_ball()
 	if red_remaining() == 0:
@@ -628,6 +631,7 @@ func _finish_board(tick: int) -> void:
 	result.outcome = outcome
 	result.total = total
 	result.shots_left = shots_left
+	result.best_shot = best_shot
 	result.interest_cap = _config.interest_cap
 	for effect: Effect in _effects:
 		effect.on_board_end(self, result)
