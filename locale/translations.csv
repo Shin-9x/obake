@@ -142,3 +142,44 @@ EVENT_TRAVELLER,The mysterious traveller,Il viaggiatore misterioso
 EVENT_TRAVELLER_TEXT,"A traveller in a straw hat opens a lacquered box. ""A rare ball for %d mon. Which one? Fate decides.""","Un viaggiatore con il cappello di paglia apre una scatola laccata. «Una pallina rara per %d mon. Quale? Lo decide il destino.»"
 EVENT_TRAVELLER_BUY,Pay %d mon,Paga %d mon
 EVENT_TRAVELLER_BOUGHT,The traveller hands you a ball and is gone.,Il viaggiatore ti porge una pallina e scompare.
+BUTTON_CONTINUE,Continue,Continua
+BUTTON_BACK,Back,Indietro
+BUTTON_CANCEL,Cancel,Annulla
+RUN_FLOOR,Floor %d/%d,Piano %d/%d
+RUN_MON,%d mon,%d mon
+RUN_BAG,%d balls,%d palline
+BIOME_BAMBOO_FOREST,Bamboo forest,Bosco di bambù
+BIOME_HAUNTED_VILLAGE,Haunted village,Villaggio infestato
+REWARD_TITLE,Spoils,Bottino
+REWARD_PICK_BALL,Choose a ball for your bag,Scegli una pallina per la borsa
+REWARD_SKIP,Skip (+%d mon),Salta (+%d mon)
+REWARD_PICK_OMAMORI,Choose an omamori,Scegli un omamori
+REWARD_SKIP_OMAMORI,Skip,Salta
+REWARD_REPLACE,Every slot is taken: choose the omamori to replace,Gli slot sono pieni: scegli l'omamori da sostituire
+PAYOUT_WIN,Victory %d,Vittoria %d
+PAYOUT_SHOTS,Unused shots %d,Tiri non usati %d
+PAYOUT_MATSURI,Matsuri %d,Matsuri %d
+PAYOUT_INTEREST,Interest %d,Interessi %d
+PAYOUT_ITEMS,Items %d,Oggetti %d
+PAYOUT_WAGER,Kappa's wager %d,Scommessa del kappa %d
+PAYOUT_TOTAL,+%d mon,+%d mon
+SHOP_TITLE,Shop,Negozio
+SHOP_PRICE,%d mon,%d mon
+SHOP_SOLD,Sold,Venduto
+SHOP_NO_SLOT,No free omamori slot,Nessuno slot omamori libero
+SHOP_REROLL,Reroll (%d mon),Rinnova (%d mon)
+SHOP_UPGRADE,Upgrade a ball,Potenzia una pallina
+SHOP_UPGRADE_PICK,"Choose a ball: %d mon to level II, %d mon to level III","Scegli una pallina: %d mon per il livello II, %d mon per il livello III"
+SHOP_SELL,Sell an omamori,Vendi un omamori
+SHOP_SELL_PICK,Choose the omamori to sell,Scegli l'omamori da vendere
+SHOP_SELL_PRICE,Sells for %d mon,Si vende a %d mon
+SHOP_LEAVE,Leave,Esci
+SHRINE_TITLE,Shrine,Santuario
+SHRINE_TEXT,"A quiet shrine among the trees. Offer one ball to the kami, or ask them to bless one.","Un santuario silenzioso tra gli alberi. Offri una pallina ai kami, o chiedi loro di benedirne una."
+SHRINE_REMOVE,Remove a ball,Rimuovi una pallina
+SHRINE_UPGRADE,Upgrade a ball,Potenzia una pallina
+SHRINE_LEAVE,Leave,Vai via
+SHRINE_PICK_REMOVE,Choose the ball to remove,Scegli la pallina da rimuovere
+SHRINE_PICK_UPGRADE,Choose the ball to upgrade,Scegli la pallina da potenziare
+EVENT_PICK_BALL,Choose a ball,Scegli una pallina
+EVENT_PICK_OMAMORI,Choose an omamori,Scegli un omamori
