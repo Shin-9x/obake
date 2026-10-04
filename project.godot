@@ -15,6 +15,10 @@ run/main_scene="res://src/presentation/run/run_screen.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
 
+[autoload]
+
+SaveService="*res://src/services/save_service.gd"
+
 [debug]
 
 gdscript/warnings/untyped_declaration=2

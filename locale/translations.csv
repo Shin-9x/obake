@@ -226,3 +226,10 @@ FEAT_PEG_COLLECTOR,Collector,Collezionista
 FEAT_PEG_COLLECTOR_DESC,Own 4 purchased pegs in one run.,Possiedi 4 peg acquistati nella stessa run.
 FEAT_SHUTEN_DEFEATED,Oni slayer,Ammazza-oni
 FEAT_SHUTEN_DEFEATED_DESC,Defeat Shuten-dōji.,Sconfiggi Shuten-dōji.
+BUTTON_CONTINUE_RUN,Continue run,Continua la run
+HARD_MODE,Hard,Difficile
+SEED_LABEL,Seed,Seed
+SEED_RANDOM,random,casuale
+MARK_SHUTEN,Mark: Shuten-dōji defeated,Marchio: Shuten-dōji sconfitto
+MARK_HARD,Mark: run won on Hard,Marchio: run vinta in Difficile
+MARK_FESTIVAL,Mark: Festival Night (a won run with Matsuri on 8 boards),Marchio: Notte di festa (una run vinta con Matsuri in 8 board)

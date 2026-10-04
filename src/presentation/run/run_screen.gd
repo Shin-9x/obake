@@ -1,15 +1,19 @@
 class_name RunScreen
 extends Control
 ## The game from the choice of a character to the end of a run: owns the [Run] and shows the
-## screen of its current phase, swapping screens as the phase changes.
+## screen of its current phase, swapping screens as the phase changes. The run is saved after
+## every action and resumed from the character screen; the profile learns of feats after every
+## board and of marks and statistics when the run ends.
 
 const BALANCE: BalanceConfig = preload("res://data/balance.tres")
 const CONTENT: RunContent = preload("res://data/run_content.tres")
 const BASE_PEGS: BasePegs = preload("res://data/pegs/base_pegs.tres")
 const MAP_SKIN: MapSkin = preload("res://data/skins/map_skin.tres")
+const PROGRESSION: ProgressionDefinition = preload("res://data/progression.tres")
 const BOARD_SCENE: PackedScene = preload("res://src/presentation/board/board_screen.tscn")
 
 var run: Run
+var profile: Profile
 ## The screen on show.
 var current: Control
 
@@ -18,6 +22,7 @@ var _library: LayoutLibrary
 
 func _ready() -> void:
 	_library = LayoutLibrary.load_from()
+	profile = SaveService.load_profile()
 	show_character_select()
 
 
@@ -25,12 +30,33 @@ func show_character_select() -> void:
 	run = null
 	var screen: CharacterSelectScreen = CharacterSelectScreen.new()
 	_swap(screen)
-	screen.open(CONTENT)
+	screen.open(CONTENT, PROGRESSION, profile, SaveService.has_run())
 	screen.character_chosen.connect(_on_character_chosen)
+	screen.continue_requested.connect(continue_run)
 
 
-func start_run(character: CharacterDefinition, seed_value: int) -> void:
-	run = Run.start(BALANCE, CONTENT, _library, BASE_PEGS, character, seed_value)
+## Starts a run with the items the profile has unlocked. A [param custom_seed] run earns no
+## feat and no mark.
+func start_run(
+	character: CharacterDefinition, seed_value: int, hard: bool = false, custom_seed: bool = false
+) -> void:
+	var options: RunOptions = RunOptions.new()
+	options.pool = Progression.pool(CONTENT, PROGRESSION, profile)
+	options.hard = hard and profile.hard_unlocked(character.id)
+	options.custom_seed = custom_seed
+	run = Run.start(BALANCE, CONTENT, _library, BASE_PEGS, character, seed_value, options)
+	_watch(run)
+	show_phase()
+
+
+## Picks up the saved run where it was left; a save that cannot be read is dropped.
+func continue_run() -> void:
+	run = Run.resume(SaveService.load_run(), BALANCE, CONTENT, _library, BASE_PEGS)
+	if run == null:
+		SaveService.clear_run()
+		show_character_select()
+		return
+	_watch(run)
 	show_phase()
 
 
@@ -91,8 +117,20 @@ func _swap(screen: Control) -> void:
 	add_child(screen)
 
 
-func _on_character_chosen(character: CharacterDefinition) -> void:
-	start_run(character, _new_seed())
+func _watch(watched: Run) -> void:
+	watched.action_recorded.connect(_save_run)
+	_save_run()
+
+
+func _save_run() -> void:
+	SaveService.save_run(run.to_save())
+
+
+func _on_character_chosen(character: CharacterDefinition, hard: bool, seed_text: String) -> void:
+	if seed_text.is_empty():
+		start_run(character, _new_seed(), hard)
+	else:
+		start_run(character, seed_text.hex_to_int(), hard, true)
 
 
 func _on_node_chosen(node: int) -> void:
@@ -101,7 +139,13 @@ func _on_node_chosen(node: int) -> void:
 
 
 func _on_board_finished(_result: BoardResult) -> void:
-	run.finish_board()
+	if not run.finish_board():
+		return
+	Progression.check_board(PROGRESSION, profile, run)
+	if run.is_over():
+		Progression.finish_run(PROGRESSION, profile, run)
+		SaveService.clear_run()
+	SaveService.save_profile(profile)
 	show_phase()
 
 

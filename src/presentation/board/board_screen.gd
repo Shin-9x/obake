@@ -113,6 +113,8 @@ func _show(
 	_hud.show_boss(boss)
 	_hud.set_continue_text("BUTTON_PLAY_AGAIN" if standalone else "BUTTON_CONTINUE")
 	_hud.show_board(placed, seed_value)
+	if game.outcome != BoardGame.Outcome.PLAYING:
+		_hud.show_result(game)
 	_accumulator = 0.0
 	_refresh_guide()
 

@@ -32,6 +32,13 @@ const SPECIAL_PEGS: Dictionary[String, Array] = {
 const BOSSES: Array[String] = ["jorogumo", "nue", "tamamo", "shuten_doji"]
 const MAP_ICONS: Array[String] = ["board", "elite", "event", "shrine", "shop", "boss"]
 const MAP_ICON_SIZE: int = 16
+## Completion mark badges: outline and fill.
+const MARKS: Dictionary[String, Array] = {
+	"mark_shuten": [Color("#5a0a14"), Color("#e04a4a")],
+	"mark_hard": [Color("#2a1440"), Color("#a46cff")],
+	"mark_festival": [Color("#6b4a10"), Color("#ffd866")],
+}
+const MARK_SIZE: int = 12
 const BOSS_SIZE: int = 48
 ## Character portraits: head, ears or headgear, and the colour across the eyes.
 const PORTRAITS: Dictionary[String, Array] = {
@@ -103,6 +110,8 @@ func _init() -> void:
 		_save(_boss(boss), "boss_" + boss)
 	for node: String in MAP_ICONS:
 		_save(_map_icon(node), "map_" + node)
+	for mark: String in MARKS:
+		_save(_mark(MARKS[mark][0], MARKS[mark][1]), mark)
 	for index: int in OMAMORI.size():
 		_save(_omamori(OMAMORI_COLOURS[index], index), "omamori_" + OMAMORI[index])
 	_save(_bucket(), "bucket")
@@ -384,6 +393,19 @@ func _map_icon(node: String) -> Image:
 				image.set_pixel(12 - step / 2, 4 - step, Color("#f4e9c9"))
 			image.set_pixel(6, 8, Color("#ffeb3b"))
 			image.set_pixel(9, 8, Color("#ffeb3b"))
+	return image
+
+
+## A diamond badge for a completion mark.
+func _mark(outline: Color, fill: Color) -> Image:
+	var image: Image = _blank(MARK_SIZE, MARK_SIZE)
+	var centre: float = (MARK_SIZE - 1) / 2.0
+	for y: int in MARK_SIZE:
+		for x: int in MARK_SIZE:
+			var distance: float = absf(x - centre) + absf(y - centre)
+			if distance <= centre + 0.5:
+				image.set_pixel(x, y, outline if distance > centre - 1.0 else fill)
+	image.set_pixel(4, 3, Color.WHITE)
 	return image
 
 

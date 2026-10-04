@@ -14,7 +14,11 @@
 [ext_resource type="Resource" uid="uid://ssybr0mo1hr4" path="res://data/feats/peg_collector.tres" id="12_a7uci"]
 [ext_resource type="Resource" uid="uid://dy5eyafhpo2pc" path="res://data/feats/shuten_defeated.tres" id="13_eo75p"]
 [ext_resource type="Script" uid="uid://dg454wrjernfn" path="res://data/definitions/progression_definition.gd" id="14_fb5j1"]
+[ext_resource type="Texture2D" uid="uid://byeb1eglau36b" path="res://assets/sprites/placeholder/mark_shuten.png" id="14_pb8d8"]
+[ext_resource type="Texture2D" uid="uid://xo00jbx1hfmf" path="res://assets/sprites/placeholder/mark_hard.png" id="15_5fui3"]
+[ext_resource type="Texture2D" uid="uid://3vrl22pbtw8p" path="res://assets/sprites/placeholder/mark_festival.png" id="16_7hwny"]
 
 [resource]
 script = ExtResource("14_fb5j1")
 feats = Array[ExtResource("1_imxq8")]([ExtResource("2_dd702"), ExtResource("3_htguv"), ExtResource("4_pb8d8"), ExtResource("5_5fui3"), ExtResource("6_7hwny"), ExtResource("7_badj2"), ExtResource("8_50dd0"), ExtResource("9_6kg0c"), ExtResource("10_my0nc"), ExtResource("11_hccal"), ExtResource("12_a7uci"), ExtResource("13_eo75p")])
+mark_icons = Array[Texture2D]([ExtResource("14_pb8d8"), ExtResource("15_5fui3"), ExtResource("16_7hwny")])
