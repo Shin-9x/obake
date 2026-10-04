@@ -2,11 +2,18 @@ class_name BoardScreen
 extends Control
 ## Plays one board: steps the simulation at a fixed 120 Hz, interpolates rendering in between
 ## and routes input. Nothing computed for display ever flows back into the simulation.
+##
+## On its own (F6) it plays the development loadout on random layouts; the run screen turns
+## [member standalone] off and hands it each board with [method play].
+
+## The board is over and the player chose to continue the run.
+signal board_finished(result: BoardResult)
 
 const BALANCE: BalanceConfig = preload("res://data/balance.tres")
 const BASE_PEGS: BasePegs = preload("res://data/pegs/base_pegs.tres")
 const SKIN: BoardSkin = preload("res://data/skins/placeholder_skin.tres")
-## Bag, omamori and purchased pegs used until the run arrives (M5); edit it in the Inspector.
+## Character, bag, omamori and purchased pegs of a board played on its own; edit it in the
+## Inspector to try items.
 const DEV_LOADOUT: LoadoutDefinition = preload("res://data/debug/dev_loadout.tres")
 const TICK_SECONDS: float = 1.0 / BoardSimulation.TICKS_PER_SECOND
 ## Caps catch-up after a long frame, so a hitch never turns into a burst of ticks.
@@ -22,6 +29,8 @@ const MULT_COLOR: Color = Color("#ff9a8a")
 const TIMES_COLOR: Color = Color("#ffd866")
 const MON_COLOR: Color = Color("#ffe08a")
 
+## Plays random development boards when true; the run sets it to false before adding the screen.
+var standalone: bool = true
 var game: BoardGame
 var placed: PlacedBoard
 var board_seed: int = 0
@@ -54,20 +63,52 @@ func _ready() -> void:
 	_aim.aim_changed.connect(_on_aim_changed)
 	_aim.shoot_requested.connect(shoot)
 	_hud.connect_aim(_aim)
-	_hud.play_again_requested.connect(_on_play_again)
-	start_board(_new_seed())
+	_hud.continue_requested.connect(_on_continue)
+	if standalone:
+		start_board(_new_seed())
 
 
+## Plays a development board for [param seed_value] with the development loadout.
 func start_board(seed_value: int) -> void:
-	board_seed = seed_value
 	var layout: BoardLayout = BoardSetup.pick_layout(_library, seed_value)
-	placed = BoardSetup.create_board(BALANCE, BASE_PEGS, layout, seed_value, DEV_LOADOUT, _carry)
+	var board: PlacedBoard = BoardSetup.create_board(
+		BALANCE, BASE_PEGS, layout, seed_value, DEV_LOADOUT, _carry
+	)
+	_show(board, seed_value, DEV_LOADOUT, BALANCE.omamori_slots, null)
+
+
+## Plays a run's board: [param board] already holds the run's loadout and rules; the rest is
+## for display.
+func play(
+	board: PlacedBoard,
+	seed_value: int,
+	loadout: LoadoutDefinition,
+	slots: int,
+	boss: BossDefinition
+) -> void:
+	_show(board, seed_value, loadout, slots, boss)
+
+
+func _show(
+	board: PlacedBoard,
+	seed_value: int,
+	loadout: LoadoutDefinition,
+	slots: int,
+	boss: BossDefinition
+) -> void:
+	board_seed = seed_value
+	placed = board
 	game = placed.game
+	# Changes made while the board was set up, such as oni placed by a boss, are already drawn.
+	game.events.clear()
 	_view.setup(game, BALANCE, SKIN)
 	_view.set_aim(_aim.aim)
 	_popups.hide_all()
 	_blasts.clear()
-	_hud.show_loadout(DEV_LOADOUT)
+	_hud.show_loadout(loadout, slots)
+	_hud.show_character(loadout.character)
+	_hud.show_boss(boss)
+	_hud.set_continue_text("BUTTON_PLAY_AGAIN" if standalone else "BUTTON_CONTINUE")
 	_hud.show_board(placed, seed_value)
 	_accumulator = 0.0
 	_refresh_guide()
@@ -169,6 +210,7 @@ func _consume_events() -> void:
 				_hud.update_counts(game)
 			SimEvent.Kind.SHOT_SCORED:
 				_hud.burst(event.amount)
+				_hud.boss_react()
 				_hud.update_counts(game)
 			SimEvent.Kind.BOARD_ENDED:
 				_hud.show_result(game)
@@ -184,8 +226,11 @@ func _on_aim_changed(aim: int) -> void:
 	_refresh_guide()
 
 
-func _on_play_again() -> void:
-	start_board(_new_seed())
+func _on_continue() -> void:
+	if standalone:
+		start_board(_new_seed())
+	else:
+		board_finished.emit(game.result)
 
 
 func _refresh_guide() -> void:

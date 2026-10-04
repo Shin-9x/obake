@@ -111,6 +111,33 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "GAME_TITLE"
 
+[node name="CharacterRow" type="HBoxContainer" parent="Hud/LeftPanel/Content"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+mouse_filter = 2
+
+[node name="CharacterPortrait" type="TextureRect" parent="Hud/LeftPanel/Content/CharacterRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CharacterName" type="Label" parent="Hud/LeftPanel/Content/CharacterRow"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="CharacterPower" type="Label" parent="Hud/LeftPanel/Content"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(124, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.603922, 0.627451, 0.709804, 1)
+theme_override_font_sizes/font_size = 8
+autowrap_mode = 3
+
 [node name="ShotsCaption" type="Label" parent="Hud/LeftPanel/Content"]
 layout_mode = 2
 text = "HUD_SHOTS"
@@ -168,23 +195,47 @@ layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
 
-[node name="LayoutCaption" type="Label" parent="Hud/LeftPanel/Content"]
+[node name="BossBox" type="VBoxContainer" parent="Hud/LeftPanel/Content"]
+unique_name_in_owner = true
+visible = false
 layout_mode = 2
-text = "HUD_LAYOUT"
+mouse_filter = 2
+
+[node name="BossRow" type="HBoxContainer" parent="Hud/LeftPanel/Content/BossBox"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="BossPortrait" type="TextureRect" parent="Hud/LeftPanel/Content/BossBox/BossRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="BossName" type="Label" parent="Hud/LeftPanel/Content/BossBox/BossRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.560784, 0.639216, 1)
+
+[node name="BossRule" type="Label" parent="Hud/LeftPanel/Content/BossBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(124, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 8
+autowrap_mode = 3
 
 [node name="LayoutValue" type="Label" parent="Hud/LeftPanel/Content"]
 unique_name_in_owner = true
 layout_mode = 2
 auto_translate_mode = 2
-
-[node name="SeedCaption" type="Label" parent="Hud/LeftPanel/Content"]
-layout_mode = 2
-text = "HUD_SEED"
+theme_override_font_sizes/font_size = 8
 
 [node name="SeedValue" type="Label" parent="Hud/LeftPanel/Content"]
 unique_name_in_owner = true
 layout_mode = 2
 auto_translate_mode = 2
+theme_override_font_sizes/font_size = 8
 text = "0"
 
 [node name="RightPanel" type="ColorRect" parent="Hud"]
@@ -270,7 +321,7 @@ text = "+0"
 layout_mode = 2
 text = "HUD_OMAMORI"
 
-[node name="OmamoriSlots" type="HBoxContainer" parent="Hud/RightPanel/Content"]
+[node name="OmamoriSlots" type="HFlowContainer" parent="Hud/RightPanel/Content"]
 unique_name_in_owner = true
 layout_mode = 2
 mouse_filter = 2

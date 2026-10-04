@@ -51,3 +51,40 @@ func test_board_keeps_moving_while_aiming() -> void:
 	assert_that(Vector2i(peg.x, peg.y)).is_not_equal(where)
 	var layout: Label = screen.get_node("%LayoutValue") as Label
 	assert_str(layout.text).starts_with(screen.placed.layout.id)
+
+
+func test_a_run_board_shows_its_boss_and_continues_with_the_result() -> void:
+	var runner: GdUnitSceneRunner = scene_runner(SCENE)
+	var screen: BoardScreen = runner.scene() as BoardScreen
+	screen.standalone = false
+	var boss: BossDefinition = load("res://data/bosses/tamamo.tres")
+	var library: LayoutLibrary = LayoutLibrary.load_from()
+	var loadout: LoadoutDefinition = LoadoutDefinition.new()
+	loadout.character = load("res://data/characters/yamabushi.tres")
+	var board: PlacedBoard = BoardSetup.create_board(
+		BoardScreen.BALANCE,
+		BoardScreen.BASE_PEGS,
+		library.find(boss.layout_id),
+		SEED,
+		loadout,
+		null,
+		BoardRules.new(1, 0, boss)
+	)
+	screen.play(board, SEED, loadout, 6, boss)
+	assert_bool((screen.get_node("%BossBox") as Control).visible).is_true()
+	var slots: Array[Node] = screen.get_node("%OmamoriSlots").get_children()
+	var shown: int = 0
+	for slot: Node in slots:
+		shown += 1 if (slot as Control).visible else 0
+	assert_int(shown).is_equal(6)
+	var finished: Array[BoardResult] = []
+	screen.board_finished.connect(func(result: BoardResult) -> void: finished.append(result))
+	screen.shoot()
+	var frames: int = 0
+	while screen.game.outcome == BoardGame.Outcome.PLAYING and frames < MAX_FRAMES:
+		await runner.simulate_frames(10, 50)
+		frames += 10
+	assert_int(screen.game.outcome).is_equal(BoardGame.Outcome.TARGET_REACHED)
+	(screen.get_node("%PlayAgainButton") as Button).pressed.emit()
+	assert_array(finished).has_size(1)
+	assert_object(finished[0]).is_same(screen.game.result)

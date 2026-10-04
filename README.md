@@ -32,12 +32,21 @@ the board. Use **Bake into pegs** on a pattern to hand-tune its pegs, and **Expo
 document (or `make layouts`) to write `data/layouts/<id>.json`, which the game loads. The test
 suite fails if a source scene and its JSON disagree.
 
-## Playtesting items
+Boss layouts set **Kind** to boss on the document; `ZoneMarker` nodes add circular zones, such
+as Jorōgumo's webs.
 
-Until the run and its shop exist, the board uses `data/debug/dev_loadout.tres`: the bag, the
-omamori in slot order and the purchased pegs. Edit it in the Inspector to try other balls,
-omamori or pegs. Item definitions live in `data/balls/`, `data/pegs/` and `data/omamori/`, with
-their behaviour in `src/sim/effects/`.
+## Playing
+
+Press **F5** to play a run: choose a character, then pick your way through four floors of
+boards, shops, shrines and yōkai events, each ending with a boss. Numbers such as targets,
+prices and odds live in `data/balance.tres`; what a run can offer lives in
+`data/run_content.tres`.
+
+To try items on a single board, open `src/presentation/board/board_screen.tscn` and press
+**F6**: it plays random layouts with `data/debug/dev_loadout.tres` (character, bag, omamori in
+slot order and purchased pegs), which you can edit in the Inspector. Item, character and boss
+definitions live in `data/`, with their behaviour in `src/sim/effects/`; events live in
+`data/events/` and `src/run/events/`.
 
 ## Controls
 

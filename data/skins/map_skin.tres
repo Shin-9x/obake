@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="MapSkin" format=3 uid="uid://c4muufo3d0xms"]
+
+[ext_resource type="Texture2D" uid="uid://cfa5t60cgkqse" path="res://assets/sprites/placeholder/map_board.png" id="1_1vj35"]
+[ext_resource type="Texture2D" uid="uid://cqj2e285c0rbl" path="res://assets/sprites/placeholder/map_elite.png" id="2_bgwri"]
+[ext_resource type="Texture2D" uid="uid://cc1nhx2appifd" path="res://assets/sprites/placeholder/map_event.png" id="3_qihgs"]
+[ext_resource type="Texture2D" uid="uid://c2x74cdvyga8a" path="res://assets/sprites/placeholder/map_shrine.png" id="4_f8mi4"]
+[ext_resource type="Texture2D" uid="uid://bljvy6jv03a61" path="res://assets/sprites/placeholder/map_shop.png" id="5_q1bhx"]
+[ext_resource type="Texture2D" uid="uid://dfgul851gnqcr" path="res://assets/sprites/placeholder/map_boss.png" id="6_lpk3v"]
+[ext_resource type="Script" uid="uid://dor4500e0tt0n" path="res://data/definitions/map_skin.gd" id="7_3n806"]
+
+[resource]
+script = ExtResource("7_3n806")
+node_icons = Array[Texture2D]([ExtResource("1_1vj35"), ExtResource("2_bgwri"), ExtResource("3_qihgs"), ExtResource("4_f8mi4"), ExtResource("5_q1bhx"), ExtResource("6_lpk3v")])

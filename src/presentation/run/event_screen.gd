@@ -6,6 +6,8 @@ extends Control
 ## The run has left the event.
 signal advanced
 
+const OPTION_WIDTH: float = 320.0
+
 var _run: Run
 var _bar: RunBar
 var _body: VBoxContainer
@@ -52,6 +54,8 @@ func _show_choices(choices: Array[EventChoice]) -> void:
 		if not choice.args.is_empty():
 			text = text % choice.args
 		var option: Button = UiKit.button(text, false)
+		option.custom_minimum_size = Vector2(OPTION_WIDTH, 0)
+		option.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		option.disabled = not choice.enabled
 		option.pressed.connect(_choose.bind(index))
 		_body.add_child(option)

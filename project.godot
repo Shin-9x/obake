@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Obake!"
-run/main_scene="res://src/presentation/board/board_screen.tscn"
+run/main_scene="res://src/presentation/run/run_screen.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
 

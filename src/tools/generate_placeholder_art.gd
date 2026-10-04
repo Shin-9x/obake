@@ -30,6 +30,8 @@ const SPECIAL_PEGS: Dictionary[String, Array] = {
 	"peg_oni": [Color("#6b1f2a"), Color("#12060a"), Color("#ff7043")],
 }
 const BOSSES: Array[String] = ["jorogumo", "nue", "tamamo", "shuten_doji"]
+const MAP_ICONS: Array[String] = ["board", "elite", "event", "shrine", "shop", "boss"]
+const MAP_ICON_SIZE: int = 16
 const BOSS_SIZE: int = 48
 ## Character portraits: head, ears or headgear, and the colour across the eyes.
 const PORTRAITS: Dictionary[String, Array] = {
@@ -99,6 +101,8 @@ func _init() -> void:
 		_save(_portrait(look[0], look[1], look[2], look[3]), portrait)
 	for boss: String in BOSSES:
 		_save(_boss(boss), "boss_" + boss)
+	for node: String in MAP_ICONS:
+		_save(_map_icon(node), "map_" + node)
 	for index: int in OMAMORI.size():
 		_save(_omamori(OMAMORI_COLOURS[index], index), "omamori_" + OMAMORI[index])
 	_save(_bucket(), "bucket")
@@ -310,6 +314,76 @@ func _boss(boss: String) -> Image:
 		for y: int in range(34, 38):
 			image.set_pixel(23, y, accent)
 			image.set_pixel(24, y, accent)
+	return image
+
+
+## Map node icons: a lantern for boards, a red one with a crest for elites, a question mark for
+## events, a torii for shrines, a coin for shops and horns for the boss.
+func _map_icon(node: String) -> Image:
+	var image: Image = _blank(MAP_ICON_SIZE, MAP_ICON_SIZE)
+	var ink: Color = Color("#1a1a1a")
+	match node:
+		"board", "elite":
+			var body: Color = Color("#4a7ab5") if node == "board" else Color("#c8453b")
+			for y: int in range(2, 14):
+				for x: int in range(3, 13):
+					var distance: float = Vector2(x - 7.5, y - 7.5).length()
+					if distance <= 6.0:
+						image.set_pixel(x, y, ink if distance > 5.0 else body)
+			for x: int in range(6, 10):
+				image.set_pixel(x, 1, ink)
+				image.set_pixel(x, 14, ink)
+			if node == "elite":
+				for x: int in range(5, 11):
+					image.set_pixel(x, 7, Color("#ffd866"))
+				for y: int in range(4, 11):
+					image.set_pixel(7, y, Color("#ffd866"))
+					image.set_pixel(8, y, Color("#ffd866"))
+		"event":
+			var purple: Color = Color("#b58cff")
+			for x: int in range(5, 11):
+				image.set_pixel(x, 2, purple)
+				image.set_pixel(x, 3, purple)
+			for y: int in range(3, 8):
+				image.set_pixel(10, y, purple)
+				image.set_pixel(11, y, purple)
+			for y: int in range(7, 11):
+				image.set_pixel(7, y, purple)
+				image.set_pixel(8, y, purple)
+			for x: int in [7, 8]:
+				image.set_pixel(x, 12, purple)
+				image.set_pixel(x, 13, purple)
+		"shrine":
+			var red: Color = Color("#d9381e")
+			for x: int in range(1, 15):
+				image.set_pixel(x, 2, ink)
+				image.set_pixel(x, 3, red)
+			for x: int in range(3, 13):
+				image.set_pixel(x, 6, red)
+			for y: int in range(3, 15):
+				for x: int in [4, 5, 10, 11]:
+					image.set_pixel(x, y, red)
+		"shop":
+			for y: int in MAP_ICON_SIZE:
+				for x: int in MAP_ICON_SIZE:
+					var distance: float = Vector2(x - 7.5, y - 7.5).length()
+					var hole: bool = absf(x - 7.5) < 2.0 and absf(y - 7.5) < 2.0
+					if distance <= 7.0 and not hole:
+						image.set_pixel(
+							x, y, Color("#6b4a10") if distance > 6.0 else Color("#e0b030")
+						)
+		"boss":
+			var face: Color = Color("#8e1f2b")
+			for y: int in range(4, 15):
+				for x: int in range(2, 14):
+					var distance: float = Vector2(x - 7.5, y - 9.0).length()
+					if distance <= 5.8:
+						image.set_pixel(x, y, ink if distance > 4.8 else face)
+			for step: int in 4:
+				image.set_pixel(3 + step / 2, 4 - step, Color("#f4e9c9"))
+				image.set_pixel(12 - step / 2, 4 - step, Color("#f4e9c9"))
+			image.set_pixel(6, 8, Color("#ffeb3b"))
+			image.set_pixel(9, 8, Color("#ffeb3b"))
 	return image
 
 

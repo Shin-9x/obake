@@ -4,7 +4,6 @@ HUD_SHOTS,Shots,Tiri
 HUD_BALL,Ball,Pallina
 HUD_NEXT_BALL,Next,Prossima
 HUD_SEED,Seed,Seed
-HUD_LAYOUT,Layout,Layout
 HUD_MIRRORED,(mirrored),(specchiato)
 HUD_SHOT,Shot,Tiro
 HUD_TOTAL,Total,Totale
@@ -183,3 +182,23 @@ SHRINE_PICK_REMOVE,Choose the ball to remove,Scegli la pallina da rimuovere
 SHRINE_PICK_UPGRADE,Choose the ball to upgrade,Scegli la pallina da potenziare
 EVENT_PICK_BALL,Choose a ball,Scegli una pallina
 EVENT_PICK_OMAMORI,Choose an omamori,Scegli un omamori
+CHOOSE_CHARACTER,Choose your character,Scegli il personaggio
+CHARACTER_POWER_LABEL,Power,Potere
+CHARACTER_PASSIVE_LABEL,Passive,Passiva
+MAP_BOSS,Boss of this floor: %s,Boss del piano: %s
+MAP_NODE_BOARD,Board,Board
+MAP_NODE_ELITE,Elite board,Board élite
+MAP_NODE_EVENT,Yokai event,Evento yōkai
+MAP_NODE_SHRINE,Shrine,Santuario
+MAP_NODE_SHOP,Shop,Negozio
+MAP_NODE_BOSS,Boss,Boss
+MAP_TARGET,Target %d,Obiettivo %d
+RESULT_VICTORY,Victory!,Vittoria!
+RESULT_DEFEAT,The run is over,La run è finita
+END_FLOOR,Floor reached: %d/%d,Piano raggiunto: %d/%d
+END_BOARDS,Boards won: %d,Board vinte: %d
+END_MATSURI,Matsuri: %d,Matsuri: %d
+END_BEST_SHOT,Best shot: %d,Miglior tiro: %d
+END_MON,Mon: %d,Mon: %d
+END_SEED,Seed: %s,Seed: %s
+BUTTON_NEW_RUN,New run,Nuova run

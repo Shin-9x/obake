@@ -29,7 +29,7 @@ func show_item(definition: ItemDefinition, footer: String = "") -> void:
 	add_child(content)
 	content.add_child(UiKit.icon(_texture(definition), ICON_SIZE))
 	var title: Label = UiKit.label(
-		definition.name_key, 0, UiKit.RARITY_COLOURS.get(definition.rarity, UiKit.TEXT)
+		tr(definition.name_key), 0, UiKit.RARITY_COLOURS.get(definition.rarity, UiKit.TEXT), false
 	)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	content.add_child(title)

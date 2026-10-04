@@ -2,7 +2,8 @@ class_name BoardHud
 extends Control
 ## Side panels, touch controls and the end-of-board overlay. Reads the board game, never writes it.
 
-signal play_again_requested
+## The end-of-board button was pressed: play again, or continue the run.
+signal continue_requested
 
 ## Seconds the shot total takes to settle after bursting.
 const BURST_TIME: float = 0.35
@@ -10,10 +11,17 @@ const BURST_SCALE: float = 1.8
 ## Seconds an omamori slot glows after its effect acts.
 const FLASH_TIME: float = 0.3
 const FLASH_TINT: Color = Color(1.8, 1.8, 1.4)
+## Seconds and pixels of the boss portrait's jolt after each shot.
+const JOLT_TIME: float = 0.3
+const JOLT_DISTANCE: float = 3.0
+const SLOT_SIZE: Vector2 = Vector2(20, 20)
+const SLOT_COLOUR: Color = Color(0.180392, 0.203922, 0.286275, 1)
 
 var _burst_age: float = -1.0
 var _slot_ages: PackedFloat32Array = PackedFloat32Array()
 var _slots: Array[ColorRect] = []
+var _jolt_age: float = -1.0
+var _portrait_age: float = -1.0
 
 @onready var _shots: Label = %ShotsValue
 @onready var _ball: Label = %BallValue
@@ -21,7 +29,7 @@ var _slots: Array[ColorRect] = []
 @onready var _next: Label = %NextValue
 @onready var _next_icon: TextureRect = %NextIcon
 @onready var _mon: Label = %MonValue
-@onready var _slot_row: HBoxContainer = %OmamoriSlots
+@onready var _slot_row: HFlowContainer = %OmamoriSlots
 @onready var _seed: Label = %SeedValue
 @onready var _layout: Label = %LayoutValue
 @onready var _shot: Label = %ShotValue
@@ -33,26 +41,27 @@ var _slots: Array[ColorRect] = []
 @onready var _result_title: Label = %ResultTitle
 @onready var _result_total: Label = %ResultTotal
 @onready var _result_shots: Label = %ResultShots
-@onready var _play_again: Button = %PlayAgainButton
+@onready var _continue: Button = %PlayAgainButton
 @onready var _aim_left: Button = %AimLeftButton
 @onready var _aim_right: Button = %AimRightButton
 @onready var _shoot: Button = %ShootButton
 @onready var _left_panel: ColorRect = %LeftPanel
 @onready var _right_panel: ColorRect = %RightPanel
+@onready var _character_row: Control = %CharacterRow
+@onready var _character_portrait: TextureRect = %CharacterPortrait
+@onready var _character_name: Label = %CharacterName
+@onready var _character_power: Label = %CharacterPower
+@onready var _boss_box: Control = %BossBox
+@onready var _boss_portrait: TextureRect = %BossPortrait
+@onready var _boss_name: Label = %BossName
+@onready var _boss_rule: Label = %BossRule
 
 
 func _ready() -> void:
 	_touch_controls.visible = DisplayServer.is_touchscreen_available()
-	_play_again.pressed.connect(play_again_requested.emit)
+	_continue.pressed.connect(continue_requested.emit)
 	for child: Node in _slot_row.get_children():
-		_slots.append(child as ColorRect)
-		var icon: TextureRect = TextureRect.new()
-		icon.set_anchors_preset(Control.PRESET_FULL_RECT)
-		icon.stretch_mode = TextureRect.STRETCH_KEEP_CENTERED
-		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		child.add_child(icon)
-	_slot_ages.resize(_slots.size())
-	_slot_ages.fill(-1.0)
+		_add_icon(child as ColorRect)
 	set_process(false)
 
 
@@ -76,9 +85,17 @@ func apply_skin(skin: BoardSkin) -> void:
 	_right_panel.color = skin.panel_color
 
 
-## Shows the omamori of [param loadout] in their slots, with name and description as tooltip.
-func show_loadout(loadout: LoadoutDefinition) -> void:
+## Shows the omamori of [param loadout] in [param slots] slots, with name and description as
+## tooltip.
+func show_loadout(loadout: LoadoutDefinition, slots: int) -> void:
+	while _slots.size() < slots:
+		var frame: ColorRect = ColorRect.new()
+		frame.custom_minimum_size = SLOT_SIZE
+		frame.color = SLOT_COLOUR
+		_slot_row.add_child(frame)
+		_add_icon(frame)
 	for index: int in _slots.size():
+		_slots[index].visible = index < slots
 		var slot: ColorRect = _slots[index]
 		var icon: TextureRect = slot.get_child(0) as TextureRect
 		var charm: OmamoriDefinition = (
@@ -91,8 +108,47 @@ func show_loadout(loadout: LoadoutDefinition) -> void:
 		slot.modulate = Color.WHITE
 
 
-## Lights up omamori [param slot] for a moment after its effect acts.
+## Shows the character's portrait, name and power, or nothing for [code]null[/code].
+func show_character(character: CharacterDefinition) -> void:
+	_character_row.visible = character != null
+	_character_power.visible = character != null
+	if character == null:
+		return
+	_character_portrait.texture = character.portrait
+	_character_name.text = character.name_key
+	_character_power.text = character.power_key
+
+
+## Shows the boss and its rule, or hides the box on boards without one.
+func show_boss(boss: BossDefinition) -> void:
+	_boss_box.visible = boss != null
+	if boss == null:
+		return
+	_boss_portrait.texture = boss.portrait
+	_boss_name.text = boss.name_key
+	_boss_rule.text = boss.description_key
+
+
+## Text of the end-of-board button: play again on its own, continue in a run.
+func set_continue_text(key: String) -> void:
+	_continue.text = key
+
+
+## The boss portrait jolts after a shot, the GDD's boss reacting to shots.
+func boss_react() -> void:
+	if _boss_box.visible:
+		_jolt_age = 0.0
+		set_process(true)
+
+
+## Lights up omamori [param slot] for a moment after its effect acts; the character's slot lights
+## up its portrait.
 func flash_slot(slot: int) -> void:
+	if slot == Effect.CHARACTER_SLOT:
+		_portrait_age = 0.0
+		_character_portrait.modulate = FLASH_TINT
+		set_process(true)
+		return
 	if slot < 0 or slot >= _slots.size():
 		return
 	_slot_ages[slot] = 0.0
@@ -106,7 +162,7 @@ func update_bag(game: BoardGame) -> void:
 
 
 func show_board(placed: PlacedBoard, board_seed: int) -> void:
-	_seed.text = "%X" % board_seed
+	_seed.text = "%s %X" % [tr("HUD_SEED"), board_seed]
 	_layout.text = placed.layout.id
 	if placed.mirrored:
 		_layout.text += " " + tr("HUD_MIRRORED")
@@ -160,6 +216,22 @@ func _process(delta: float) -> void:
 			_burst_age = -1.0
 		else:
 			busy = true
+	if _jolt_age >= 0.0:
+		_jolt_age += delta
+		var left: float = 1.0 - clampf(_jolt_age / JOLT_TIME, 0.0, 1.0)
+		_boss_portrait.position.x = sin(_jolt_age * 60.0) * JOLT_DISTANCE * left
+		if left <= 0.0:
+			_jolt_age = -1.0
+		else:
+			busy = true
+	if _portrait_age >= 0.0:
+		_portrait_age += delta
+		var faded: float = clampf(_portrait_age / FLASH_TIME, 0.0, 1.0)
+		_character_portrait.modulate = FLASH_TINT.lerp(Color.WHITE, faded)
+		if faded >= 1.0:
+			_portrait_age = -1.0
+		else:
+			busy = true
 	for index: int in _slots.size():
 		if _slot_ages[index] < 0.0:
 			continue
@@ -172,6 +244,16 @@ func _process(delta: float) -> void:
 			busy = true
 	if not busy:
 		set_process(false)
+
+
+func _add_icon(frame: ColorRect) -> void:
+	_slots.append(frame)
+	_slot_ages.append(-1.0)
+	var icon: TextureRect = TextureRect.new()
+	icon.set_anchors_preset(Control.PRESET_FULL_RECT)
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_CENTERED
+	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	frame.add_child(icon)
 
 
 func _show_ball(ball: BagBall, label: Label, icon: TextureRect) -> void:

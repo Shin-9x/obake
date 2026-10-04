@@ -6,6 +6,9 @@ extends HFlowContainer
 signal ball_picked(index: int)
 
 const BUTTON_SIZE: Vector2 = Vector2(30, 30)
+const ICON_WIDTH: int = 16
+## Tint of a ball that cannot be picked.
+const UNAVAILABLE: Color = Color(1, 1, 1, 0.4)
 
 
 ## Lists [param inventory]'s balls; [param allowed] are the indices that can be picked, or
@@ -19,7 +22,8 @@ func show_bag(inventory: Inventory, allowed: Variant = null) -> void:
 		var entry: Button = Button.new()
 		entry.custom_minimum_size = BUTTON_SIZE
 		entry.icon = ball.texture
-		entry.expand_icon = false
+		entry.expand_icon = true
+		entry.add_theme_constant_override("icon_max_width", ICON_WIDTH)
 		entry.focus_mode = Control.FOCUS_NONE
 		entry.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 		entry.text = (
@@ -28,8 +32,9 @@ func show_bag(inventory: Inventory, allowed: Variant = null) -> void:
 		entry.add_theme_font_size_override("font_size", UiKit.SMALL_SIZE)
 		entry.tooltip_text = "%s\n%s" % [tr(ball.name_key), tr(ball.description_key)]
 		if allowed == null:
-			entry.disabled = true
+			entry.mouse_filter = Control.MOUSE_FILTER_PASS
 		else:
 			entry.disabled = not (allowed as PackedInt32Array).has(index)
+			entry.modulate = UNAVAILABLE if entry.disabled else Color.WHITE
 			entry.pressed.connect(ball_picked.emit.bind(index))
 		add_child(entry)
