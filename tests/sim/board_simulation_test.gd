@@ -143,6 +143,46 @@ func test_head_on_hit_is_nudged_sideways() -> void:
 	assert_array(_event_kinds()).not_contains([SimEvent.Kind.STUCK_CLEARED])
 
 
+func test_balls_pass_through_illusions() -> void:
+	var peg: int = _sim.add_round_peg(_config.launcher_x, 100 * PX)
+	_sim.pegs[peg].illusion = true
+	_sim.launch(_aimed(STRAIGHT_DOWN))
+	var hit: SimEvent = _step_until(SimEvent.Kind.PEG_HIT)
+	assert_object(hit).is_not_null()
+	assert_int(hit.target).is_equal(peg)
+	assert_int(_sim.balls[0].vy).is_greater(0)
+	assert_int(_sim.balls[0].vx).is_equal(0)
+
+
+func test_removed_pegs_leave_the_board_until_restored() -> void:
+	var peg: int = _sim.add_round_peg(100 * PX, 100 * PX)
+	var found: PackedInt32Array = PackedInt32Array()
+	found.resize(1)
+	_sim.mark_hit(peg)
+	_sim.remove_peg(peg)
+	assert_bool(_sim.pegs[peg].removed).is_true()
+	assert_int(_sim.pegs_within(100 * PX, 100 * PX, PX, found)).is_equal(0)
+	_sim.restore_peg(peg)
+	assert_bool(_sim.pegs[peg].removed).is_false()
+	assert_bool(_sim.pegs[peg].lit).is_false()
+	assert_int(_sim.pegs_within(100 * PX, 100 * PX, PX, found)).is_equal(1)
+
+
+func test_an_extended_prediction_follows_the_ball_past_the_first_contact() -> void:
+	var peg: int = _sim.add_round_peg(_config.launcher_x + 3 * PX, 100 * PX)
+	var points: PackedInt32Array = PackedInt32Array()
+	points.resize(2 * 200)
+	var before: int = _sim.state_hash()
+	var short: int = _sim.predict_path(STRAIGHT_DOWN, 4, points, 1)
+	var first_stop: int = points[2 * short - 1]
+	var long: int = _sim.predict_path(STRAIGHT_DOWN, 4, points, 3)
+	assert_int(long).is_greater(short)
+	assert_int(points[2 * long - 1]).is_not_equal(first_stop)
+	assert_int(_sim.state_hash()).is_equal(before)
+	assert_bool(_sim.pegs[peg].lit).is_false()
+	assert_int(_sim.events.size()).is_equal(0)
+
+
 func _aimed(aim: int) -> ShotInput:
 	return ShotInput.new(aim, _away())
 

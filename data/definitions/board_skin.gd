@@ -11,3 +11,6 @@ extends Resource
 @export var guide_color: Color = Color("#f4e9c9b0")
 ## Ring drawn around lit pegs.
 @export var lit_color: Color = Color("#fff6d8")
+## Zones such as webs: a translucent fill and the strands drawn over it.
+@export var zone_color: Color = Color("#c9d1d922")
+@export var zone_line_color: Color = Color("#c9d1d980")

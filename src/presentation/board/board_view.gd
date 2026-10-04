@@ -10,6 +10,9 @@ extends Node2D
 const PX: float = 1000.0
 ## Brightening applied to lit lanterns.
 const LIT_TINT: Color = Color(1.6, 1.6, 1.6)
+## Spokes and rings of the web drawn over each zone.
+const ZONE_SPOKES: int = 8
+const ZONE_RINGS: int = 3
 ## Ring drawn around pegs that are about to be hit by fire.
 const BURN_COLOUR: Color = Color("#ff7a2f")
 
@@ -130,11 +133,25 @@ func render(alpha: float) -> void:
 func _draw() -> void:
 	if _game == null:
 		return
+	for zone: SimZone in _game.simulation.zones:
+		_draw_zone(zone)
 	var pegs: Array[SimPeg] = _game.simulation.pegs
 	for index: int in pegs.size():
 		var peg: SimPeg = pegs[index]
 		if peg.group < 0 and not peg.removed:
 			_draw_peg(self, index, Vector2(peg.x, peg.y) / PX)
+
+
+func _draw_zone(zone: SimZone) -> void:
+	var centre: Vector2 = Vector2(zone.x, zone.y) / PX
+	var radius: float = zone.radius / PX
+	draw_circle(centre, radius, _skin.zone_color)
+	for spoke: int in ZONE_SPOKES:
+		var direction: Vector2 = Vector2.from_angle(TAU * spoke / ZONE_SPOKES)
+		draw_line(centre, centre + direction * radius, _skin.zone_line_color, 1.0)
+	for ring: int in range(1, ZONE_RINGS + 1):
+		var ring_radius: float = radius * ring / ZONE_RINGS
+		draw_arc(centre, ring_radius, 0.0, TAU, ZONE_SPOKES, _skin.zone_line_color, 1.0)
 
 
 func _draw_moving_pegs() -> void:

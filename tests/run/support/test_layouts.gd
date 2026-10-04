@@ -34,3 +34,14 @@ static func sample() -> BoardLayout:
 	slide.pegs.append(LayoutPeg.rect_at(120 * PX, 280 * PX, 2 * PX, 10 * PX, 0))
 	layout.groups = [ring, slide]
 	return layout
+
+
+## Twelve static round pegs in a grid, as a second layer for the sample layout.
+static func second_layer() -> BoardLayout:
+	var layout: BoardLayout = BoardLayout.new()
+	layout.id = "second"
+	layout.biome = "test"
+	for y: int in [100, 160, 220]:
+		for x: int in [60, 140, 220, 300]:
+			layout.pegs.append(LayoutPeg.round_at(x * PX, y * PX))
+	return layout

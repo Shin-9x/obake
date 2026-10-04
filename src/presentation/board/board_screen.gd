@@ -142,8 +142,11 @@ func _consume_events() -> void:
 				var scaled: String = BoardHud.format_mult(event.amount)
 				_popups.show_text(tr("POPUP_POINTS_TIMES") % scaled, at, POINTS_COLOR)
 				score_changed = true
-			SimEvent.Kind.PEG_TRANSFORMED:
+			SimEvent.Kind.PEG_TRANSFORMED, SimEvent.Kind.PEG_VANISHED:
 				pegs_changed = true
+			SimEvent.Kind.LAYOUT_CHANGED:
+				pegs_changed = true
+				_hud.update_counts(game)
 			SimEvent.Kind.SCORE_MULT_TIMES:
 				var factor: String = BoardHud.format_mult(event.amount)
 				_popups.show_text(tr("POPUP_MULT_TIMES") % factor, at, TIMES_COLOR)
@@ -188,7 +191,7 @@ func _on_play_again() -> void:
 func _refresh_guide() -> void:
 	_guide.visible = game.can_shoot()
 	if _guide.visible:
-		_guide.show_path(game.simulation, _aim.aim)
+		_guide.show_path(game.simulation, _aim.aim, game.guide_contacts())
 
 
 ## A fresh board seed from the clock; game randomness itself always comes from PCG32.

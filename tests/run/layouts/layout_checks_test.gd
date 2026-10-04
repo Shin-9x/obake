@@ -51,6 +51,12 @@ func test_crossing_rectangles_overlap() -> void:
 	assert_bool(LayoutChecks.overlap(a, apart)).is_false()
 
 
+func test_zones_outside_the_board_are_reported() -> void:
+	var layout: BoardLayout = TestLayouts.sample()
+	layout.zones.append(LayoutZone.new(20 * PX, 200 * PX, 30 * PX))
+	_assert_problem(layout, "zone at (20, 200) leaves the board")
+
+
 func _assert_problem(layout: BoardLayout, expected: String) -> void:
 	var problems: Array[String] = LayoutChecks.find_problems(layout, _config)
 	assert_str("\n".join(problems)).contains(expected)

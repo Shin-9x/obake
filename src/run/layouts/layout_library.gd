@@ -24,6 +24,24 @@ static func load_from(directory: String = DIRECTORY) -> LayoutLibrary:
 	return library
 
 
+## The standard boards of [param biome], in id order.
+func pool(biome: String) -> Array[BoardLayout]:
+	var found: Array[BoardLayout] = []
+	for layout: BoardLayout in layouts:
+		if layout.biome == biome and layout.kind == BoardLayout.Kind.BOARD:
+			found.append(layout)
+	return found
+
+
+## Every standard board, in id order.
+func boards() -> Array[BoardLayout]:
+	var found: Array[BoardLayout] = []
+	for layout: BoardLayout in layouts:
+		if layout.kind == BoardLayout.Kind.BOARD:
+			found.append(layout)
+	return found
+
+
 func find(id: String) -> BoardLayout:
 	for layout: BoardLayout in layouts:
 		if layout.id == id:

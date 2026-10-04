@@ -42,6 +42,11 @@ func remove(index: int) -> void:
 	_enabled[index] = 0
 
 
+## Puts back a peg taken out by [method remove].
+func restore(index: int) -> void:
+	_enabled[index] = 1
+
+
 func query(min_x: int, min_y: int, max_x: int, max_y: int) -> void:
 	_query_id += 1
 	result_count = 0

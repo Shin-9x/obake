@@ -16,6 +16,24 @@ func test_poses_compose_through_parents() -> void:
 	assert_that(peg.document_pose()).is_equal(Vector3i(100 * PX, 70 * PX, 9000))
 
 
+func test_zones_and_kind_are_exported() -> void:
+	var document: LayoutDocument = auto_free(LayoutDocument.new())
+	document.kind = BoardLayout.Kind.BOSS
+	var group: Node2D = Node2D.new()
+	document.add_child(group)
+	var zone: ZoneMarker = ZoneMarker.new()
+	zone.position = Vector2(120, 80)
+	zone.radius = 25.0
+	group.add_child(zone)
+	var peg: PegMarker = PegMarker.new()
+	document.add_child(peg)
+	var layout: BoardLayout = document.build_layout()
+	assert_int(layout.kind).is_equal(BoardLayout.Kind.BOSS)
+	assert_int(layout.zones.size()).is_equal(1)
+	assert_int(layout.zones[0].x).is_equal(120 * PX)
+	assert_int(layout.zones[0].radius).is_equal(25 * PX)
+
+
 func test_grid_is_centred_and_symmetric() -> void:
 	var grid: GridPattern = auto_free(GridPattern.new())
 	grid.columns = 4

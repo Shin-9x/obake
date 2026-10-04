@@ -27,6 +27,7 @@ var balls: Array[SimBall] = []
 var pegs: Array[SimPeg] = []
 var walls: Array[SimWall] = []
 var groups: Array[MovingGroup] = []
+var zones: Array[SimZone] = []
 var bucket: Bucket
 ## Index of the ball fired by the last [method launch].
 var launched_ball: int = -1
@@ -70,6 +71,20 @@ func add_rect_peg(
 func add_wall(ax: int, ay: int, bx: int, by: int) -> int:
 	walls.append(SimWall.new(ax, ay, bx, by))
 	return walls.size() - 1
+
+
+## Adds a circular zone and returns its index; it brakes nothing until its drag is set.
+func add_zone(x: int, y: int, radius: int) -> int:
+	zones.append(SimZone.new(x, y, radius))
+	return zones.size() - 1
+
+
+## Index of the first zone containing ([param x], [param y]), or -1.
+func zone_at(x: int, y: int) -> int:
+	for index: int in zones.size():
+		if zones[index].contains(x, y):
+			return index
+	return -1
 
 
 ## Adds an empty moving group and returns its index. [param pivot_x] and [param pivot_y] only
@@ -156,6 +171,7 @@ func step() -> void:
 		if not ball.active:
 			continue
 		_attract(ball)
+		_drag(ball)
 		_integrate(ball)
 		_collide_with_walls(index, ball)
 		_collide_with_pegs(index, ball)
@@ -181,11 +197,14 @@ func step() -> void:
 		_resolve_shot()
 
 
-## Flies a ghost ball along [param aim] until its first contact or until it leaves the board,
-## without changing any state. Moving pegs are taken where they are now. Writes x, y pairs
-## (milli-pixels) every [param sample_ticks] ticks into [param out_points], always ending with
-## the last position, and returns the point count.
-func predict_path(aim: int, sample_ticks: int, out_points: PackedInt32Array) -> int:
+## Flies a ghost ball along [param aim] until its [param contacts]-th contact or until it leaves
+## the board, without changing any state. Past the first contact the ghost bounces off walls,
+## pegs and rims as a plain ball would. Moving pegs are taken where they are now. Writes x, y
+## pairs (milli-pixels) every [param sample_ticks] ticks and at every contact into
+## [param out_points], always ending with the last position, and returns the point count.
+func predict_path(
+	aim: int, sample_ticks: int, out_points: PackedInt32Array, contacts: int = 1
+) -> int:
 	var capacity: int = out_points.size() / 2
 	if capacity == 0:
 		return 0
@@ -195,10 +214,18 @@ func predict_path(aim: int, sample_ticks: int, out_points: PackedInt32Array) -> 
 	ghost.radius = _config.ball_radius
 	_aim_ball(ghost, aim)
 	var count: int = _write_point(out_points, 0, ghost)
+	var touched: int = 0
 	for flight_tick: int in range(1, PREDICTION_TICKS + 1):
+		_drag(ghost)
 		_integrate(ghost)
-		var ended: bool = _touches_anything(ghost) or ghost.y - ghost.radius > _config.board_height
-		if ended or flight_tick % sample_ticks == 0:
+		var left: bool = ghost.y - ghost.radius > _config.board_height
+		var contact: bool = false
+		if not left:
+			contact = _touches_anything(ghost) if touched + 1 >= contacts else _bounce_ghost(ghost)
+		if contact:
+			touched += 1
+		var ended: bool = left or touched >= contacts
+		if ended or contact or flight_tick % sample_ticks == 0:
 			count = _write_point(out_points, mini(count, capacity - 1), ghost)
 		if ended:
 			break
@@ -226,6 +253,24 @@ func pegs_within(x: int, y: int, radius: int, out: PackedInt32Array) -> int:
 				out[count] = index
 				count += 1
 	return count
+
+
+## Takes [param peg] off the board at once, as a vanished illusion or a layer out of play.
+func remove_peg(peg: int) -> void:
+	var removed: SimPeg = pegs[peg]
+	removed.removed = true
+	removed.lit = false
+	if removed.group < 0:
+		_grid.remove(peg)
+
+
+## Puts a peg taken off by [method remove_peg] back on the board, unlit.
+func restore_peg(peg: int) -> void:
+	var restored: SimPeg = pegs[peg]
+	restored.removed = false
+	restored.lit = false
+	if restored.group < 0:
+		_grid.restore(peg)
 
 
 ## Lights [param peg] as if a ball had touched it, without a [constant SimEvent.Kind.PEG_HIT].
@@ -260,7 +305,8 @@ func state_hash() -> int:
 		result = _mix(result, ball.vy)
 		result = _mix(result, ball.slow_ticks)
 	for peg: SimPeg in pegs:
-		result = _mix(result, (1 if peg.lit else 0) + (2 if peg.removed else 0))
+		var flags: int = (1 if peg.lit else 0) + (2 if peg.removed else 0)
+		result = _mix(result, flags + (4 if peg.illusion else 0))
 		if peg.group >= 0:
 			result = _mix(result, peg.x)
 			result = _mix(result, peg.y)
@@ -385,6 +431,10 @@ func _hit_peg(ball_index: int, ball: SimBall, peg_index: int) -> void:
 		return
 	if not _touches_peg(ball, peg):
 		return
+	if peg.illusion:
+		# Nothing to bounce off; the board makes the illusion vanish when it sees the hit.
+		events.push(SimEvent.Kind.PEG_HIT, tick, ball_index, peg_index, ball.x, ball.y)
+		return
 	if ball.ghost_hits > 0 and ball.ghost_count < SimBall.GHOST_CAPACITY:
 		# Passes through, hitting the peg without bouncing.
 		ball.ghost_hits -= 1
@@ -451,6 +501,55 @@ func _touches_anything(ball: SimBall) -> bool:
 			if not peg.removed and _touches_peg(ball, peg):
 				return true
 	return _touches_rim(ball, -1) or _touches_rim(ball, 1)
+
+
+## Bounces the prediction ghost off whatever it touches, without events or lighting anything.
+## Returns whether it hit something this tick.
+func _bounce_ghost(ghost: SimBall) -> bool:
+	var hit: bool = false
+	for wall: SimWall in walls:
+		if Collision.circle_vs_wall(ghost.x, ghost.y, ghost.radius, wall, _contact):
+			hit = _resolve_contact(ghost, _config.wall_restitution, 0, 0) or hit
+	var radius: int = ghost.radius
+	var left: int = ghost.x - radius
+	var top: int = ghost.y - radius
+	var right: int = ghost.x + radius
+	var bottom: int = ghost.y + radius
+	_grid.query(left, top, right, bottom)
+	for result: int in _grid.result_count:
+		hit = _bounce_ghost_off(ghost, pegs[_grid.results[result]]) or hit
+	for group: MovingGroup in groups:
+		if not group.overlaps(left, top, right, bottom):
+			continue
+		for peg_index: int in group.pegs:
+			var peg: SimPeg = pegs[peg_index]
+			if not peg.removed:
+				hit = _bounce_ghost_off(ghost, peg) or hit
+	if _touches_rim(ghost, -1):
+		hit = _resolve_contact(ghost, _config.wall_restitution, 0, 0) or hit
+	if _touches_rim(ghost, 1):
+		hit = _resolve_contact(ghost, _config.wall_restitution, 0, 0) or hit
+	return hit
+
+
+func _bounce_ghost_off(ghost: SimBall, peg: SimPeg) -> bool:
+	if not _touches_peg(ghost, peg):
+		return false
+	var restitution: int = peg.restitution if peg.restitution >= 0 else _config.peg_restitution
+	if not _resolve_contact(ghost, restitution, peg.vx, peg.vy):
+		return false
+	_nudge_head_on(ghost, peg.vx, peg.vy)
+	return true
+
+
+## Brakes a ball whose centre lies in a zone with drag.
+func _drag(ball: SimBall) -> void:
+	for zone: SimZone in zones:
+		if zone.drag > 0 and zone.contains(ball.x, ball.y):
+			var keep: int = _PERMILLE - zone.drag
+			ball.vx = FixedMath.div_round(ball.vx * keep, _PERMILLE)
+			ball.vy = FixedMath.div_round(ball.vy * keep, _PERMILLE)
+			return
 
 
 func _wall_restitution(ball: SimBall) -> int:

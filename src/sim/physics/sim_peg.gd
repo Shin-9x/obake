@@ -26,6 +26,10 @@ var restitution: int = -1
 var persistent: bool = false
 ## Pulls balls that have an attraction.
 var attractor: bool = false
+## Not really there: balls pass through it, and the board makes it vanish when touched.
+var illusion: bool = false
+## Layout layer the peg belongs to; pegs of a layer not in play stay removed until it is.
+var layer: int = 0
 
 ## Index of the moving group this peg belongs to, or -1 for a static peg.
 var group: int = -1

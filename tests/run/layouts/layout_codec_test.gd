@@ -24,6 +24,33 @@ func test_keys_are_written_in_a_fixed_order() -> void:
 	assert_array(order).is_equal(sorted)
 
 
+func test_kind_and_zones_round_trip_and_are_optional() -> void:
+	var layout: BoardLayout = TestLayouts.sample()
+	layout.kind = BoardLayout.Kind.BOSS
+	layout.zones.append(LayoutZone.new(100_000, 120_000, 30_000))
+	var text: String = LayoutCodec.to_json(layout)
+	var errors: Array[String] = []
+	var parsed: BoardLayout = LayoutCodec.from_json(text, errors)
+	assert_array(errors).is_empty()
+	assert_int(parsed.kind).is_equal(BoardLayout.Kind.BOSS)
+	assert_int(parsed.zones.size()).is_equal(1)
+	assert_int(parsed.zones[0].radius).is_equal(30_000)
+	var plain: String = LayoutCodec.to_json(TestLayouts.sample())
+	assert_str(plain).not_contains('"kind"')
+	assert_str(plain).not_contains('"zones"')
+	assert_int(LayoutCodec.from_json(plain, errors).kind).is_equal(BoardLayout.Kind.BOARD)
+
+
+func test_rejects_unknown_kinds_and_empty_zones() -> void:
+	_assert_rejected(
+		{"format": 1, "id": "x", "biome": "y", "kind": "secret", "pegs": [_round()]}, "secret"
+	)
+	var zone: Dictionary = {"x": 10, "y": 10, "radius": 0}
+	_assert_rejected(
+		{"format": 1, "id": "x", "biome": "y", "pegs": [_round()], "zones": [zone]}, "radius"
+	)
+
+
 func test_rejects_an_unknown_format() -> void:
 	_assert_rejected({"format": 2, "id": "x", "biome": "y", "pegs": [_round()]}, "format")
 

@@ -42,6 +42,10 @@ enum Kind {
 	SCORE_POINTS_TIMES,
 	## [code]target[/code] has become another kind of peg.
 	PEG_TRANSFORMED,
+	## [code]target[/code] was an illusion and is gone, without scoring.
+	PEG_VANISHED,
+	## Another layer of the layout is now in play; [code]amount[/code] is the layer.
+	LAYOUT_CHANGED,
 }
 
 var kind: Kind = Kind.PEG_HIT

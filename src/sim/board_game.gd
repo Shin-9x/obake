@@ -59,6 +59,7 @@ var _rng: Pcg32
 var _definitions: Array[PegDefinition] = []
 var _peg_definitions: Array[PegDefinition] = []
 var _peg_effects: Array[Effect] = []
+var _purchased: Array[PegDefinition] = []
 ## Character, boss, then omamori in slot order: the effects that act on every hit.
 var _effects: Array[Effect] = []
 var _scored: PackedByteArray = PackedByteArray()
@@ -134,9 +135,9 @@ func _init(
 		effect.on_board_start(self)
 	shots_left = maxi(1, shots_left)
 	if loadout != null:
-		_place_purchased(loadout.purchased_pegs)
-	for peg: int in count:
-		simulation.pegs[peg].attractor = roles[peg] == Role.RED
+		_purchased = loadout.purchased_pegs
+	_place_purchased(_purchased)
+	_refresh_attractors()
 
 
 func definition_of(peg: int) -> PegDefinition:
@@ -357,7 +358,12 @@ func transform_random(role: Role, count: int, definition: PegDefinition) -> int:
 		var available: int = 0
 		for peg: int in roles.size():
 			var candidate: SimPeg = simulation.pegs[peg]
-			if roles[peg] == role and not candidate.lit and not candidate.removed:
+			if (
+				roles[peg] == role
+				and not candidate.lit
+				and not candidate.removed
+				and not candidate.illusion
+			):
 				_candidates[available] = peg
 				available += 1
 		if available == 0:
@@ -368,6 +374,62 @@ func transform_random(role: Role, count: int, definition: PegDefinition) -> int:
 		events.push(SimEvent.Kind.PEG_TRANSFORMED, simulation.tick, -1, chosen, where.x, where.y)
 		turned += 1
 	return turned
+
+
+## Makes [param count] random unlit blue lanterns illusions, after clearing the previous ones,
+## and returns how many it made. Balls pass through illusions, which vanish without scoring.
+func scatter_illusions(count: int) -> int:
+	for peg: SimPeg in simulation.pegs:
+		peg.illusion = false
+	var made: int = 0
+	for pick: int in count:
+		var available: int = 0
+		for peg: int in roles.size():
+			var candidate: SimPeg = simulation.pegs[peg]
+			if (
+				roles[peg] == Role.BLUE
+				and not candidate.lit
+				and not candidate.removed
+				and not candidate.illusion
+			):
+				_candidates[available] = peg
+				available += 1
+		if available == 0:
+			break
+		simulation.pegs[_candidates[_rng.next_below(available)]].illusion = true
+		made += 1
+	return made
+
+
+## Number of pegs still on the board.
+func pegs_in_play() -> int:
+	var count: int = 0
+	for peg: SimPeg in simulation.pegs:
+		if not peg.removed:
+			count += 1
+	return count
+
+
+## Brings layout layer [param layer] into play: the pegs still on the board leave, the pegs of
+## that layer arrive coloured as on a new board, and the purchased pegs are placed again.
+func switch_layer(layer: int) -> void:
+	for peg: int in roles.size():
+		var sim_peg: SimPeg = simulation.pegs[peg]
+		sim_peg.illusion = false
+		if sim_peg.layer == layer:
+			simulation.restore_peg(peg)
+			roles[peg] = Role.BLUE
+			_peg_definitions[peg] = null
+			_peg_effects[peg] = null
+			sim_peg.restitution = -1
+			sim_peg.persistent = false
+		elif not sim_peg.removed:
+			simulation.remove_peg(peg)
+	_gold = -1
+	_colour_pegs()
+	_place_purchased(_purchased)
+	_refresh_attractors()
+	events.push(SimEvent.Kind.LAYOUT_CHANGED, simulation.tick, -1, -1, 0, 0, layer)
 
 
 ## Shows the aim guide up to [param contacts] contacts for the next [param shots] shots, on top
@@ -399,6 +461,9 @@ func trigger(effect: Effect) -> void:
 
 func _score(peg: int, source: PegHit.Source, ball: int) -> void:
 	if _scored[peg] == 1:
+		return
+	if simulation.pegs[peg].illusion:
+		_vanish(peg)
 		return
 	_scored[peg] = 1
 	simulation.mark_hit(peg)
@@ -446,6 +511,13 @@ func _score(peg: int, source: PegHit.Source, ball: int) -> void:
 	if hit.role == Role.GREEN:
 		for effect: Effect in _effects:
 			effect.on_power(self, hit)
+
+
+func _vanish(peg: int) -> void:
+	var where: SimPeg = simulation.pegs[peg]
+	where.illusion = false
+	simulation.remove_peg(peg)
+	events.push(SimEvent.Kind.PEG_VANISHED, simulation.tick, -1, peg, where.x, where.y)
 
 
 func _drain_areas() -> void:
@@ -569,12 +641,17 @@ func _place_purchased(pegs: Array[PegDefinition]) -> void:
 		for copy: int in purchased_copies:
 			var available: int = 0
 			for peg: int in roles.size():
-				if roles[peg] == Role.BLUE:
+				if roles[peg] == Role.BLUE and not simulation.pegs[peg].removed:
 					_candidates[available] = peg
 					available += 1
 			if available == 0:
 				return
 			place_special(_candidates[_rng.next_below(available)], definition)
+
+
+func _refresh_attractors() -> void:
+	for peg: int in roles.size():
+		simulation.pegs[peg].attractor = roles[peg] == Role.RED
 
 
 func _assign_roles() -> void:
@@ -583,11 +660,17 @@ func _assign_roles() -> void:
 	roles.fill(Role.BLUE)
 	_scored.resize(count)
 	_candidates.resize(count)
-	var reds: int = mini(count, FixedMath.div_round(count * _config.red_permille, _PERMILLE))
-	_assign_reds_by_zone(reds)
+	_colour_pegs()
+
+
+## Colours the pegs in play, which are all blue so far: reds, then greens, then the gold.
+func _colour_pegs() -> void:
+	var in_play: int = pegs_in_play()
+	var reds: int = mini(in_play, FixedMath.div_round(in_play * _config.red_permille, _PERMILLE))
+	_assign_reds_by_zone(reds, in_play)
 	var available: int = 0
-	for peg: int in count:
-		if roles[peg] == Role.BLUE:
+	for peg: int in roles.size():
+		if roles[peg] == Role.BLUE and not simulation.pegs[peg].removed:
 			_candidates[available] = peg
 			available += 1
 	_candidates = _shuffled(_candidates, available)
@@ -598,8 +681,7 @@ func _assign_roles() -> void:
 
 ## GDD: reds are stratified by zones so they spread across the board. Each zone gets the floor
 ## of its proportional share; the reds left over go to the largest remainders, lowest zone first.
-func _assign_reds_by_zone(reds: int) -> void:
-	var count: int = roles.size()
+func _assign_reds_by_zone(reds: int, count: int) -> void:
 	if count == 0 or reds == 0:
 		return
 	var columns: int = maxi(1, _config.colour_zone_columns)
@@ -607,8 +689,10 @@ func _assign_reds_by_zone(reds: int) -> void:
 	var zone_pegs: Array[PackedInt32Array] = []
 	for zone: int in columns * rows:
 		zone_pegs.append(PackedInt32Array())
-	for peg_index: int in count:
+	for peg_index: int in roles.size():
 		var peg: SimPeg = simulation.pegs[peg_index]
+		if peg.removed:
+			continue
 		var column: int = clampi(peg.base_x * columns / _config.board_width, 0, columns - 1)
 		var row: int = clampi(peg.base_y * rows / _config.board_height, 0, rows - 1)
 		zone_pegs[row * columns + column].append(peg_index)

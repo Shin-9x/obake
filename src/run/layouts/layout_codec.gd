@@ -4,7 +4,8 @@ class_name LayoutCodec
 ##
 ## Every number is an integer: milli-pixels, centidegrees and ticks. JSON parses numbers as
 ## doubles, which hold integers exactly below 2^53, so nothing is lost on the way back. Keys are
-## written in a fixed order so exported files diff cleanly.
+## written in a fixed order so exported files diff cleanly; "kind" and "zones" are optional and
+## only written when they differ from a standard board without zones.
 
 const FORMAT: int = 1
 const _SHAPES: Dictionary[String, SimPeg.Shape] = {
@@ -14,6 +15,10 @@ const _SHAPES: Dictionary[String, SimPeg.Shape] = {
 const _MOTIONS: Dictionary[String, MovingGroup.Motion] = {
 	"rotate": MovingGroup.Motion.ROTATE,
 	"oscillate": MovingGroup.Motion.OSCILLATE,
+}
+const _KINDS: Dictionary[String, BoardLayout.Kind] = {
+	"board": BoardLayout.Kind.BOARD,
+	"boss": BoardLayout.Kind.BOSS,
 }
 
 
@@ -25,14 +30,22 @@ static func to_dictionary(layout: BoardLayout) -> Dictionary[String, Variant]:
 	var groups: Array[Dictionary] = []
 	for group: LayoutGroup in layout.groups:
 		groups.append(_group_to_dictionary(group))
-	return {
+	var result: Dictionary[String, Variant] = {
 		"format": FORMAT,
 		"id": layout.id,
 		"biome": layout.biome,
-		"mirrorable": layout.mirrorable,
-		"pegs": _pegs_to_array(layout.pegs),
-		"groups": groups,
 	}
+	if layout.kind != BoardLayout.Kind.BOARD:
+		result["kind"] = _KINDS.find_key(layout.kind)
+	result["mirrorable"] = layout.mirrorable
+	result["pegs"] = _pegs_to_array(layout.pegs)
+	result["groups"] = groups
+	if not layout.zones.is_empty():
+		var zones: Array[Dictionary] = []
+		for zone: LayoutZone in layout.zones:
+			zones.append({"x": zone.x, "y": zone.y, "radius": zone.radius})
+		result["zones"] = zones
+	return result
 
 
 ## Parses [param text]. Returns null and appends to [param errors] when it is not a valid layout.
@@ -51,12 +64,30 @@ static func from_dictionary(data: Dictionary, errors: Array[String]) -> BoardLay
 	var layout: BoardLayout = BoardLayout.new()
 	layout.id = _read_string(data, "id", "layout", errors)
 	layout.biome = _read_string(data, "biome", "layout", errors)
+	var kind: String = str(data.get("kind", "board"))
+	if not _KINDS.has(kind):
+		errors.append("layout: unknown kind '%s'" % kind)
+	layout.kind = _KINDS.get(kind, BoardLayout.Kind.BOARD)
 	layout.mirrorable = data.get("mirrorable", true) == true
 	layout.pegs = _read_pegs(data, "layout", errors)
 	for entry: Variant in _read_array(data, "groups", "layout", errors):
 		var group: LayoutGroup = _read_group(entry, "group %d" % layout.groups.size(), errors)
 		if group != null:
 			layout.groups.append(group)
+	for entry: Variant in _read_array(data, "zones", "layout", errors):
+		var where: String = "zone %d" % layout.zones.size()
+		if not entry is Dictionary:
+			errors.append("%s: not an object" % where)
+			continue
+		var zone_data: Dictionary = entry
+		var zone: LayoutZone = LayoutZone.new(
+			_read_int(zone_data, "x", where, errors),
+			_read_int(zone_data, "y", where, errors),
+			_read_int(zone_data, "radius", where, errors)
+		)
+		if zone.radius <= 0:
+			errors.append("%s: radius must be positive" % where)
+		layout.zones.append(zone)
 	if layout.peg_count() == 0:
 		errors.append("layout: no pegs")
 	return layout if errors.size() == start else null

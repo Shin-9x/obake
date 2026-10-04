@@ -71,6 +71,21 @@ func test_pick_layout_uses_the_seed() -> void:
 	assert_str(BoardSetup.pick_layout(library, 5).id).is_equal(picked[5])
 
 
+func test_zones_are_placed_and_mirrored_with_the_layout() -> void:
+	var layout: BoardLayout = TestLayouts.sample()
+	layout.zones.append(LayoutZone.new(100 * PX, 150 * PX, 20 * PX))
+	var config: BalanceConfig = TestBoards.gdd_config()
+	var plain: PlacedBoard = BoardSetup.create_board(
+		config, TestBoards.gdd_pegs(), layout, _unmirrored_seed()
+	)
+	var flipped: PlacedBoard = BoardSetup.create_board(
+		config, TestBoards.gdd_pegs(), layout, _mirrored_seed()
+	)
+	assert_int(plain.game.simulation.zones[0].x).is_equal(100 * PX)
+	assert_int(flipped.game.simulation.zones[0].x).is_equal(config.board_width - 100 * PX)
+	assert_int(flipped.game.simulation.zones[0].radius).is_equal(20 * PX)
+
+
 func _place(board_seed: int) -> PlacedBoard:
 	return BoardSetup.create_board(
 		TestBoards.gdd_config(), TestBoards.gdd_pegs(), TestLayouts.sample(), board_seed

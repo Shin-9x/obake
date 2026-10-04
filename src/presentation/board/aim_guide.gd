@@ -1,9 +1,12 @@
 class_name AimGuide
 extends Node2D
-## Dotted trajectory from the launcher to the first impact, predicted by the simulation itself.
+## Dotted trajectory from the launcher to the first impact, or further when a power extends it,
+## predicted by the simulation itself.
 
 ## One dot every few ticks of predicted flight.
 const SAMPLE_TICKS: int = 4
+## Room for the extra points written at each contact of an extended guide.
+const CONTACT_POINTS: int = 8
 const PX: float = 1000.0
 
 var color: Color = Color.WHITE
@@ -13,11 +16,12 @@ var _count: int = 0
 
 
 func _ready() -> void:
-	_points.resize(2 * (BoardSimulation.PREDICTION_TICKS / SAMPLE_TICKS + 2))
+	_points.resize(2 * (BoardSimulation.PREDICTION_TICKS / SAMPLE_TICKS + 2 + CONTACT_POINTS))
 
 
-func show_path(simulation: BoardSimulation, aim: int) -> void:
-	_count = simulation.predict_path(aim, SAMPLE_TICKS, _points)
+## Shows the path along [param aim] up to its [param contacts]-th contact.
+func show_path(simulation: BoardSimulation, aim: int, contacts: int = 1) -> void:
+	_count = simulation.predict_path(aim, SAMPLE_TICKS, _points, contacts)
 	visible = true
 	queue_redraw()
 

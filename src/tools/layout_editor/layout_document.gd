@@ -2,7 +2,8 @@
 class_name LayoutDocument
 extends Node2D
 ## Root of a layout source scene. Its children describe the pegs: [PegMarker]s, pattern
-## generators and [MovingGroupMarker]s. Export writes data/layouts/<id>.json.
+## generators and [MovingGroupMarker]s, plus any [ZoneMarker]s. Export writes
+## data/layouts/<id>.json.
 ##
 ## Coordinates are board pixels with the origin at the top-left corner of the board.
 
@@ -19,6 +20,7 @@ const GUIDE_COLOUR: Color = Color("#f4e9c955")
 		id = value
 		mark_dirty()
 @export_enum("bamboo_forest", "haunted_village") var biome: String = "bamboo_forest"
+@export var kind: BoardLayout.Kind = BoardLayout.Kind.BOARD
 @export var mirrorable: bool = true
 @export_tool_button("Export JSON", "Save") var export_button: Callable = export_json
 
@@ -45,10 +47,12 @@ func build_layout() -> BoardLayout:
 	var layout: BoardLayout = BoardLayout.new()
 	layout.id = id
 	layout.biome = biome
+	layout.kind = kind
 	layout.mirrorable = mirrorable
 	for child: Node in get_children():
 		collect_pegs(child, layout.pegs)
 	_collect_groups(self, layout.groups)
+	_collect_zones(self, layout.zones)
 	return layout
 
 
@@ -111,6 +115,13 @@ func _draw() -> void:
 	draw_line(Vector2(0, lane), Vector2(size.x, lane), GUIDE_COLOUR, 1.0)
 	var launcher: Vector2 = Vector2(BALANCE.launcher_x, BALANCE.launcher_y) / PX
 	draw_circle(launcher, BALANCE.ball_radius / PX, FRAME_COLOUR)
+
+
+static func _collect_zones(node: Node, zones: Array[LayoutZone]) -> void:
+	for child: Node in node.get_children():
+		if child is ZoneMarker:
+			zones.append((child as ZoneMarker).to_layout_zone())
+		_collect_zones(child, zones)
 
 
 static func _collect_groups(node: Node, groups: Array[LayoutGroup]) -> void:

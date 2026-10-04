@@ -1,8 +1,8 @@
 @tool
 class_name LayoutChecks
 ## Geometry checks for authored layouts: pegs inside the board and above the bucket, no
-## overlaps, rectangles thick enough for the ball's top speed, and moving pegs that never run
-## into another peg anywhere along their motion.
+## overlaps, rectangles thick enough for the ball's top speed, moving pegs that never run into
+## another peg anywhere along their motion, and zones inside the board.
 ##
 ## Positions come from a real [BoardSimulation], so they are exactly the ones the game uses.
 
@@ -56,6 +56,17 @@ static func find_problems(layout: BoardLayout, config: BalanceConfig) -> Array[S
 					)
 		for i: int in stride:
 			simulation.idle_step()
+	for zone: LayoutZone in layout.zones:
+		var outside: bool = zone.x - zone.radius < 0 or zone.y - zone.radius < 0
+		outside = outside or zone.x + zone.radius > config.board_width
+		if outside or zone.y + zone.radius > config.board_height:
+			_report(
+				problems,
+				(
+					"zone at (%d, %d) leaves the board"
+					% [roundi(zone.x / 1000.0), roundi(zone.y / 1000.0)]
+				)
+			)
 	return problems
 
 
