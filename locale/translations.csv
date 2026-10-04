@@ -104,3 +104,13 @@ CHARACTER_TANUKI_POWER,Green lantern: 3 random blue lanterns become coin pegs.,L
 CHARACTER_TANUKI_PASSIVE,The shop offers one extra ball; the bag starts one ball smaller.,Il negozio offre una pallina in più; la borsa parte con una pallina in meno.
 PEG_KITSUNEBI,Kitsunebi,Kitsunebi
 PEG_KITSUNEBI_DESC,+1 mult. Not a red lantern.,+1 mult. Non è una lanterna rossa.
+BOSS_JOROGUMO,Jorōgumo,Jorōgumo
+BOSS_JOROGUMO_RULE,Webs slow the ball; pegs inside webs score ×3 points.,Le ragnatele rallentano la pallina; i peg dentro le ragnatele danno ×3 punti.
+BOSS_NUE,Nue,Nue
+BOSS_NUE_RULE,At half the target the board turns into a new layout.,A metà del target la board si trasforma in un nuovo layout.
+BOSS_TAMAMO,Tamamo-no-Mae,Tamamo-no-Mae
+BOSS_TAMAMO_RULE,"A third of the pegs are illusions that vanish without scoring, reshuffled every shot.","Un terzo dei peg sono illusioni che svaniscono senza punteggio, rimescolate a ogni tiro."
+BOSS_SHUTEN_DOJI,Shuten-dōji,Shuten-dōji
+BOSS_SHUTEN_DOJI_RULE,Oni pegs take away 1 mult; three in one shot halve its points.,I peg oni tolgono 1 mult; tre in un tiro ne dimezzano i punti.
+PEG_ONI,Oni,Oni
+PEG_ONI_DESC,−1 mult. Three in one shot halve its points.,−1 mult. Tre in un tiro ne dimezzano i punti.

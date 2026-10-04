@@ -27,7 +27,10 @@ const SPECIAL_PEGS: Dictionary[String, Array] = {
 	"peg_kagami": [Color("#c9d1d9"), Color("#5b6672"), Color("#ffffff")],
 	"peg_omikuji": [Color("#f5f0e6"), Color("#b22222"), Color("#ffffff")],
 	"peg_kitsunebi": [Color("#5fe0c8"), Color("#1f6b5c"), Color("#e6fff9")],
+	"peg_oni": [Color("#6b1f2a"), Color("#12060a"), Color("#ff7043")],
 }
+const BOSSES: Array[String] = ["jorogumo", "nue", "tamamo", "shuten_doji"]
+const BOSS_SIZE: int = 48
 ## Character portraits: head, ears or headgear, and the colour across the eyes.
 const PORTRAITS: Dictionary[String, Array] = {
 	"portrait_yamabushi": [Color("#e8c39e"), "cap", Color("#e8c39e"), Color("#f4f1ea")],
@@ -94,6 +97,8 @@ func _init() -> void:
 	for portrait: String in PORTRAITS:
 		var look: Array = PORTRAITS[portrait]
 		_save(_portrait(look[0], look[1], look[2], look[3]), portrait)
+	for boss: String in BOSSES:
+		_save(_boss(boss), "boss_" + boss)
 	for index: int in OMAMORI.size():
 		_save(_omamori(OMAMORI_COLOURS[index], index), "omamori_" + OMAMORI[index])
 	_save(_bucket(), "bucket")
@@ -242,6 +247,69 @@ func _portrait(head: Color, top: String, band: Color, light: Color) -> Image:
 			image.set_pixel(x, 25, Color("#d94f4f"))
 	image.set_pixel(15, 22, outline)
 	image.set_pixel(16, 22, outline)
+	return image
+
+
+## A boss portrait: a big head with one telling feature each.
+func _boss(boss: String) -> Image:
+	var image: Image = _blank(BOSS_SIZE, BOSS_SIZE)
+	var centre: Vector2 = Vector2(23.5, 26.5)
+	var looks: Dictionary[String, Array] = {
+		"jorogumo": [Color("#2b2233"), Color("#c62828")],
+		"nue": [Color("#8d6e63"), Color("#f2b134")],
+		"tamamo": [Color("#f5f0e6"), Color("#e3b341")],
+		"shuten_doji": [Color("#c0392b"), Color("#f4e9c9")],
+	}
+	var head: Color = looks[boss][0]
+	var accent: Color = looks[boss][1]
+	var outline: Color = head.darkened(0.6)
+	if boss == "jorogumo":
+		for leg: int in 8:
+			var angle: float = PI * (0.15 + 0.7 * (leg % 4) / 3.0) + (PI if leg >= 4 else 0.0)
+			for step: int in range(14, 23):
+				var at: Vector2 = centre + Vector2.from_angle(angle) * step
+				image.set_pixelv(Vector2i(at.round()).clampi(0, BOSS_SIZE - 1), outline)
+	if boss == "tamamo":
+		for tail: int in 9:
+			var angle: float = PI + PI * tail / 8.0
+			for step: int in range(12, 23):
+				var at: Vector2 = centre + Vector2.from_angle(angle) * step
+				var pixel: Vector2i = Vector2i(at.round()).clampi(0, BOSS_SIZE - 1)
+				image.set_pixelv(pixel, accent if step > 19 else head.darkened(0.15))
+	for y: int in BOSS_SIZE:
+		for x: int in BOSS_SIZE:
+			var distance: float = Vector2(x, y).distance_to(centre)
+			if distance > 14.5:
+				continue
+			var colour: Color = outline if distance > 13.5 else head
+			if boss == "nue" and (x + y / 2) % 6 == 0 and distance <= 13.5:
+				colour = accent.darkened(0.3)
+			image.set_pixel(x, y, colour)
+	var eye: Color = accent if boss != "shuten_doji" else Color("#ffeb3b")
+	for side: int in [-1, 1]:
+		var eye_x: int = 23 + side * 5 + (1 if side > 0 else 0)
+		for dy: int in 2:
+			image.set_pixel(eye_x, 23 + dy, eye)
+			image.set_pixel(eye_x + side, 23 + dy, eye)
+		if boss == "shuten_doji":
+			for step: int in 7:
+				image.set_pixel(
+					23 + side * (7 + step / 2) + (1 if side > 0 else 0), 13 - step, accent
+				)
+				image.set_pixel(
+					23 + side * (8 + step / 2) + (1 if side > 0 else 0), 13 - step, accent
+				)
+		if boss == "tamamo" or boss == "nue":
+			for row: int in 5:
+				for width: int in range(0, 5 - row):
+					var ear_x: int = 23 + side * (7 + width) + (1 if side > 0 else 0)
+					image.set_pixel(ear_x, 13 - row, outline if width == 4 - row else head)
+	for x: int in range(20, 28):
+		image.set_pixel(x, 32, outline)
+	if boss == "jorogumo":
+		for y: int in range(34, 38):
+			image.set_pixel(23, y, accent)
+			image.set_pixel(24, y, accent)
 	return image
 
 

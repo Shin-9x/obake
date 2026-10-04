@@ -7,9 +7,25 @@ func test_loads_every_shipped_layout_in_id_order() -> void:
 	for layout: BoardLayout in library.layouts:
 		ids.append(layout.id)
 	assert_array(ids).is_equal(
-		["bamboo_01", "bamboo_02", "bamboo_03", "village_01", "village_02", "village_03"]
+		[
+			"bamboo_01",
+			"bamboo_02",
+			"bamboo_03",
+			"bamboo_04",
+			"jorogumo",
+			"nue_a",
+			"nue_b",
+			"shuten",
+			"tamamo",
+			"village_01",
+			"village_02",
+			"village_03",
+			"village_04"
+		]
 	)
-	assert_object(library.find("village_02")).is_same(library.layouts[4])
+	assert_object(library.find("village_02")).is_same(library.layouts[10])
+	for biome: String in ["bamboo_forest", "haunted_village"]:
+		assert_array(library.pool(biome)).has_size(4)
 	assert_object(library.find("missing")).is_null()
 
 

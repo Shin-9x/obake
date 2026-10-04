@@ -1,0 +1,82 @@
+[gd_scene format=3 uid="uid://dqxbq03tx420i"]
+
+[ext_resource type="Script" uid="uid://wr1xm1ufr4e0" path="res://src/tools/layout_editor/layout_document.gd" id="1_wzb90"]
+[ext_resource type="Script" uid="uid://c8xyf8yleaqbj" path="res://src/tools/layout_editor/circle_pattern.gd" id="2_xya2c"]
+[ext_resource type="Script" uid="uid://p81dwr5cedpj" path="res://src/tools/layout_editor/arc_pattern.gd" id="3_lmhp3"]
+[ext_resource type="Script" uid="uid://dxqwv3stwpeqi" path="res://src/tools/layout_editor/grid_pattern.gd" id="4_w6w7q"]
+[ext_resource type="Script" uid="uid://dtm0bsqti5om3" path="res://src/tools/layout_editor/wave_pattern.gd" id="5_3gxsc"]
+[ext_resource type="Script" uid="uid://cawwst3apj1rp" path="res://src/tools/layout_editor/zone_marker.gd" id="6_1fnv6"]
+
+[node name="Jorogumo" type="Node2D" unique_id=1311742160]
+script = ExtResource("1_wzb90")
+id = "jorogumo"
+kind = 1
+
+[node name="CentreWeb" type="Node2D" parent="." unique_id=778732303]
+position = Vector2(180, 170)
+script = ExtResource("6_1fnv6")
+radius = 55.0
+
+[node name="LeftWeb" type="Node2D" parent="." unique_id=1971577223]
+position = Vector2(70, 260)
+script = ExtResource("6_1fnv6")
+radius = 40.0
+
+[node name="RightWeb" type="Node2D" parent="." unique_id=318247701]
+position = Vector2(290, 260)
+script = ExtResource("6_1fnv6")
+radius = 40.0
+
+[node name="CentreRing" type="Node2D" parent="." unique_id=730057529]
+position = Vector2(180, 170)
+script = ExtResource("2_xya2c")
+radius = 35.0
+count = 10
+
+[node name="CentreCore" type="Node2D" parent="." unique_id=592010498]
+position = Vector2(180, 170)
+script = ExtResource("2_xya2c")
+radius = 15.0
+start_degrees = 90.0
+count = 5
+
+[node name="LeftRing" type="Node2D" parent="." unique_id=1984699267]
+position = Vector2(70, 260)
+script = ExtResource("2_xya2c")
+radius = 25.0
+count = 7
+
+[node name="RightRing" type="Node2D" parent="." unique_id=1508836477]
+position = Vector2(290, 260)
+script = ExtResource("2_xya2c")
+radius = 25.0
+count = 7
+
+[node name="Canopy" type="Node2D" parent="." unique_id=1170687912]
+position = Vector2(180, 170)
+script = ExtResource("3_lmhp3")
+radius = 95.0
+count = 9
+
+[node name="Floor" type="Node2D" parent="." unique_id=197726007]
+position = Vector2(180, 330)
+script = ExtResource("5_3gxsc")
+count = 9
+amplitude = 6.0
+cycles = 1.0
+
+[node name="LeftEdge" type="Node2D" parent="." unique_id=670982050]
+position = Vector2(25, 140)
+script = ExtResource("4_w6w7q")
+columns = 1
+rows = 5
+spacing = Vector2(0, 30)
+staggered = false
+
+[node name="RightEdge" type="Node2D" parent="." unique_id=1473100413]
+position = Vector2(335, 140)
+script = ExtResource("4_w6w7q")
+columns = 1
+rows = 5
+spacing = Vector2(0, 30)
+staggered = false

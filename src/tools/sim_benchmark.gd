@@ -1,11 +1,20 @@
 extends SceneTree
-## Headless benchmark of a full board game, physics and item effects together: a shipped layout
-## with a water wheel, the development loadout (Explosive, Splitter, Onibi, Magnetic, five omamori,
-## six purchased pegs) and extra balls in flight. Run with `make bench`; it measures, it does not
-## assert.
+## Headless benchmark of full board games, physics and item effects together: a shipped layout
+## with a water wheel and the four boss boards, all with the development loadout (a character,
+## Explosive, Splitter, Onibi, Magnetic, five omamori, six purchased pegs) and extra balls in
+## flight. Run with `make bench`; it measures, it does not assert.
 
 const PX: int = FixedMath.PX
-const LAYOUT: String = "village_01"
+## Layout and boss of each scenario; the boards are shared out between them in turn.
+const SCENARIOS: Array[Array] = [
+	["village_01", ""],
+	["jorogumo", "jorogumo"],
+	["nue_a", "nue"],
+	["tamamo", "tamamo"],
+	["shuten", "shuten_doji"],
+]
+## Reachable within a few shots, so Nue transforms during most boards.
+const BOSS_TARGET: int = 1500
 const LOADOUT: String = "res://data/debug/dev_loadout.tres"
 const BOARDS: int = 60
 const EXTRA_BALLS: int = 3
@@ -17,15 +26,26 @@ func _init() -> void:
 	var config: BalanceConfig = BalanceConfig.new()
 	var base_pegs: BasePegs = load("res://data/pegs/base_pegs.tres") as BasePegs
 	var loadout: LoadoutDefinition = load(LOADOUT) as LoadoutDefinition
-	var layout: BoardLayout = LayoutLibrary.load_from().find(LAYOUT)
+	var library: LayoutLibrary = LayoutLibrary.load_from()
 	var rng: Pcg32 = Pcg32.new(1, 0)
 	var total_ticks: int = 0
 	var total_usec: int = 0
 	var worst_tick_usec: int = 0
 	var objects_created_while_stepping: int = 0
 	for board: int in BOARDS:
+		var scenario: Array = SCENARIOS[board % SCENARIOS.size()]
+		var rules: BoardRules = null
+		var second: BoardLayout = null
+		if not (scenario[1] as String).is_empty():
+			var boss: BossDefinition = load("res://data/bosses/%s.tres" % scenario[1])
+			rules = BoardRules.new(BOSS_TARGET, 0, boss)
+			second = library.find(boss.second_layout_id)
 		var game: BoardGame = (
-			BoardSetup.create_board(config, base_pegs, layout, board, loadout).game
+			BoardSetup
+			. create_board(
+				config, base_pegs, library.find(scenario[0]), board, loadout, null, rules, second
+			)
+			. game
 		)
 		while game.can_shoot():
 			var aim: int = rng.next_below(2 * config.aim_limit + 1) - config.aim_limit

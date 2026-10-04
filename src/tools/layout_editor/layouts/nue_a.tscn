@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://dc1j5q0y8yduh"]
+
+[ext_resource type="Script" uid="uid://wr1xm1ufr4e0" path="res://src/tools/layout_editor/layout_document.gd" id="1_utlfj"]
+[ext_resource type="Script" uid="uid://dxqwv3stwpeqi" path="res://src/tools/layout_editor/grid_pattern.gd" id="2_t4kdf"]
+[ext_resource type="Script" uid="uid://dtm0bsqti5om3" path="res://src/tools/layout_editor/wave_pattern.gd" id="3_8zcpw"]
+
+[node name="NueA" type="Node2D" unique_id=1774456105]
+script = ExtResource("1_utlfj")
+id = "nue_a"
+kind = 1
+
+[node name="Crest" type="Node2D" parent="." unique_id=537319431]
+position = Vector2(180, 60)
+script = ExtResource("3_8zcpw")
+count = 12
+amplitude = 10.0
+cycles = 1.5
+
+[node name="Body" type="Node2D" parent="." unique_id=978533348]
+position = Vector2(180, 190)
+script = ExtResource("2_t4kdf")
+columns = 8
+rows = 6
+spacing = Vector2(40, 34)

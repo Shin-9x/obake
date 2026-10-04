@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="BossDefinition" format=3 uid="uid://db7g6ym3uer6k"]
+
+[ext_resource type="Script" uid="uid://bstixpvu6d7i4" path="res://src/sim/effects/bosses/jorogumo_effect.gd" id="1_epnlb"]
+[ext_resource type="Texture2D" uid="uid://cpeaq1opje3ti" path="res://assets/sprites/placeholder/boss_jorogumo.png" id="2_h33wr"]
+[ext_resource type="Script" uid="uid://xqhjewgi5imt" path="res://data/definitions/boss_definition.gd" id="3_orxuw"]
+
+[resource]
+script = ExtResource("3_orxuw")
+layout_id = "jorogumo"
+portrait = ExtResource("2_h33wr")
+id = &"jorogumo"
+name_key = "BOSS_JOROGUMO"
+description_key = "BOSS_JOROGUMO_RULE"
+icon = ExtResource("2_h33wr")
+effect_script = ExtResource("1_epnlb")
+level_values = PackedInt32Array()
+params = Dictionary[StringName, int]({
+&"drag": 20,
+&"points_factor": 3000
+})

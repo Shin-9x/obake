@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="BossDefinition" format=3 uid="uid://b3dxkfa5xlwjq"]
+
+[ext_resource type="Script" uid="uid://dkbi1gjlpawxf" path="res://src/sim/effects/bosses/tamamo_effect.gd" id="1_yjb2l"]
+[ext_resource type="Texture2D" uid="uid://c3cam8m6su5mg" path="res://assets/sprites/placeholder/boss_tamamo.png" id="2_vjepk"]
+[ext_resource type="Script" uid="uid://xqhjewgi5imt" path="res://data/definitions/boss_definition.gd" id="3_erbam"]
+
+[resource]
+script = ExtResource("3_erbam")
+layout_id = "tamamo"
+portrait = ExtResource("2_vjepk")
+id = &"tamamo"
+name_key = "BOSS_TAMAMO"
+description_key = "BOSS_TAMAMO_RULE"
+icon = ExtResource("2_vjepk")
+effect_script = ExtResource("1_yjb2l")
+level_values = PackedInt32Array()
+params = Dictionary[StringName, int]({
+&"one_in": 3
+})

@@ -5,8 +5,9 @@ const SOURCES: String = "res://src/tools/layout_editor/layouts"
 const BIOMES: Array[String] = ["bamboo_forest", "haunted_village"]
 
 
-func test_there_are_six_sources() -> void:
-	assert_array(_source_paths()).has_size(6)
+## Four standard boards per biome and five boss layouts, Nue counting two.
+func test_there_are_thirteen_sources() -> void:
+	assert_array(_source_paths()).has_size(13)
 
 
 func test_exported_json_matches_every_source() -> void:
@@ -18,13 +19,15 @@ func test_exported_json_matches_every_source() -> void:
 		assert_str(exported).override_failure_message(message).is_equal(expected)
 
 
-func test_every_layout_is_clean_and_has_moving_pegs() -> void:
+## Standard boards always move; boss layouts may rely on their rule instead.
+func test_every_layout_is_clean_and_boards_have_moving_pegs() -> void:
 	for path: String in _source_paths():
 		var layout: BoardLayout = _open(path).build_layout()
 		var problems: Array[String] = LayoutChecks.find_problems(layout, LayoutDocument.BALANCE)
 		var message: String = "%s: %s" % [layout.id, "; ".join(problems)]
 		assert_array(problems).override_failure_message(message).is_empty()
-		assert_array(layout.groups).is_not_empty()
+		if layout.kind == BoardLayout.Kind.BOARD:
+			assert_array(layout.groups).override_failure_message(layout.id).is_not_empty()
 		assert_int(layout.peg_count()).is_between(55, 75)
 		assert_array(BIOMES).contains([layout.biome])
 

@@ -1,0 +1,82 @@
+[gd_scene format=3 uid="uid://cfc7wor1itn6w"]
+
+[ext_resource type="Script" uid="uid://wr1xm1ufr4e0" path="res://src/tools/layout_editor/layout_document.gd" id="1_0jdc5"]
+[ext_resource type="Script" uid="uid://dl0veuy6ol4es" path="res://src/tools/layout_editor/moving_group_marker.gd" id="2_vnii0"]
+[ext_resource type="Script" uid="uid://c8xyf8yleaqbj" path="res://src/tools/layout_editor/circle_pattern.gd" id="3_gk1xj"]
+[ext_resource type="Script" uid="uid://dxqwv3stwpeqi" path="res://src/tools/layout_editor/grid_pattern.gd" id="4_d0sj3"]
+
+[node name="NueB" type="Node2D" unique_id=1979987103]
+script = ExtResource("1_0jdc5")
+id = "nue_b"
+kind = 1
+
+[node name="OuterStripes" type="Node2D" parent="." unique_id=2145980293]
+position = Vector2(180, 185)
+script = ExtResource("2_vnii0")
+period_seconds = 6.0
+travel = Vector2(0, 0)
+
+[node name="OuterRing" type="Node2D" parent="OuterStripes" unique_id=1332303111]
+script = ExtResource("3_gk1xj")
+radius = 70.0
+count = 14
+
+[node name="InnerStripes" type="Node2D" parent="." unique_id=1830198687]
+position = Vector2(180, 185)
+script = ExtResource("2_vnii0")
+period_seconds = 4.0
+clockwise = false
+travel = Vector2(0, 0)
+
+[node name="InnerRing" type="Node2D" parent="InnerStripes" unique_id=363547311]
+script = ExtResource("3_gk1xj")
+radius = 35.0
+count = 7
+
+[node name="Head" type="Node2D" parent="." unique_id=2095960302]
+position = Vector2(180, 60)
+script = ExtResource("4_d0sj3")
+columns = 6
+rows = 1
+spacing = Vector2(50, 0)
+staggered = false
+
+[node name="Mane" type="Node2D" parent="." unique_id=1121403833]
+position = Vector2(180, 100)
+script = ExtResource("4_d0sj3")
+columns = 7
+rows = 1
+spacing = Vector2(45, 0)
+staggered = false
+
+[node name="Haunch" type="Node2D" parent="." unique_id=973969703]
+position = Vector2(180, 272)
+script = ExtResource("4_d0sj3")
+columns = 7
+rows = 1
+spacing = Vector2(45, 0)
+staggered = false
+
+[node name="Tail" type="Node2D" parent="." unique_id=2061866367]
+position = Vector2(180, 305)
+script = ExtResource("4_d0sj3")
+columns = 7
+rows = 1
+spacing = Vector2(45, 0)
+staggered = false
+
+[node name="LeftFlank" type="Node2D" parent="." unique_id=1048313468]
+position = Vector2(30, 185)
+script = ExtResource("4_d0sj3")
+columns = 1
+rows = 5
+spacing = Vector2(0, 40)
+staggered = false
+
+[node name="RightFlank" type="Node2D" parent="." unique_id=1479270578]
+position = Vector2(330, 185)
+script = ExtResource("4_d0sj3")
+columns = 1
+rows = 5
+spacing = Vector2(0, 40)
+staggered = false

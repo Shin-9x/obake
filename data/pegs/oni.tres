@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="PegDefinition" format=3 uid="uid://c7bfkwylc0vel"]
+
+[ext_resource type="Texture2D" uid="uid://dy6ktftfx6t1c" path="res://assets/sprites/placeholder/peg_oni.png" id="1_1jn4q"]
+[ext_resource type="Script" uid="uid://22odkxg6kbgf" path="res://data/definitions/peg_definition.gd" id="2_svtp1"]
+
+[resource]
+script = ExtResource("2_svtp1")
+mult_add = -1000
+color = Color(0.41960785, 0.12156863, 0.16470589, 1)
+texture = ExtResource("1_1jn4q")
+id = &"oni"
+name_key = "PEG_ONI"
+description_key = "PEG_ONI_DESC"
+icon = ExtResource("1_1jn4q")
+level_values = PackedInt32Array()

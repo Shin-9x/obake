@@ -1,0 +1,52 @@
+[gd_scene format=3 uid="uid://bx7v4pqm1eef"]
+
+[ext_resource type="Script" uid="uid://wr1xm1ufr4e0" path="res://src/tools/layout_editor/layout_document.gd" id="1_u4rs4"]
+[ext_resource type="Script" uid="uid://p81dwr5cedpj" path="res://src/tools/layout_editor/arc_pattern.gd" id="2_zjhy8"]
+[ext_resource type="Script" uid="uid://dtm0bsqti5om3" path="res://src/tools/layout_editor/wave_pattern.gd" id="3_l5vlf"]
+
+[node name="Tamamo" type="Node2D" unique_id=1056265651]
+script = ExtResource("1_u4rs4")
+id = "tamamo"
+biome = "haunted_village"
+kind = 1
+
+[node name="HighWave" type="Node2D" parent="." unique_id=584781562]
+position = Vector2(180, 70)
+script = ExtResource("3_l5vlf")
+count = 13
+width = 300.0
+amplitude = 12.0
+cycles = 1.5
+
+[node name="LowWave" type="Node2D" parent="." unique_id=1106338197]
+position = Vector2(180, 110)
+script = ExtResource("3_l5vlf")
+count = 12
+width = 300.0
+amplitude = 8.0
+cycles = 1.5
+phase_degrees = 180.0
+
+[node name="OuterTails" type="Node2D" parent="." unique_id=1679372952]
+position = Vector2(180, 330)
+script = ExtResource("2_zjhy8")
+radius = 170.0
+from_degrees = 195.0
+to_degrees = 345.0
+count = 13
+
+[node name="MiddleTails" type="Node2D" parent="." unique_id=1177036918]
+position = Vector2(180, 330)
+script = ExtResource("2_zjhy8")
+radius = 120.0
+from_degrees = 195.0
+to_degrees = 345.0
+count = 10
+
+[node name="InnerTails" type="Node2D" parent="." unique_id=1862698979]
+position = Vector2(180, 330)
+script = ExtResource("2_zjhy8")
+radius = 70.0
+from_degrees = 195.0
+to_degrees = 345.0
+count = 8

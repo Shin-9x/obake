@@ -33,23 +33,28 @@ static func board(
 	loadout: LoadoutDefinition = null,
 	settings: BalanceConfig = null,
 	board_seed: int = SEED,
-	rules: BoardRules = null
+	rules: BoardRules = null,
+	zones: Array = []
 ) -> BoardGame:
 	var used: BalanceConfig = settings if settings != null else config()
 	var simulation: BoardSimulation = BoardSimulation.new(used)
 	for position: Vector2i in positions:
 		simulation.add_round_peg(position.x * PX, position.y * PX)
 	simulation.add_round_peg(SPARE.x * PX, SPARE.y * PX)
+	# Zones as x, y and radius in pixels.
+	for zone: Vector3i in zones:
+		simulation.add_zone(zone.x * PX, zone.y * PX, zone.z * PX)
 	var rng: Pcg32 = Pcg32.new(board_seed, RngStreams.Domain.BOARD)
 	var game: BoardGame = BoardGame.new(
 		simulation, used, TestBoards.gdd_pegs(), rng, loadout, null, rules
 	)
 	var spare: int = positions.size()
-	if game.roles[spare] == BoardGame.Role.GOLD and spare > 0:
+	if game.roles[spare] == BoardGame.Role.GOLD:
 		# The gold would turn the spare back to blue when it moves, ending the board in a
-		# Matsuri; it starts on the first peg instead.
-		game._gold = 0
-		game.roles[0] = BoardGame.Role.GOLD
+		# Matsuri; it starts on the first blue lantern instead.
+		game._gold = game.roles.find(BoardGame.Role.BLUE)
+		if game._gold >= 0:
+			game.roles[game._gold] = BoardGame.Role.GOLD
 	game.roles[spare] = BoardGame.Role.RED
 	return game
 
@@ -117,6 +122,12 @@ static func probe_peg(script: GDScript = Probe) -> PegDefinition:
 	peg.points = 10
 	peg.effect_script = script
 	return peg
+
+
+## A board ruled by the boss at [param path].
+static func boss_board(path: String, positions: Array, zones: Array = []) -> BoardGame:
+	var rules: BoardRules = BoardRules.new(0, 0, load(path))
+	return board(positions, null, null, SEED, rules, zones)
 
 
 ## Fires straight down with the bucket centred under the launcher, so the ball is caught.

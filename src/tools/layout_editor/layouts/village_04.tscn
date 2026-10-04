@@ -1,0 +1,79 @@
+[gd_scene format=3 uid="uid://cjw50kw1eu8lg"]
+
+[ext_resource type="Script" uid="uid://wr1xm1ufr4e0" path="res://src/tools/layout_editor/layout_document.gd" id="1_nkksu"]
+[ext_resource type="Script" uid="uid://dl0veuy6ol4es" path="res://src/tools/layout_editor/moving_group_marker.gd" id="2_m8nlm"]
+[ext_resource type="Script" uid="uid://c8xyf8yleaqbj" path="res://src/tools/layout_editor/circle_pattern.gd" id="3_ytbx0"]
+[ext_resource type="Script" uid="uid://p81dwr5cedpj" path="res://src/tools/layout_editor/arc_pattern.gd" id="4_kjqev"]
+[ext_resource type="Script" uid="uid://dxqwv3stwpeqi" path="res://src/tools/layout_editor/grid_pattern.gd" id="5_tavet"]
+[ext_resource type="Script" uid="uid://dtm0bsqti5om3" path="res://src/tools/layout_editor/wave_pattern.gd" id="6_wt4ul"]
+
+[node name="Village04" type="Node2D" unique_id=1033408624]
+script = ExtResource("1_nkksu")
+id = "village_04"
+biome = "haunted_village"
+
+[node name="Roof" type="Node2D" parent="." unique_id=1014768379]
+position = Vector2(180, 120)
+script = ExtResource("4_kjqev")
+radius = 90.0
+count = 9
+
+[node name="LeftWheel" type="Node2D" parent="." unique_id=1513265450]
+position = Vector2(100, 190)
+script = ExtResource("2_m8nlm")
+period_seconds = 7.0
+travel = Vector2(0, 0)
+
+[node name="LeftRim" type="Node2D" parent="LeftWheel" unique_id=378215003]
+script = ExtResource("3_ytbx0")
+radius = 40.0
+
+[node name="RightWheel" type="Node2D" parent="." unique_id=122408570]
+position = Vector2(260, 190)
+script = ExtResource("2_m8nlm")
+period_seconds = 7.0
+clockwise = false
+travel = Vector2(0, 0)
+
+[node name="RightRim" type="Node2D" parent="RightWheel" unique_id=550146304]
+script = ExtResource("3_ytbx0")
+radius = 40.0
+
+[node name="Axle" type="Node2D" parent="." unique_id=2094010357]
+position = Vector2(180, 190)
+script = ExtResource("5_tavet")
+columns = 1
+rows = 4
+spacing = Vector2(0, 30)
+staggered = false
+
+[node name="Stream" type="Node2D" parent="." unique_id=2016512512]
+position = Vector2(180, 255)
+script = ExtResource("6_wt4ul")
+count = 7
+width = 300.0
+amplitude = 4.0
+cycles = 1.0
+
+[node name="Fields" type="Node2D" parent="." unique_id=49103412]
+position = Vector2(180, 290)
+script = ExtResource("5_tavet")
+columns = 8
+rows = 2
+spacing = Vector2(40, 30)
+
+[node name="LeftEaves" type="Node2D" parent="." unique_id=2038435448]
+position = Vector2(25, 130)
+script = ExtResource("5_tavet")
+columns = 1
+rows = 3
+spacing = Vector2(0, 30)
+staggered = false
+
+[node name="RightEaves" type="Node2D" parent="." unique_id=1610172545]
+position = Vector2(335, 130)
+script = ExtResource("5_tavet")
+columns = 1
+rows = 3
+spacing = Vector2(0, 30)
+staggered = false

@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="BossDefinition" format=3 uid="uid://ddkkt8mnxtvna"]
+
+[ext_resource type="Script" uid="uid://bjty5p4iurikd" path="res://src/sim/effects/bosses/shuten_doji_effect.gd" id="1_whcxr"]
+[ext_resource type="Texture2D" uid="uid://dinwbsobuwipe" path="res://assets/sprites/placeholder/boss_shuten_doji.png" id="2_47bw4"]
+[ext_resource type="Script" uid="uid://xqhjewgi5imt" path="res://data/definitions/boss_definition.gd" id="3_eyk0i"]
+[ext_resource type="Resource" uid="uid://c7bfkwylc0vel" path="res://data/pegs/oni.tres" id="4_ljnpg"]
+
+[resource]
+script = ExtResource("3_eyk0i")
+layout_id = "shuten"
+special_peg = ExtResource("4_ljnpg")
+portrait = ExtResource("2_47bw4")
+id = &"shuten_doji"
+name_key = "BOSS_SHUTEN_DOJI"
+description_key = "BOSS_SHUTEN_DOJI_RULE"
+icon = ExtResource("2_47bw4")
+effect_script = ExtResource("1_whcxr")
+level_values = PackedInt32Array()
+params = Dictionary[StringName, int]({
+&"halving_hits": 3,
+&"mult_floor": 1000,
+&"oni": 8,
+&"points_factor": 500
+})

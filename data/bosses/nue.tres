@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="BossDefinition" format=3 uid="uid://0bomiplev3gd"]
+
+[ext_resource type="Script" uid="uid://04eryjldjkif" path="res://src/sim/effects/bosses/nue_effect.gd" id="1_185uk"]
+[ext_resource type="Texture2D" uid="uid://cmln0hahqv7ys" path="res://assets/sprites/placeholder/boss_nue.png" id="2_2asxb"]
+[ext_resource type="Script" uid="uid://xqhjewgi5imt" path="res://data/definitions/boss_definition.gd" id="3_ppx2k"]
+
+[resource]
+script = ExtResource("3_ppx2k")
+layout_id = "nue_a"
+second_layout_id = "nue_b"
+portrait = ExtResource("2_2asxb")
+id = &"nue"
+name_key = "BOSS_NUE"
+description_key = "BOSS_NUE_RULE"
+icon = ExtResource("2_2asxb")
+effect_script = ExtResource("1_185uk")
+level_values = PackedInt32Array()
+params = Dictionary[StringName, int]({
+&"threshold": 500
+})
