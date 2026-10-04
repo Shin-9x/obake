@@ -87,6 +87,12 @@ extends Resource
 @export var boss_target_factor: int = 1800
 @export var target_rounding: int = 10
 
+@export_group("Hard mode")
+## Hard targets over the normal ones, in permille.
+@export var hard_target_factor: int = 1250
+## Added to the shots of every board in Hard mode.
+@export var hard_shot_delta: int = -1
+
 @export_group("Economy")
 ## Mon for winning a standard, an elite and a boss board.
 @export var win_mon: PackedInt32Array = PackedInt32Array([4, 7, 10])

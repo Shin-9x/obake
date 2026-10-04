@@ -3,6 +3,9 @@ class_name RunOptions
 
 ## Ids of the items shops, rewards and events may offer; empty offers every item.
 var pool: Array[StringName] = []
+var hard: bool = false
+## The player chose the seed, so the run counts for no feat and no mark.
+var custom_seed: bool = false
 
 
 ## Copy of [param content] keeping only the items of the pool.
@@ -20,14 +23,18 @@ func to_dictionary() -> Dictionary[String, Variant]:
 	var ids: Array[String] = []
 	for id: StringName in pool:
 		ids.append(String(id))
-	return {"pool": ids}
+	return {"pool": ids, "hard": hard, "custom_seed": custom_seed}
 
 
 static func from_dictionary(data: Variant) -> RunOptions:
 	var options: RunOptions = RunOptions.new()
-	if data is Dictionary and data.get("pool") is Array:
+	if not data is Dictionary:
+		return options
+	if data.get("pool") is Array:
 		for id: Variant in data["pool"]:
 			options.pool.append(StringName(str(id)))
+	options.hard = data.get("hard", false) == true
+	options.custom_seed = data.get("custom_seed", false) == true
 	return options
 
 

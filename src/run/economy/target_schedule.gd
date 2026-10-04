@@ -1,10 +1,13 @@
 class_name TargetSchedule
 ## Score targets: the first board's, grown for every board played since; an elite board raises
 ## the standard target and a boss board grows the previous board's target by its own factor.
+## Hard mode raises every target.
 
 
 ## Target of a [param kind] board when [param boards_played] boards came before it.
-static func target(config: BalanceConfig, kind: MapNode.Kind, boards_played: int) -> int:
+static func target(
+	config: BalanceConfig, kind: MapNode.Kind, boards_played: int, hard: bool = false
+) -> int:
 	var value: int = 0
 	match kind:
 		MapNode.Kind.ELITE:
@@ -18,6 +21,8 @@ static func target(config: BalanceConfig, kind: MapNode.Kind, boards_played: int
 			)
 		_:
 			value = _standard(config, boards_played)
+	if hard:
+		value = FixedMath.div_round(value * config.hard_target_factor, FixedMath.PERMILLE)
 	var step: int = maxi(1, config.target_rounding)
 	return maxi(step, FixedMath.div_round(value, step) * step)
 

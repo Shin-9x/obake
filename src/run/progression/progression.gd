@@ -1,7 +1,7 @@
 class_name Progression
 ## Meta-progression rules: which items a new run may offer, which feats a board achieves, and
 ## what a finished run adds to the profile: completion marks and statistics. Discoveries are
-## merged in whenever the profile is updated.
+## merged in whenever the profile is updated. Runs on a chosen seed earn no feat and no mark.
 
 
 ## Ids of the items a new run may offer: every item of [param content] except those whose
@@ -28,6 +28,8 @@ static func check_board(
 ) -> Array[FeatDefinition]:
 	var achieved: Array[FeatDefinition] = []
 	merge_discoveries(profile, run)
+	if run.run_log.options.custom_seed:
+		return achieved
 	for feat: FeatDefinition in definition.feats:
 		if not profile.has_feat(feat.id) and achieves(feat, run):
 			profile.feats.append(feat.id)
@@ -84,7 +86,11 @@ static func finish_run(
 	if run.phase != Run.Phase.VICTORY:
 		return earned
 	profile.wins_by_character[character] = profile.wins_by_character.get(character, 0) + 1
+	if run.run_log.options.custom_seed:
+		return earned
 	var marks: Array[Profile.Mark] = [Profile.Mark.SHUTEN]
+	if run.run_log.options.hard:
+		marks.append(Profile.Mark.HARD)
 	if state.matsuri_count >= definition.festival_matsuri:
 		marks.append(Profile.Mark.FESTIVAL)
 	for mark: Profile.Mark in marks:

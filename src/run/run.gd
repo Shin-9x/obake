@@ -55,6 +55,8 @@ static func start(
 	var used: RunOptions = options if options != null else RunOptions.new()
 	var run: Run = _create(run_config, used.filter(run_content), layouts, base_pegs)
 	run.state = RunState.start(run_config, character, seed_value)
+	if used.hard:
+		run.state.shot_delta += run_config.hard_shot_delta
 	run.run_log = RunLog.new(seed_value, character.id, used)
 	run._see(character.starting_balls)
 	run._snapshot()
@@ -414,6 +416,6 @@ func _prepare_board(kind: MapNode.Kind) -> BoardSpec:
 			fresh = pool
 		spec.layout = fresh[rng.next_below(fresh.size())]
 		state.floor_layouts.append(spec.layout.id)
-	var target: int = TargetSchedule.target(config, kind, state.boards_played)
+	var target: int = TargetSchedule.target(config, kind, state.boards_played, run_log.options.hard)
 	spec.rules = BoardRules.new(target, state.shot_delta, boss)
 	return spec
