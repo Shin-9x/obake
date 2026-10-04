@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="FeatDefinition" format=3 uid="uid://dv0lyx86i8cu7"]
+
+[ext_resource type="Script" uid="uid://brcxnrvmd618k" path="res://data/definitions/feat_definition.gd" id="1_hhxui"]
+[ext_resource type="Resource" uid="uid://bxhsr6b8lr0s1" path="res://data/omamori/ema.tres" id="2_e3an3"]
+
+[resource]
+script = ExtResource("1_hhxui")
+id = &"matsuri_streak"
+name_key = "FEAT_MATSURI_STREAK"
+description_key = "FEAT_MATSURI_STREAK_DESC"
+condition = 9
+threshold = 3
+unlocks = ExtResource("2_e3an3")

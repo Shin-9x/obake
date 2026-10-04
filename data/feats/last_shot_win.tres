@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="FeatDefinition" format=3 uid="uid://drh0jbm7cf114"]
+
+[ext_resource type="Script" uid="uid://brcxnrvmd618k" path="res://data/definitions/feat_definition.gd" id="1_jo75i"]
+[ext_resource type="Resource" uid="uid://gfwq8w3x8b7i" path="res://data/balls/daruma.tres" id="2_5q0a6"]
+
+[resource]
+script = ExtResource("1_jo75i")
+id = &"last_shot_win"
+name_key = "FEAT_LAST_SHOT_WIN"
+description_key = "FEAT_LAST_SHOT_WIN_DESC"
+condition = 5
+unlocks = ExtResource("2_5q0a6")

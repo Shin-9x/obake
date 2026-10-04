@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="FeatDefinition" format=3 uid="uid://diq7i7vspclbw"]
+
+[ext_resource type="Script" uid="uid://brcxnrvmd618k" path="res://data/definitions/feat_definition.gd" id="1_ysb8a"]
+[ext_resource type="Resource" uid="uid://c6d185c8idima" path="res://data/balls/magnetic.tres" id="2_v27dy"]
+
+[resource]
+script = ExtResource("1_ysb8a")
+id = &"five_reds"
+name_key = "FEAT_FIVE_REDS"
+description_key = "FEAT_FIVE_REDS_DESC"
+condition = 4
+threshold = 5
+unlocks = ExtResource("2_v27dy")

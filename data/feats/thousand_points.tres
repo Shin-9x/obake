@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="FeatDefinition" format=3 uid="uid://cb8hqxtnaaq6i"]
+
+[ext_resource type="Script" uid="uid://brcxnrvmd618k" path="res://data/definitions/feat_definition.gd" id="1_86fag"]
+[ext_resource type="Resource" uid="uid://c1vqop1ck7m0f" path="res://data/pegs/explosive_lantern.tres" id="2_ygc5s"]
+
+[resource]
+script = ExtResource("1_86fag")
+id = &"thousand_points"
+name_key = "FEAT_THOUSAND_POINTS"
+description_key = "FEAT_THOUSAND_POINTS_DESC"
+condition = 6
+threshold = 1000
+unlocks = ExtResource("2_ygc5s")

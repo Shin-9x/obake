@@ -34,6 +34,8 @@ var shop: Shop
 var event: RunEvent
 ## What the last event choice did; null until the player chooses.
 var event_outcome: EventOutcome
+## Items and bosses met in this run, by id, for the compendium.
+var seen: Dictionary[StringName, bool] = {}
 ## State when the run was last on the map, and how many logged actions came before it.
 var snapshot: Dictionary[String, Variant] = {}
 var snapshot_at: int = 0
@@ -47,11 +49,14 @@ static func start(
 	layouts: LayoutLibrary,
 	base_pegs: BasePegs,
 	character: CharacterDefinition,
-	seed_value: int
+	seed_value: int,
+	options: RunOptions = null
 ) -> Run:
-	var run: Run = _create(run_config, run_content, layouts, base_pegs)
+	var used: RunOptions = options if options != null else RunOptions.new()
+	var run: Run = _create(run_config, used.filter(run_content), layouts, base_pegs)
 	run.state = RunState.start(run_config, character, seed_value)
-	run.run_log = RunLog.new(seed_value, character.id)
+	run.run_log = RunLog.new(seed_value, character.id, used)
+	run._see(character.starting_balls)
 	run._snapshot()
 	return run
 
@@ -71,12 +76,14 @@ static func resume(
 	var data: Variant = save.get("snapshot")
 	if saved == null or not data is Dictionary:
 		return null
-	var run: Run = _create(run_config, run_content, layouts, base_pegs)
+	var run: Run = _create(run_config, saved.options.filter(run_content), layouts, base_pegs)
 	run.state = RunCodec.decode(data, run_config, ItemCatalog.new(run_content))
 	if run.state == null:
 		return null
 	var start: int = clampi(int(save.get("snapshot_at", 0)), 0, saved.size())
-	run.run_log = RunLog.new(saved.run_seed, saved.character)
+	run.run_log = RunLog.new(saved.run_seed, saved.character, saved.options)
+	for id: Variant in save.get("seen", []):
+		run.seen[StringName(str(id))] = true
 	run.run_log.actions = saved.actions.slice(0, start)
 	run._snapshot()
 	for action: PackedInt32Array in saved.actions.slice(start):
@@ -92,6 +99,7 @@ func to_save() -> Dictionary[String, Variant]:
 		"run_log": run_log.to_dictionary(),
 		"snapshot": snapshot,
 		"snapshot_at": snapshot_at,
+		"seen": seen.keys().map(func(id: StringName) -> String: return String(id)),
 	}
 
 
@@ -114,6 +122,7 @@ func choose_node(node: int) -> bool:
 	match kind:
 		MapNode.Kind.SHOP:
 			shop = Shop.new(state, content, config)
+			_see_offers()
 			phase = Phase.SHOP
 		MapNode.Kind.SHRINE:
 			phase = Phase.SHRINE
@@ -125,6 +134,8 @@ func choose_node(node: int) -> bool:
 				phase = Phase.EVENT
 		_:
 			board = _prepare_board(kind)
+			if board.rules.boss != null:
+				seen[board.rules.boss.id] = true
 			placed = board.create(config, _base_pegs, state.inventory, state.carry)
 			game = placed.game
 			phase = Phase.BOARD
@@ -232,7 +243,11 @@ func buy_peg(index: int) -> bool:
 
 
 func reroll() -> bool:
-	return phase == Phase.SHOP and _shop_did(shop.reroll(), RunLog.Action.REROLL, -1)
+	if phase != Phase.SHOP or not shop.reroll():
+		return false
+	_see_offers()
+	_did(RunLog.Action.REROLL)
+	return true
 
 
 func upgrade_ball(index: int) -> bool:
@@ -289,6 +304,8 @@ func choose_event(index: int, pick: int = -1) -> EventOutcome:
 		return null
 	event_outcome = event.choose(state, content, config, index, pick)
 	if event_outcome != null:
+		if event_outcome.item != null:
+			seen[event_outcome.item.id] = true
 		_did(RunLog.Action.CHOOSE_EVENT, index, pick)
 	return event_outcome
 
@@ -326,6 +343,17 @@ func _shop_did(succeeded: bool, action: RunLog.Action, index: int) -> bool:
 	return succeeded
 
 
+func _see(items: Array) -> void:
+	for item: ItemDefinition in items:
+		seen[item.id] = true
+
+
+func _see_offers() -> void:
+	for row: Array[Offer] in [shop.balls, shop.omamori, shop.pegs]:
+		for offer: Offer in row:
+			seen[offer.item.id] = true
+
+
 func _snapshot() -> void:
 	snapshot = RunCodec.encode(state)
 	snapshot_at = run_log.size()
@@ -347,6 +375,8 @@ func _offer_rewards() -> void:
 			)
 		_:
 			ball_choices = Rewards.ball_choices(state, content, config)
+	_see(ball_choices)
+	_see(omamori_choices)
 	phase = Phase.REWARD
 	_after_reward()
 

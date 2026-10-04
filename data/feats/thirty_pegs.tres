@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="FeatDefinition" format=3 uid="uid://dmh5yv6v3thdu"]
+
+[ext_resource type="Script" uid="uid://brcxnrvmd618k" path="res://data/definitions/feat_definition.gd" id="1_xnvfl"]
+[ext_resource type="Resource" uid="uid://djoamkch3vb4p" path="res://data/balls/splitter.tres" id="2_5vvid"]
+
+[resource]
+script = ExtResource("1_xnvfl")
+id = &"thirty_pegs"
+name_key = "FEAT_THIRTY_PEGS"
+description_key = "FEAT_THIRTY_PEGS_DESC"
+threshold = 30
+unlocks = ExtResource("2_5vvid")

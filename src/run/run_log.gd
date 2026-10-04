@@ -32,13 +32,18 @@ const FORMAT: int = 1
 
 var run_seed: int = 0
 var character: StringName = &""
+var options: RunOptions = RunOptions.new()
 ## Each entry holds the action kind and its two arguments.
 var actions: Array[PackedInt32Array] = []
 
 
-func _init(seed_value: int = 0, character_id: StringName = &"") -> void:
+func _init(
+	seed_value: int = 0, character_id: StringName = &"", run_options: RunOptions = null
+) -> void:
 	run_seed = seed_value
 	character = character_id
+	if run_options != null:
+		options = run_options
 
 
 func record(action: Action, first: int = -1, second: int = -1) -> void:
@@ -57,6 +62,7 @@ func to_dictionary() -> Dictionary[String, Variant]:
 		"format": FORMAT,
 		"seed": run_seed,
 		"character": String(character),
+		"options": options.to_dictionary(),
 		"actions": entries,
 	}
 
@@ -66,7 +72,9 @@ static func from_dictionary(data: Dictionary) -> RunLog:
 	if int(data.get("format", 0)) != FORMAT or not data.get("actions") is Array:
 		return null
 	var run_log: RunLog = RunLog.new(
-		int(data.get("seed", 0)), StringName(str(data.get("character")))
+		int(data.get("seed", 0)),
+		StringName(str(data.get("character"))),
+		RunOptions.from_dictionary(data.get("options"))
 	)
 	for entry: Variant in data["actions"]:
 		if not entry is Array or (entry as Array).size() != 3:

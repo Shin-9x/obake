@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="FeatDefinition" format=3 uid="uid://ssybr0mo1hr4"]
+
+[ext_resource type="Script" uid="uid://brcxnrvmd618k" path="res://data/definitions/feat_definition.gd" id="1_78wcj"]
+[ext_resource type="Resource" uid="uid://1ia2ionv8myw" path="res://data/omamori/tsukumogami.tres" id="2_14xvy"]
+
+[resource]
+script = ExtResource("1_78wcj")
+id = &"peg_collector"
+name_key = "FEAT_PEG_COLLECTOR"
+description_key = "FEAT_PEG_COLLECTOR_DESC"
+condition = 10
+threshold = 4
+unlocks = ExtResource("2_14xvy")

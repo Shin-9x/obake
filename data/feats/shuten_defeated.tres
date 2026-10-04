@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="FeatDefinition" format=3 uid="uid://dy5eyafhpo2pc"]
+
+[ext_resource type="Resource" uid="uid://ddkkt8mnxtvna" path="res://data/bosses/shuten_doji.tres" id="1_3o1vs"]
+[ext_resource type="Script" uid="uid://brcxnrvmd618k" path="res://data/definitions/feat_definition.gd" id="2_tk7yq"]
+[ext_resource type="Resource" uid="uid://d8fg1asfs6r6" path="res://data/omamori/shuten_sake.tres" id="3_oas31"]
+
+[resource]
+script = ExtResource("2_tk7yq")
+id = &"shuten_defeated"
+name_key = "FEAT_SHUTEN_DEFEATED"
+description_key = "FEAT_SHUTEN_DEFEATED_DESC"
+condition = 11
+boss = ExtResource("1_3o1vs")
+unlocks = ExtResource("3_oas31")

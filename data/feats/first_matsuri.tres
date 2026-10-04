@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="FeatDefinition" format=3 uid="uid://cpyi6gmxtme7s"]
+
+[ext_resource type="Script" uid="uid://brcxnrvmd618k" path="res://data/definitions/feat_definition.gd" id="1_0haue"]
+[ext_resource type="Resource" uid="uid://ctndrnmb6vvw3" path="res://data/pegs/omikuji.tres" id="2_octba"]
+
+[resource]
+script = ExtResource("1_0haue")
+id = &"first_matsuri"
+name_key = "FEAT_FIRST_MATSURI"
+description_key = "FEAT_FIRST_MATSURI_DESC"
+condition = 8
+unlocks = ExtResource("2_octba")

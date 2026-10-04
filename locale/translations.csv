@@ -202,3 +202,27 @@ END_BEST_SHOT,Best shot: %d,Miglior tiro: %d
 END_MON,Mon: %d,Mon: %d
 END_SEED,Seed: %s,Seed: %s
 BUTTON_NEW_RUN,New run,Nuova run
+FEAT_THIRTY_PEGS,Thirty lanterns,Trenta lanterne
+FEAT_THIRTY_PEGS_DESC,Hit 30 pegs in one shot.,Colpisci 30 peg in un tiro.
+FEAT_THREE_BUCKETS,Bucket brigade,Catena di secchi
+FEAT_THREE_BUCKETS_DESC,Land in the bucket 3 times on one board.,Entra nel secchio 3 volte nella stessa board.
+FEAT_ONE_SHOT_WIN,One and done,Un colpo solo
+FEAT_ONE_SHOT_WIN_DESC,Win a board with a single shot.,Vinci una board con un solo tiro.
+FEAT_PURIST_BOSS,Plain spirit,Spirito semplice
+FEAT_PURIST_BOSS_DESC,Beat a boss without firing a special ball.,Batti un boss senza tirare palline speciali.
+FEAT_FIVE_REDS,Red tide,Marea rossa
+FEAT_FIVE_REDS_DESC,Hit 5 red lanterns in one shot.,Colpisci 5 lanterne rosse in un tiro.
+FEAT_LAST_SHOT_WIN,Last breath,Ultimo respiro
+FEAT_LAST_SHOT_WIN_DESC,Win a board with its last shot.,Vinci una board con l'ultimo tiro.
+FEAT_THOUSAND_POINTS,A thousand lights,Mille luci
+FEAT_THOUSAND_POINTS_DESC,"Score 1,000 points with one shot.",Fai 1.000 punti con un tiro.
+FEAT_TENFOLD_MULT,Tenfold,Dieci volte
+FEAT_TENFOLD_MULT_DESC,Reach ×10 mult in one shot.,Raggiungi mult ×10 in un tiro.
+FEAT_FIRST_MATSURI,First festival,Prima festa
+FEAT_FIRST_MATSURI_DESC,Win a board by Matsuri.,Vinci una board con un Matsuri.
+FEAT_MATSURI_STREAK,Festival season,Stagione delle feste
+FEAT_MATSURI_STREAK_DESC,Get 3 Matsuri in one run.,Fai 3 Matsuri nella stessa run.
+FEAT_PEG_COLLECTOR,Collector,Collezionista
+FEAT_PEG_COLLECTOR_DESC,Own 4 purchased pegs in one run.,Possiedi 4 peg acquistati nella stessa run.
+FEAT_SHUTEN_DEFEATED,Oni slayer,Ammazza-oni
+FEAT_SHUTEN_DEFEATED_DESC,Defeat Shuten-dōji.,Sconfiggi Shuten-dōji.

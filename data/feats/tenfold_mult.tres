@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="FeatDefinition" format=3 uid="uid://dtjje187ivcmp"]
+
+[ext_resource type="Script" uid="uid://brcxnrvmd618k" path="res://data/definitions/feat_definition.gd" id="1_n8v38"]
+[ext_resource type="Resource" uid="uid://dlnn3ufn2vo4x" path="res://data/pegs/kagami.tres" id="2_1n17h"]
+
+[resource]
+script = ExtResource("1_n8v38")
+id = &"tenfold_mult"
+name_key = "FEAT_TENFOLD_MULT"
+description_key = "FEAT_TENFOLD_MULT_DESC"
+condition = 7
+threshold = 10000
+unlocks = ExtResource("2_1n17h")

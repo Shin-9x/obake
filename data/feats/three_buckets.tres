@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="FeatDefinition" format=3 uid="uid://bmqn7rr4widex"]
+
+[ext_resource type="Script" uid="uid://brcxnrvmd618k" path="res://data/definitions/feat_definition.gd" id="1_vmnmn"]
+[ext_resource type="Resource" uid="uid://d2ffya1hrn5cu" path="res://data/omamori/kaeru.tres" id="2_8xx07"]
+
+[resource]
+script = ExtResource("1_vmnmn")
+id = &"three_buckets"
+name_key = "FEAT_THREE_BUCKETS"
+description_key = "FEAT_THREE_BUCKETS_DESC"
+condition = 1
+threshold = 3
+unlocks = ExtResource("2_8xx07")

@@ -19,7 +19,9 @@ static func replay(
 	)
 	if character == null:
 		return null
-	var run: Run = Run.start(config, content, library, base_pegs, character, run_log.run_seed)
+	var run: Run = Run.start(
+		config, content, library, base_pegs, character, run_log.run_seed, run_log.options
+	)
 	for action: PackedInt32Array in run_log.actions:
 		if not apply(run, action):
 			return null

@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="FeatDefinition" format=3 uid="uid://c47ytqiygw4j8"]
+
+[ext_resource type="Script" uid="uid://brcxnrvmd618k" path="res://data/definitions/feat_definition.gd" id="1_ogsks"]
+[ext_resource type="Resource" uid="uid://dujkygwjf17sb" path="res://data/balls/onibi.tres" id="2_ceh0a"]
+
+[resource]
+script = ExtResource("1_ogsks")
+id = &"purist_boss"
+name_key = "FEAT_PURIST_BOSS"
+description_key = "FEAT_PURIST_BOSS_DESC"
+condition = 3
+unlocks = ExtResource("2_ceh0a")

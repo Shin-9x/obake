@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="ProgressionDefinition" format=3 uid="uid://b8n8a1v376q1f"]
+
+[ext_resource type="Script" uid="uid://brcxnrvmd618k" path="res://data/definitions/feat_definition.gd" id="1_imxq8"]
+[ext_resource type="Resource" uid="uid://dmh5yv6v3thdu" path="res://data/feats/thirty_pegs.tres" id="2_dd702"]
+[ext_resource type="Resource" uid="uid://bmqn7rr4widex" path="res://data/feats/three_buckets.tres" id="3_htguv"]
+[ext_resource type="Resource" uid="uid://dcjn465fk1k8h" path="res://data/feats/one_shot_win.tres" id="4_pb8d8"]
+[ext_resource type="Resource" uid="uid://c47ytqiygw4j8" path="res://data/feats/purist_boss.tres" id="5_5fui3"]
+[ext_resource type="Resource" uid="uid://diq7i7vspclbw" path="res://data/feats/five_reds.tres" id="6_7hwny"]
+[ext_resource type="Resource" uid="uid://drh0jbm7cf114" path="res://data/feats/last_shot_win.tres" id="7_badj2"]
+[ext_resource type="Resource" uid="uid://cb8hqxtnaaq6i" path="res://data/feats/thousand_points.tres" id="8_50dd0"]
+[ext_resource type="Resource" uid="uid://dtjje187ivcmp" path="res://data/feats/tenfold_mult.tres" id="9_6kg0c"]
+[ext_resource type="Resource" uid="uid://cpyi6gmxtme7s" path="res://data/feats/first_matsuri.tres" id="10_my0nc"]
+[ext_resource type="Resource" uid="uid://dv0lyx86i8cu7" path="res://data/feats/matsuri_streak.tres" id="11_hccal"]
+[ext_resource type="Resource" uid="uid://ssybr0mo1hr4" path="res://data/feats/peg_collector.tres" id="12_a7uci"]
+[ext_resource type="Resource" uid="uid://dy5eyafhpo2pc" path="res://data/feats/shuten_defeated.tres" id="13_eo75p"]
+[ext_resource type="Script" uid="uid://dg454wrjernfn" path="res://data/definitions/progression_definition.gd" id="14_fb5j1"]
+
+[resource]
+script = ExtResource("14_fb5j1")
+feats = Array[ExtResource("1_imxq8")]([ExtResource("2_dd702"), ExtResource("3_htguv"), ExtResource("4_pb8d8"), ExtResource("5_5fui3"), ExtResource("6_7hwny"), ExtResource("7_badj2"), ExtResource("8_50dd0"), ExtResource("9_6kg0c"), ExtResource("10_my0nc"), ExtResource("11_hccal"), ExtResource("12_a7uci"), ExtResource("13_eo75p")])
