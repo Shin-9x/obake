@@ -59,3 +59,68 @@ extends Resource
 @export var launcher_y: int = 12_000
 ## Largest aim deviation from straight down, either side.
 @export var aim_limit: int = 8_500
+
+@export_group("Run")
+@export var starting_mon: int = 4
+@export var floors: int = 4
+@export var omamori_slots: int = 5
+## Smallest bag a removal may leave.
+@export var min_bag_size: int = 1
+@export var max_ball_level: int = 3
+
+@export_group("Map")
+@export var steps_per_floor: int = 4
+@export var min_nodes_per_step: int = 2
+@export var max_nodes_per_step: int = 3
+## Odds of each node kind after the first step, which holds boards only, in [enum MapNode.Kind]
+## order: board, elite, event, shrine, shop.
+@export var node_weights: PackedInt32Array = PackedInt32Array([40, 15, 20, 12, 13])
+## Most next nodes a node may lead to.
+@export var max_node_links: int = 2
+
+@export_group("Targets")
+## Growth from one board to the next, in permille.
+@export var board_target_growth: int = 1350
+## Elite target over the standard one, in permille.
+@export var elite_target_factor: int = 1500
+## Boss target over the previous board's, in permille; it replaces the usual growth.
+@export var boss_target_factor: int = 1800
+@export var target_rounding: int = 10
+
+@export_group("Economy")
+## Mon for winning a standard, an elite and a boss board.
+@export var win_mon: PackedInt32Array = PackedInt32Array([4, 7, 10])
+@export var unused_shot_mon: int = 1
+@export var matsuri_mon: int = 5
+## One mon of interest for every this many held at the end of a board.
+@export var interest_step: int = 5
+@export var skip_reward_mon: int = 2
+
+@export_group("Shop")
+@export var shop_balls: int = 3
+@export var shop_omamori: int = 2
+@export var shop_pegs: int = 2
+## Prices by rarity: common, uncommon, rare.
+@export var ball_prices: PackedInt32Array = PackedInt32Array([4, 6, 9])
+@export var omamori_prices: PackedInt32Array = PackedInt32Array([5, 7, 10])
+@export var peg_prices: PackedInt32Array = PackedInt32Array([3, 5, 8])
+@export var reroll_price: int = 3
+## Added to the reroll price for every reroll already made in the same shop.
+@export var reroll_increase: int = 1
+## Price of upgrading a ball to level 2, then to level 3.
+@export var upgrade_prices: PackedInt32Array = PackedInt32Array([5, 8])
+## Share of its price an omamori sells for, in permille.
+@export var sell_permille: int = 500
+## What a legendary omamori sells for, since it has no shop price.
+@export var legendary_sell_price: int = 5
+
+@export_group("Rarity")
+@export var uncommon_permille: int = 280
+## Rare share of shop and reward balls by floor, from the first; later floors keep the last.
+@export var rare_permille_by_floor: PackedInt32Array = PackedInt32Array(
+	[70, 80, 90, 105, 115, 125, 140, 150]
+)
+## Omamori reward odds: common, uncommon, rare, legendary.
+@export var elite_omamori_weights: PackedInt32Array = PackedInt32Array([55, 30, 12, 3])
+@export var boss_omamori_weights: PackedInt32Array = PackedInt32Array([35, 35, 22, 8])
+@export var reward_choices: int = 3

@@ -64,7 +64,10 @@ static func find_problems(layout: BoardLayout, config: BalanceConfig) -> Array[S
 				problems,
 				(
 					"zone at (%d, %d) leaves the board"
-					% [roundi(zone.x / 1000.0), roundi(zone.y / 1000.0)]
+					% [
+						FixedMath.div_round(zone.x, FixedMath.PX),
+						FixedMath.div_round(zone.y, FixedMath.PX)
+					]
 				)
 			)
 	return problems
@@ -126,7 +129,8 @@ static func _add(simulation: BoardSimulation, peg: LayoutPeg, group: int) -> voi
 
 ## Position at phase zero, in pixels, so authors can find the peg in the editor.
 static func _where(peg: SimPeg) -> String:
-	return "(%d, %d)" % [roundi(peg.base_x / 1000.0), roundi(peg.base_y / 1000.0)]
+	var x: int = FixedMath.div_round(peg.base_x, FixedMath.PX)
+	return "(%d, %d)" % [x, FixedMath.div_round(peg.base_y, FixedMath.PX)]
 
 
 static func _report(problems: Array[String], problem: String) -> void:
