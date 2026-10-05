@@ -1,5 +1,6 @@
 extends GdUnitTestSuite
-## The three MVP characters match the GDD: starting bags, power numbers, art and texts.
+## The three MVP characters match the GDD: starting bags, power numbers (as tuned with the balance
+## bot in M8), art and texts.
 
 ## Special balls each starting bag holds besides the six Hitodama.
 const BAGS: Dictionary[String, Array] = {
@@ -8,9 +9,9 @@ const BAGS: Dictionary[String, Array] = {
 	"tanuki": ["zeni"],
 }
 const PARAMS: Dictionary[String, Dictionary] = {
-	"yamabushi": {&"shots": 2, &"contacts": 3},
-	"kitsune": {&"count": 3, &"red_points": 5},
-	"tanuki": {&"count": 3, &"shop_extra_balls": 1},
+	"yamabushi": {&"shots": 2, &"contacts": 4},
+	"kitsune": {&"count": 2, &"red_points": 5},
+	"tanuki": {&"count": 5, &"shop_extra_balls": 2},
 }
 const HITODAMA_COUNT: int = 6
 

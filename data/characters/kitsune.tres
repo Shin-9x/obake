@@ -22,6 +22,6 @@ icon = ExtResource("2_jbpfy")
 effect_script = ExtResource("1_fprdm")
 level_values = PackedInt32Array()
 params = Dictionary[StringName, int]({
-&"count": 3,
+&"count": 2,
 &"red_points": 5
 })

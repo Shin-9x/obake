@@ -15,8 +15,9 @@ func test_green_lanterns_extend_the_guide_for_the_next_shots() -> void:
 	assert_int(game.extended_guide_shots).is_equal(0)
 	game.score_hit(0)
 	Harness.finish(game)
-	assert_int(game.extended_guide_shots).is_equal(2)
-	assert_int(game.guide_contacts()).is_equal(3)
+	var params: Dictionary[StringName, int] = (load(YAMABUSHI) as CharacterDefinition).params
+	assert_int(game.extended_guide_shots).is_equal(params[&"shots"])
+	assert_int(game.guide_contacts()).is_equal(params[&"contacts"])
 	var triggers: Array[SimEvent] = Harness.events_of(game, SimEvent.Kind.EFFECT_TRIGGERED)
 	assert_array(triggers).has_size(1)
 	assert_int(triggers[0].target).is_equal(Effect.CHARACTER_SLOT)

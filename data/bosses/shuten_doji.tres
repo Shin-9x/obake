@@ -10,6 +10,7 @@ script = ExtResource("3_eyk0i")
 layout_id = "shuten"
 special_peg = ExtResource("4_ljnpg")
 portrait = ExtResource("2_47bw4")
+target_factor = 1500
 id = &"shuten_doji"
 name_key = "BOSS_SHUTEN_DOJI"
 description_key = "BOSS_SHUTEN_DOJI_RULE"

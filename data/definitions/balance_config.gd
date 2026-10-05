@@ -80,9 +80,9 @@ extends Resource
 
 @export_group("Targets")
 ## Growth from one board to the next, in permille.
-@export var board_target_growth: int = 1350
+@export var board_target_growth: int = 1130
 ## Elite target over the standard one, in permille.
-@export var elite_target_factor: int = 1500
+@export var elite_target_factor: int = 1300
 @export var target_rounding: int = 10
 
 @export_group("Hard mode")

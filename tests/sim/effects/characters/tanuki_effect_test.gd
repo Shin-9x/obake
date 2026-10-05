@@ -11,12 +11,18 @@ func test_green_lanterns_turn_blue_lanterns_into_coin_pegs() -> void:
 	Harness.all_blue(game)
 	game.roles[0] = BoardGame.Role.GREEN
 	Harness.shoot(game)
+	var unlit_blues: int = 0
+	for peg: int in game.roles.size():
+		if game.roles[peg] == BoardGame.Role.BLUE and not game.simulation.pegs[peg].lit:
+			unlit_blues += 1
 	game.score_hit(0)
 	var coins: Array[int] = []
 	for peg: int in game.roles.size():
 		if game.roles[peg] == BoardGame.Role.SPECIAL:
 			coins.append(peg)
 			assert_str(String(game.definition_of(peg).id)).is_equal("coin_peg")
-	assert_array(coins).has_size(3)
+	# Every unlit blue lantern of the row turns when there are fewer than the power's count.
+	var count: int = (load(TANUKI) as CharacterDefinition).params[&"count"]
+	assert_array(coins).has_size(mini(count, unlit_blues))
 	game.score_hit(coins[0])
 	assert_int(game.mon_earned).is_equal(1)

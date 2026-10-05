@@ -21,6 +21,6 @@ icon = ExtResource("2_xnqsr")
 effect_script = ExtResource("1_5qk7g")
 level_values = PackedInt32Array()
 params = Dictionary[StringName, int]({
-&"contacts": 3,
+&"contacts": 4,
 &"shots": 2
 })

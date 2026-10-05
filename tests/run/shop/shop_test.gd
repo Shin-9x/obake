@@ -20,8 +20,12 @@ func test_a_shop_offers_three_balls_two_omamori_and_two_pegs() -> void:
 				)
 
 
-func test_the_tanuki_sees_one_more_ball() -> void:
-	assert_array(_shop(Fixtures.state("tanuki")).balls).has_size(4)
+func test_the_tanuki_sees_extra_balls() -> void:
+	var extra: int = Fixtures.character("tanuki").params[&"shop_extra_balls"]
+	assert_int(extra).is_greater(0)
+	assert_array(_shop(Fixtures.state("tanuki")).balls).has_size(
+		Fixtures.config().shop_balls + extra
+	)
 
 
 func test_prices_follow_rarity() -> void:

@@ -8,6 +8,7 @@
 script = ExtResource("3_erbam")
 layout_id = "tamamo"
 portrait = ExtResource("2_vjepk")
+target_factor = 1100
 id = &"tamamo"
 name_key = "BOSS_TAMAMO"
 description_key = "BOSS_TAMAMO_RULE"

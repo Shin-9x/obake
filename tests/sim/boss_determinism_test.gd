@@ -7,14 +7,15 @@ const TestBoards: GDScript = preload("res://tests/sim/support/test_boards.gd")
 const AIMS: Array[int] = [0, -2500, 1234, 8500, -8500, 4321, -777, 6000]
 const BUCKET_PHASES: Array[int] = [0, 100, 200, 300, 400, 37, 251, 479]
 const BOARD_SEED: int = 20261004
-const TARGET: int = 2000
+## Low enough for Nue to reach half of it and transform.
+const TARGET: int = 1600
 const HASH_MODULUS: int = 2_147_483_647
 const HASH_MULTIPLIER: int = 1_000_003
 ## Total and hash chain per boss.
 const GOLDEN: Dictionary[String, Array] = {
-	"jorogumo": [1695, 244122549],
-	"nue": [1085, 935086812],
-	"tamamo": [795, 1438274870],
+	"jorogumo": [1380, 577019640],
+	"nue": [1010, 2028664732],
+	"tamamo": [685, 493019329],
 	"shuten_doji": [850, 445596392],
 }
 

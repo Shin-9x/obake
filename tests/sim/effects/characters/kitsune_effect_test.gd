@@ -13,7 +13,7 @@ func test_green_lanterns_turn_blue_lanterns_into_kitsunebi() -> void:
 		if game.roles[peg] == BoardGame.Role.SPECIAL:
 			turned.append(peg)
 			assert_str(String(game.definition_of(peg).id)).is_equal("kitsunebi")
-	assert_array(turned).has_size(3)
+	assert_array(turned).has_size((load(KITSUNE) as CharacterDefinition).params[&"count"])
 	assert_int(game.red_remaining()).is_equal(1)
 	var mult: int = game.shot_mult
 	game.score_hit(turned[0])

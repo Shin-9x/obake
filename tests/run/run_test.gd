@@ -63,7 +63,11 @@ func test_skipping_the_ball_pays_two_mon() -> void:
 func test_an_elite_board_offers_a_ball_then_an_omamori() -> void:
 	var run: Run = _run()
 	_enter(run, MapNode.Kind.ELITE)
-	assert_int(run.board.rules.target).is_equal(1200)
+	var standard: int = TargetSchedule.target(run.config, MapNode.Kind.BOARD, 0)
+	assert_int(run.board.rules.target).is_greater(standard)
+	assert_int(run.board.rules.target).is_equal(
+		TargetSchedule.target(run.config, MapNode.Kind.ELITE, 0)
+	)
 	Fixtures.finish(run, BoardGame.Outcome.TARGET_REACHED, 0)
 	assert_bool(run.take_omamori(0)).is_false()
 	run.take_ball(0)

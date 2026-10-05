@@ -20,6 +20,8 @@ make bench    # measure simulation cost per tick
 make placeholder-art  # regenerate the placeholder sprites, app icons and boot splash
 make placeholder-audio  # regenerate the placeholder sounds and music loops
 make layouts  # export every layout source scene to data/layouts
+make replays  # write new expected results into the golden replays
+make record-replays  # record the golden replays again with the balance bot
 ```
 
 ## Board layouts

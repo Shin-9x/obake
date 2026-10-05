@@ -26,6 +26,7 @@ LOGS ?= reports/balance
 SET ?=
 
 .PHONY: setup format lint test check bench placeholder-art placeholder-audio layouts replays \
+	record-replays \
 	templates import exports export-linux export-windows export-android export-android-debug \
 	pull-logs balance-sim balance-report
 
@@ -75,6 +76,10 @@ layouts:
 replays:
 	$(GODOT) --headless --path . --import
 	$(GODOT) --headless --path . -s res://src/tools/update_replays.gd
+
+# Plays the golden replays again with the balance bot when their recorded actions no longer fit.
+record-replays: import
+	$(GODOT) --headless --path . -s res://src/tools/record_replays.gd
 
 # Downloads the official export templates once, checks them and installs the ones the presets use.
 templates:

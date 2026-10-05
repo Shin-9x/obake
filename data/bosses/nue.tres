@@ -9,6 +9,7 @@ script = ExtResource("3_ppx2k")
 layout_id = "nue_a"
 second_layout_id = "nue_b"
 portrait = ExtResource("2_2asxb")
+target_factor = 1700
 id = &"nue"
 name_key = "BOSS_NUE"
 description_key = "BOSS_NUE_RULE"

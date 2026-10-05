@@ -8,6 +8,7 @@
 script = ExtResource("3_orxuw")
 layout_id = "jorogumo"
 portrait = ExtResource("2_h33wr")
+target_factor = 1700
 id = &"jorogumo"
 name_key = "BOSS_JOROGUMO"
 description_key = "BOSS_JOROGUMO_RULE"
