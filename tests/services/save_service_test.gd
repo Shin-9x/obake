@@ -52,9 +52,36 @@ func test_runs_are_saved_loaded_and_cleared() -> void:
 	assert_bool(_service.has_run()).is_false()
 
 
-func _wipe() -> void:
-	if not DirAccess.dir_exists_absolute(DIRECTORY):
+func test_run_log_lines_are_appended() -> void:
+	assert_int(_service.append_run_log({"kind": "board", "score": 120})).is_equal(OK)
+	assert_int(_service.append_run_log({"kind": "run", "outcome": "defeat"})).is_equal(OK)
+	var lines: PackedStringArray = _log_lines(_service.run_log_path())
+	assert_int(lines.size()).is_equal(2)
+	assert_int(int(JSON.parse_string(lines[0])["score"])).is_equal(120)
+	assert_str(JSON.parse_string(lines[1])["outcome"]).is_equal("defeat")
+
+
+func test_a_full_run_log_moves_aside() -> void:
+	_service.run_log_limit = 10
+	_service.append_run_log({"line": 1})
+	_service.append_run_log({"line": 2})
+	_service.append_run_log({"line": 3})
+	var old: String = _service.run_log_path().get_base_dir().path_join("runs.old.jsonl")
+	assert_int(int(JSON.parse_string(_log_lines(old)[0])["line"])).is_equal(2)
+	var current: PackedStringArray = _log_lines(_service.run_log_path())
+	assert_int(current.size()).is_equal(1)
+	assert_int(int(JSON.parse_string(current[0])["line"])).is_equal(3)
+
+
+func _log_lines(path: String) -> PackedStringArray:
+	return FileAccess.get_file_as_string(path).strip_edges().split("\n")
+
+
+func _wipe(path: String = DIRECTORY) -> void:
+	if not DirAccess.dir_exists_absolute(path):
 		return
-	for file: String in DirAccess.get_files_at(DIRECTORY):
-		DirAccess.remove_absolute(DIRECTORY.path_join(file))
-	DirAccess.remove_absolute(DIRECTORY)
+	for folder: String in DirAccess.get_directories_at(path):
+		_wipe(path.path_join(folder))
+	for file: String in DirAccess.get_files_at(path):
+		DirAccess.remove_absolute(path.path_join(file))
+	DirAccess.remove_absolute(path)

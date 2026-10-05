@@ -173,6 +173,25 @@ func test_abandoning_ends_the_run_as_a_loss() -> void:
 	assert_object(screen.current).is_instanceof(RunEndScreen)
 	assert_int(screen.profile.runs).is_equal(1)
 	assert_bool(SaveService.has_run()).is_false()
+	var lines: Array[Dictionary] = _run_log()
+	assert_int(lines.size()).is_equal(1)
+	assert_str(lines[0]["kind"]).is_equal("run")
+	assert_str(lines[0]["outcome"]).is_equal("abandoned")
+	assert_int(int(lines[0]["run"])).is_equal(1)
+
+
+func test_settled_boards_and_lost_runs_go_to_the_run_log() -> void:
+	var screen: GameScreen = _started()
+	screen._on_node_chosen(screen.run.reachable_nodes()[0])
+	_end_board(screen, BoardGame.Outcome.FAILED)
+	var lines: Array[Dictionary] = _run_log()
+	assert_int(lines.size()).is_equal(2)
+	assert_str(lines[0]["kind"]).is_equal("board")
+	assert_str(lines[0]["outcome"]).is_equal("failed")
+	assert_str(lines[0]["version"]).is_equal(BuildInfo.version())
+	assert_str(lines[1]["kind"]).is_equal("run")
+	assert_str(lines[1]["outcome"]).is_equal("defeat")
+	assert_int(int(lines[0]["run"])).is_equal(int(lines[1]["run"]))
 
 
 func test_settings_open_from_the_title_and_change_the_language() -> void:
@@ -253,12 +272,22 @@ func test_only_screens_that_move_every_frame_need_every_frame() -> void:
 	assert_bool(GameScreen.wants_low_power(title)).is_true()
 
 
-func _wipe() -> void:
-	if not DirAccess.dir_exists_absolute(SAVES):
+func _run_log() -> Array[Dictionary]:
+	var lines: Array[Dictionary] = []
+	var text: String = FileAccess.get_file_as_string(SaveService.run_log_path())
+	for line: String in text.split("\n", false):
+		lines.append(JSON.parse_string(line))
+	return lines
+
+
+func _wipe(path: String = SAVES) -> void:
+	if not DirAccess.dir_exists_absolute(path):
 		return
-	for file: String in DirAccess.get_files_at(SAVES):
-		DirAccess.remove_absolute(SAVES.path_join(file))
-	DirAccess.remove_absolute(SAVES)
+	for folder: String in DirAccess.get_directories_at(path):
+		_wipe(path.path_join(folder))
+	for file: String in DirAccess.get_files_at(path):
+		DirAccess.remove_absolute(path.path_join(file))
+	DirAccess.remove_absolute(path)
 
 
 func _started() -> GameScreen:

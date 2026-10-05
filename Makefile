@@ -10,8 +10,12 @@ TEMPLATES_ARCHIVE := build/cache/Godot_v$(GODOT_VERSION)-stable_export_templates
 TEMPLATES_URL := https://github.com/godotengine/godot/releases/download/$(GODOT_VERSION)-stable/$(notdir $(TEMPLATES_ARCHIVE))
 TEMPLATES_DIR ?= $(HOME)/.local/share/godot/export_templates/$(GODOT_VERSION).stable
 
+ADB ?= adb
+ANDROID_PACKAGE := io.github.shin9x.obake
+
 .PHONY: setup format lint test check bench placeholder-art placeholder-audio layouts replays \
-	templates import exports export-linux export-windows export-android export-android-debug
+	templates import exports export-linux export-windows export-android export-android-debug \
+	pull-logs
 
 setup:
 	$(PYTHON) -m venv $(VENV)
@@ -96,3 +100,9 @@ export-android: import
 export-android-debug: import
 	mkdir -p build/android
 	$(GODOT) --headless --path . --export-debug "Android" build/android/obake-debug.apk
+
+# Copies the run log from a phone over USB; adb may only read the files of a debug build.
+pull-logs:
+	mkdir -p reports/logs
+	$(ADB) exec-out run-as $(ANDROID_PACKAGE) cat files/run_logs/runs.jsonl > reports/logs/phone.jsonl.part
+	mv reports/logs/phone.jsonl.part reports/logs/phone.jsonl

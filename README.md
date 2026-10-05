@@ -117,6 +117,19 @@ settings opened from the title: it plays busy development boards on its own for 
 reports frame time percentiles and dropped frames, also to the log (`adb logcat -s godot` on a
 phone). The tick cost appears in the editor's Monitors tab as `obake/tick_usec`.
 
+## Run logs
+
+Every settled board and the end of every run add a line of JSON to `run_logs/runs.jsonl` in
+Godot's user data folder, for balancing: score against target, shots, mon and the loadout, and
+for each finished run its whole action log. The log never leaves the device; past 1 MB it moves
+to `runs.old.jsonl`. On Linux the folder is `~/.local/share/godot/app_userdata/Obake!/`, on
+Windows `%APPDATA%\Godot\app_userdata\Obake!\`. From a phone running a debug build, connected
+over USB:
+
+```bash
+make pull-logs ADB=~/Android/Sdk/platform-tools/adb  # writes reports/logs/phone.jsonl
+```
+
 ## Layout
 
 | Folder | Content |

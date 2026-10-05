@@ -8,6 +8,8 @@ extends Control
 ## A run pauses with the pause action or button: the run's screen stops, the pause menu and the
 ## settings keep working.
 ##
+## Every settled board and the end of every run go to the local run log, for balancing.
+##
 ## On phones everything stays inside the display's safe area, clear of camera holes and rounded
 ## corners. Menus let the engine skip frames where nothing changes, which saves battery.
 
@@ -279,6 +281,7 @@ func _abandon() -> void:
 	resume()
 	if not run.abandon():
 		return
+	SaveService.append_run_log(_record().ending(run))
 	Progression.finish_run(PROGRESSION, profile, run)
 	SaveService.clear_run()
 	SaveService.save_profile(profile)
@@ -349,6 +352,11 @@ func _fit_safe_area() -> void:
 	offset_bottom = -margins.w
 
 
+## The run log's view of the run on show; the profile counts runs only once they end.
+func _record() -> RunRecord:
+	return RunRecord.new(profile.runs + 1, BuildInfo.version())
+
+
 func _on_settings_changed() -> void:
 	if perf_overlay.visible != Settings.values.show_performance:
 		perf_overlay.show_values(Settings.values.show_performance)
@@ -378,9 +386,12 @@ func _on_node_chosen(node: int) -> void:
 func _on_board_finished(_result: BoardResult) -> void:
 	if not run.finish_board():
 		return
+	var record: RunRecord = _record()
+	SaveService.append_run_log(record.board(run))
 	for feat: FeatDefinition in Progression.check_board(PROGRESSION, profile, run):
 		toasts.announce(tr("TOAST_UNLOCKED") % tr(feat.unlocks.name_key), tr(feat.description_key))
 	if run.is_over():
+		SaveService.append_run_log(record.ending(run))
 		var character: CharacterDefinition = run.state.inventory.loadout.character
 		for mark: Profile.Mark in Progression.finish_run(PROGRESSION, profile, run):
 			toasts.announce(tr("TOAST_MARK") % tr(character.name_key), tr(MARK_KEYS[mark]))
