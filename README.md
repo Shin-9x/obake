@@ -68,6 +68,45 @@ definitions live in `data/`, with their behaviour in `src/sim/effects/`; events 
 | Pause | Esc | Start | Pause button |
 | Menus | Mouse, or arrows and Enter | D-pad, A, B | Tap |
 
+## Builds
+
+`make templates` downloads the official Godot 4.7.2 export templates once (about 1.3 GB, checked
+against their SHA-512) and installs the Linux, Windows and Android ones. Then:
+
+```bash
+make export-linux          # build/linux/obake.x86_64
+make export-windows        # build/windows/obake.exe, unsigned: SmartScreen warns on first launch
+make export-android-debug  # build/android/obake-debug.apk, signed with Godot's debug key
+make export-android        # build/android/obake.apk, signed with your release key
+make exports               # the three release builds
+```
+
+The version lives in `application/config/version` in `project.godot`. Raise `version/code` in
+the Android preset with every build meant to install over an older one.
+
+**Android release key.** Create the keystore once, outside the repository; `keytool` asks for
+its password:
+
+```bash
+keytool -genkeypair -v -keystore ~/keys/obake-release.keystore -alias obake -keyalg RSA -keysize 2048 -validity 10000
+```
+
+Then pass its path, alias and password to the export through the environment, for example in
+fish, where `read -s` keeps the password off the screen and out of the history:
+
+```fish
+set -x GODOT_ANDROID_KEYSTORE_RELEASE_PATH ~/keys/obake-release.keystore
+set -x GODOT_ANDROID_KEYSTORE_RELEASE_USER obake
+read -s -x -P "Keystore password: " GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD
+```
+
+Keep the keystore and its password safe: Android only installs updates signed with the same key.
+Debug and release builds carry different signatures, so uninstall one before installing the
+other, which deletes the saves on the phone. Install on a phone connected over USB with
+`adb install -r build/android/obake.apk`.
+
+macOS and iOS builds come later.
+
 ## Layout
 
 | Folder | Content |

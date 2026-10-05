@@ -13,3 +13,7 @@
 
 # Export output
 /build/
+
+# Signing keys never enter the repository
+*.keystore
+*.jks
