@@ -1,9 +1,11 @@
 class_name AimInput
 extends Node
-## Turns mouse, keyboard and touch input into an integer aim, in centidegrees from straight down.
+## Turns mouse, keyboard, touch and gamepad input into an integer aim, in centidegrees from
+## straight down.
 ##
 ## The mouse aims at the pointer. Touch aims with a relative drag, so the finger never hides the
-## target. Fine aim moves by [constant FINE_STEP] per wheel notch, key press or button repeat.
+## target. A gamepad stick turns the aim faster the further it is pushed. Fine aim moves by
+## [constant FINE_STEP] per wheel notch, key press, trigger or button repeat.
 
 signal aim_changed(aim: int)
 signal shoot_requested
@@ -15,6 +17,10 @@ const DRAG_SENSITIVITY: float = 40.0
 ## Seconds before a held fine-aim control starts repeating, then between repeats.
 const REPEAT_DELAY: float = 0.35
 const REPEAT_INTERVAL: float = 0.04
+## Centidegrees per second with the stick pushed all the way.
+const STICK_SPEED: float = 6000.0
+## Stick deflection below which the stick counts as centred.
+const STICK_DEADZONE: float = 0.2
 
 var aim: int = 0
 var aim_limit: int = 0
@@ -30,6 +36,9 @@ var _hold_time: float = 0.0
 var _repeat_time: float = 0.0
 var _touches: int = 0
 var _drag_remainder: float = 0.0
+## Stick deflection from -1 (left) to 1 (right), deadzone applied.
+var _stick: float = 0.0
+var _stick_remainder: float = 0.0
 
 
 func _ready() -> void:
@@ -64,10 +73,17 @@ func hold_nudge(direction: int) -> void:
 	_repeat_time = 0.0
 	if direction != 0:
 		nudge(direction)
-	set_process(direction != 0)
+	_update_processing()
 
 
 func _process(delta: float) -> void:
+	if _stick != 0.0:
+		_stick_remainder += _stick * STICK_SPEED * delta
+		var whole: int = int(_stick_remainder)
+		_stick_remainder -= whole
+		set_aim(aim + whole)
+	if _hold_direction == 0:
+		return
 	_hold_time += delta
 	if _hold_time < REPEAT_DELAY:
 		return
@@ -75,6 +91,10 @@ func _process(delta: float) -> void:
 	while _repeat_time >= REPEAT_INTERVAL:
 		_repeat_time -= REPEAT_INTERVAL
 		nudge(_hold_direction)
+
+
+func _update_processing() -> void:
+	set_process(_hold_direction != 0 or _stick != 0.0)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -93,6 +113,13 @@ func _unhandled_input(event: InputEvent) -> void:
 		set_aim(aim + whole)
 	elif event is InputEventScreenTouch:
 		_touches = maxi(0, _touches + (1 if (event as InputEventScreenTouch).pressed else -1))
+	elif (
+		event is InputEventJoypadMotion
+		and (event as InputEventJoypadMotion).axis == JOY_AXIS_LEFT_X
+	):
+		var value: float = (event as InputEventJoypadMotion).axis_value
+		_stick = value if absf(value) > STICK_DEADZONE else 0.0
+		_update_processing()
 	elif event.is_action_pressed("aim_fine_left"):
 		hold_nudge(-1)
 	elif event.is_action_pressed("aim_fine_right"):

@@ -204,3 +204,13 @@ func _end_board(screen: GameScreen, outcome: BoardGame.Outcome) -> void:
 	screen.run.game.outcome = outcome
 	screen.run.game.result = result
 	(screen.current as BoardScreen).board_finished.emit(result)
+
+
+func test_cancel_goes_back_from_the_menus() -> void:
+	var screen: GameScreen = scene_runner(SCENE).scene() as GameScreen
+	screen.show_statistics()
+	var cancel: InputEventAction = InputEventAction.new()
+	cancel.action = "ui_cancel"
+	cancel.pressed = true
+	screen._unhandled_input(cancel)
+	assert_object(screen.current).is_instanceof(TitleScreen)

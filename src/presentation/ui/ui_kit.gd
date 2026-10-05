@@ -66,7 +66,6 @@ static func button(
 ) -> Button:
 	var result: Button = Button.new()
 	result.text = key
-	result.focus_mode = Control.FOCUS_NONE
 	if not translate:
 		result.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 	result.pressed.connect(AudioService.play.bind(cue, 1.0))

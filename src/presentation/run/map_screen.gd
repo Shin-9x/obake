@@ -80,7 +80,6 @@ func _node_button(map: FloorMap, index: int, reachable: bool) -> Button:
 	button.custom_minimum_size = size
 	button.size = size
 	button.position = _centres[index] - size / 2.0
-	button.focus_mode = Control.FOCUS_NONE
 	button.icon = _skin.node_icons[node.kind]
 	button.expand_icon = true
 	button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER

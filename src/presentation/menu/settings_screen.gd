@@ -55,6 +55,10 @@ func open() -> void:
 	_body.add_child(back)
 
 
+func back() -> void:
+	_close()
+
+
 func _row(key: String, control: Control) -> void:
 	var row: HBoxContainer = UiKit.row(8)
 	row.alignment = BoxContainer.ALIGNMENT_BEGIN

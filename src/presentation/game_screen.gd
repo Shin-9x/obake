@@ -29,6 +29,7 @@ var toasts: UnlockToasts
 var pause_menu: PauseMenu
 
 var _library: LayoutLibrary
+var _navigator: FocusNavigator = FocusNavigator.new()
 var _pause_button: Button
 ## Settings opened over the pause menu.
 var _overlay_settings: SettingsScreen
@@ -38,6 +39,7 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_library = LayoutLibrary.load_from()
 	profile = SaveService.load_profile()
+	add_child(_navigator)
 	toasts = UnlockToasts.new()
 	toasts.skin = UI_SKIN
 	add_child(toasts)
@@ -177,6 +179,7 @@ func pause() -> void:
 	pause_menu.abandon_confirmed.connect(_abandon)
 	pause_menu.quit_requested.connect(_quit_to_title)
 	_refresh_overlays()
+	_navigator.focus(pause_menu)
 
 
 func resume() -> void:
@@ -186,17 +189,25 @@ func resume() -> void:
 	pause_menu = null
 	get_tree().paused = false
 	_refresh_overlays()
+	_navigator.focus(current)
 
 
+## The pause action pauses and resumes a run; the cancel action closes the settings over the pause
+## menu, resumes, or goes back from a menu screen that has a way back.
 func _unhandled_input(event: InputEvent) -> void:
-	if not event.is_action_pressed("pause"):
+	var pausing: bool = event.is_action_pressed("pause") and (can_pause() or pause_menu != null)
+	if not pausing and not event.is_action_pressed("ui_cancel"):
 		return
 	if _overlay_settings != null:
 		_close_pause_settings()
 	elif pause_menu != null:
 		resume()
-	else:
+	elif pausing:
 		pause()
+	elif current != null and current.has_method("back"):
+		current.call("back")
+	else:
+		return
 	get_viewport().set_input_as_handled()
 
 
@@ -206,12 +217,14 @@ func _open_pause_settings() -> void:
 	add_child(_overlay_settings)
 	_overlay_settings.open()
 	_overlay_settings.closed.connect(_close_pause_settings)
+	_navigator.focus(_overlay_settings)
 
 
 func _close_pause_settings() -> void:
 	if _overlay_settings != null:
 		_overlay_settings.queue_free()
 		_overlay_settings = null
+		_navigator.focus(pause_menu)
 
 
 ## Gives the run up: it ends as a loss and the end screen shows.
@@ -253,6 +266,7 @@ func _swap(screen: Control) -> void:
 	screen.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(screen)
 	_refresh_overlays()
+	_navigator.focus(screen)
 
 
 ## Keeps the pause button, the toasts and the pause menu above the screen, and the pause button

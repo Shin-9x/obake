@@ -238,7 +238,7 @@ func show_result(game: BoardGame) -> void:
 	_result_total.text = tr("RESULT_TOTAL") % game.total
 	_result_shots.text = tr("RESULT_UNUSED_SHOTS") % game.shots_left
 	_result_shots.visible = game.outcome != BoardGame.Outcome.FAILED
-	_result.visible = _banner_age < 0.0
+	_set_result_visible(_banner_age < 0.0)
 
 
 func _process(delta: float) -> void:
@@ -275,7 +275,7 @@ func _process(delta: float) -> void:
 		if shown >= 1.0:
 			_banner_age = -1.0
 			_banner.visible = false
-			_result.visible = not _result_title.text.is_empty()
+			_set_result_visible(not _result_title.text.is_empty())
 		else:
 			busy = true
 	if _portrait_age >= 0.0:
@@ -298,6 +298,13 @@ func _process(delta: float) -> void:
 			busy = true
 	if not busy:
 		set_process(false)
+
+
+## The end-of-board overlay; with a pad or the keys its button takes the focus.
+func _set_result_visible(shown: bool) -> void:
+	_result.visible = shown
+	if shown and FocusNavigator.using_pad:
+		_continue.grab_focus()
 
 
 func _add_icon(frame: ColorRect) -> void:

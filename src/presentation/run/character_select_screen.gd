@@ -52,7 +52,6 @@ func _card(
 ) -> Button:
 	var card: Button = Button.new()
 	card.custom_minimum_size = CARD_SIZE
-	card.focus_mode = Control.FOCUS_NONE
 	card.pressed.connect(AudioService.play.bind(AudioService.UI_CONFIRM, 1.0))
 	card.pressed.connect(_choose.bind(character))
 	var content: VBoxContainer = UiKit.column(3)
@@ -88,11 +87,14 @@ func _card(
 	if profile.hard_unlocked(character.id):
 		var hard: CheckBox = CheckBox.new()
 		hard.text = "HARD_MODE"
-		hard.focus_mode = Control.FOCUS_NONE
 		hard.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		content.add_child(hard)
 		_hard[character.id] = hard
 	return card
+
+
+func back() -> void:
+	back_requested.emit()
 
 
 func _choose(character: CharacterDefinition) -> void:

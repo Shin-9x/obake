@@ -15,7 +15,6 @@ var item: ItemDefinition
 ## Shows [param definition]; [param footer] is plain text, already translated.
 func show_item(definition: ItemDefinition, footer: String = "") -> void:
 	item = definition
-	focus_mode = Control.FOCUS_NONE
 	custom_minimum_size = CARD_SIZE
 	auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 	tooltip_text = tr(definition.description_key)

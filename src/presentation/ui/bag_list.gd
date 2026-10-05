@@ -24,7 +24,6 @@ func show_bag(inventory: Inventory, allowed: Variant = null) -> void:
 		entry.icon = ball.texture
 		entry.expand_icon = true
 		entry.add_theme_constant_override("icon_max_width", ICON_WIDTH)
-		entry.focus_mode = Control.FOCUS_NONE
 		entry.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 		entry.text = (
 			UiKit.level_text(inventory.level_of(index)) if ball.level_values.size() > 1 else ""

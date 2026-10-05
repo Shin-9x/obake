@@ -58,6 +58,10 @@ func entries() -> Array[ItemDefinition]:
 	return items
 
 
+func back() -> void:
+	closed.emit()
+
+
 func is_discovered(item: ItemDefinition) -> bool:
 	return _profile.discovered.has(item.id)
 
@@ -91,7 +95,6 @@ func _show_page(page: Page) -> void:
 func _entry(item: ItemDefinition) -> Button:
 	var entry: Button = Button.new()
 	entry.custom_minimum_size = ENTRY_SIZE
-	entry.focus_mode = Control.FOCUS_NONE
 	var picture: TextureRect = UiKit.icon(_picture(item), Vector2.ZERO)
 	picture.set_anchors_preset(Control.PRESET_FULL_RECT)
 	picture.offset_left = ICON_MARGIN

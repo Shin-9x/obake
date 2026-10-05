@@ -48,6 +48,10 @@ func open(content: RunContent, progression: ProgressionDefinition, profile: Prof
 	body.add_child(back)
 
 
+func back() -> void:
+	closed.emit()
+
+
 static func _discovered(content: RunContent, profile: Profile) -> int:
 	var count: int = 0
 	for items: Array in [content.balls, content.omamori, content.pegs, content.floor_bosses]:
