@@ -47,7 +47,7 @@ func _refresh() -> void:
 		var owned: Array[OmamoriDefinition] = _run.state.inventory.loadout.omamori
 		for slot: int in owned.size():
 			cards.add_child(_card(owned[slot], _replace.bind(slot)))
-		var cancel: Button = UiKit.button("BUTTON_CANCEL")
+		var cancel: Button = UiKit.button("BUTTON_CANCEL", true, AudioService.UI_BACK)
 		cancel.pressed.connect(_cancel_replace)
 		actions.add_child(cancel)
 	else:
@@ -64,6 +64,7 @@ func _refresh() -> void:
 func _card(item: ItemDefinition, action: Callable) -> ItemCard:
 	var card: ItemCard = ItemCard.new()
 	card.show_item(item)
+	card.pressed.connect(AudioService.play.bind(AudioService.UI_CONFIRM, 1.0))
 	card.pressed.connect(action)
 	return card
 

@@ -132,6 +132,8 @@ func _show_board() -> void:
 
 
 func _swap(screen: Control) -> void:
+	if not screen is BoardScreen:
+		AudioService.play_music(AudioService.Music.MENU)
 	if current != null:
 		remove_child(current)
 		current.queue_free()

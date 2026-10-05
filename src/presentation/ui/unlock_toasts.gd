@@ -70,6 +70,7 @@ func _next() -> void:
 	_text.text = note[1]
 	_panel.modulate = Color.WHITE
 	_panel.visible = true
+	AudioService.play(AudioService.UNLOCK)
 	_age = 0.0
 	set_process(true)
 

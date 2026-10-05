@@ -120,14 +120,15 @@ func _offer_card(offer: Offer, room: bool, action: Callable) -> ItemCard:
 
 
 func _back_button() -> Button:
-	var back: Button = UiKit.button("BUTTON_BACK")
+	var back: Button = UiKit.button("BUTTON_BACK", true, AudioService.UI_BACK)
 	back.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	back.pressed.connect(_set_mode.bind(Mode.BUY))
 	return back
 
 
 func _buy(purchase: Callable, index: int) -> void:
-	purchase.call(index)
+	if purchase.call(index):
+		AudioService.play(AudioService.PURCHASE)
 	_refresh()
 
 
@@ -137,13 +138,15 @@ func _reroll() -> void:
 
 
 func _upgrade(index: int) -> void:
-	_run.upgrade_ball(index)
+	if _run.upgrade_ball(index):
+		AudioService.play(AudioService.PURCHASE)
 	_mode = Mode.BUY
 	_refresh()
 
 
 func _sell(slot: int) -> void:
-	_run.sell_omamori(slot)
+	if _run.sell_omamori(slot):
+		AudioService.play(AudioService.PURCHASE)
 	_mode = Mode.BUY
 	_refresh()
 

@@ -16,6 +16,8 @@ func test_a_shot_plays_through_and_updates_the_hud() -> void:
 	assert_str(shots.text).is_equal(str(shots_before))
 	screen.shoot()
 	assert_bool(screen.game.simulation.is_shot_active()).is_true()
+	assert_bool(AudioService._last_played.has(AudioService.LAUNCH)).is_true()
+	assert_int(AudioService.music).is_equal(AudioService.Music.BOARD)
 	var frames: int = 0
 	while screen.game.simulation.is_shot_active() and frames < MAX_FRAMES:
 		await runner.simulate_frames(10, 50)

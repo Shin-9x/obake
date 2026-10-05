@@ -65,6 +65,7 @@ func _card(
 	var card: Button = Button.new()
 	card.custom_minimum_size = CARD_SIZE
 	card.focus_mode = Control.FOCUS_NONE
+	card.pressed.connect(AudioService.play.bind(AudioService.UI_CONFIRM, 1.0))
 	card.pressed.connect(_choose.bind(character))
 	var content: VBoxContainer = UiKit.column(3)
 	content.set_anchors_preset(Control.PRESET_FULL_RECT)

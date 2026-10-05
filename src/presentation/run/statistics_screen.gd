@@ -42,7 +42,7 @@ func open(content: RunContent, progression: ProgressionDefinition, profile: Prof
 	)
 	for line: String in lines:
 		body.add_child(UiKit.label(line, 0, UiKit.TEXT, false))
-	var back: Button = UiKit.button("BUTTON_BACK")
+	var back: Button = UiKit.button("BUTTON_BACK", true, AudioService.UI_BACK)
 	back.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	back.pressed.connect(closed.emit)
 	body.add_child(back)

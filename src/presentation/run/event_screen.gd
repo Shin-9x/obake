@@ -79,7 +79,7 @@ func _show_pick(choice: EventChoice) -> void:
 			card.pressed.connect(_apply_pick.bind(slot))
 			cards.add_child(card)
 		_body.add_child(cards)
-	var back: Button = UiKit.button("BUTTON_BACK")
+	var back: Button = UiKit.button("BUTTON_BACK", true, AudioService.UI_BACK)
 	back.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	back.pressed.connect(_cancel_pick)
 	_body.add_child(back)

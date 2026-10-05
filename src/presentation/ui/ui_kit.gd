@@ -60,12 +60,16 @@ static func paragraph(text: String, width: float, font_size: int = 0) -> Label:
 	return result
 
 
-static func button(key: String, translate: bool = true) -> Button:
+## A button showing [param key] that plays [param cue] when pressed.
+static func button(
+	key: String, translate: bool = true, cue: StringName = AudioService.UI_CLICK
+) -> Button:
 	var result: Button = Button.new()
 	result.text = key
 	result.focus_mode = Control.FOCUS_NONE
 	if not translate:
 		result.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	result.pressed.connect(AudioService.play.bind(cue, 1.0))
 	return result
 
 

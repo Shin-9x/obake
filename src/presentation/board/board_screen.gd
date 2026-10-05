@@ -43,6 +43,7 @@ var _library: LayoutLibrary
 var _carry: RunCarry = RunCarry.new()
 var _accumulator: float = 0.0
 var _guide_ticks: int = 0
+var _sounds: BoardSounds = BoardSounds.new()
 
 @onready var _view: BoardView = %BoardView
 @onready var _guide: AimGuide = %AimGuide
@@ -112,6 +113,8 @@ func _show(
 	_hud.show_character(loadout.character)
 	_hud.show_boss(boss)
 	_hud.set_continue_text("BUTTON_PLAY_AGAIN" if standalone else "BUTTON_CONTINUE")
+	_sounds.boss = boss != null
+	AudioService.play_music(AudioService.Music.BOARD)
 	_hud.show_board(placed, seed_value)
 	if game.outcome != BoardGame.Outcome.PLAYING:
 		_hud.show_result(game)
@@ -169,6 +172,7 @@ func _consume_events() -> void:
 	for index: int in events.size():
 		var event: SimEvent = events.at(index)
 		var at: Vector2 = Vector2(event.x, event.y) / PX
+		_sounds.hear(event)
 		match event.kind:
 			SimEvent.Kind.PEG_HIT, SimEvent.Kind.STUCK_CLEARED, SimEvent.Kind.SHOT_RESOLVED:
 				pegs_changed = true
@@ -222,6 +226,7 @@ func _consume_events() -> void:
 				_hud.update_counts(game)
 			SimEvent.Kind.BOARD_ENDED:
 				_hud.show_result(game)
+	_sounds.after_events(game)
 	if score_changed:
 		_hud.update_shot(game)
 	if pegs_changed:

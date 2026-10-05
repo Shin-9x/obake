@@ -61,7 +61,7 @@ func _refresh() -> void:
 	picker.show_bag(inventory, allowed)
 	picker.ball_picked.connect(_pick)
 	_body.add_child(picker)
-	var back: Button = UiKit.button("BUTTON_BACK")
+	var back: Button = UiKit.button("BUTTON_BACK", true, AudioService.UI_BACK)
 	back.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	back.pressed.connect(_set_mode.bind(Mode.CHOOSE))
 	_body.add_child(back)

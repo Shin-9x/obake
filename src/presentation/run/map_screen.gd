@@ -93,6 +93,7 @@ func _node_button(map: FloorMap, index: int, reachable: bool) -> Button:
 	var boss: bool = node.kind == MapNode.Kind.BOSS
 	if not reachable and not boss and index != _run.state.node:
 		button.modulate = DIMMED
+	button.pressed.connect(AudioService.play.bind(AudioService.UI_CONFIRM, 1.0))
 	button.pressed.connect(node_chosen.emit.bind(index))
 	return button
 

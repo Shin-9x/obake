@@ -73,7 +73,7 @@ func _show_page(page: Page) -> void:
 		tab.disabled = index == page
 		tab.pressed.connect(_show_page.bind(index))
 		tabs.add_child(tab)
-	var back: Button = UiKit.button("BUTTON_BACK")
+	var back: Button = UiKit.button("BUTTON_BACK", true, AudioService.UI_BACK)
 	back.pressed.connect(closed.emit)
 	tabs.add_child(back)
 	_body.add_child(tabs)
