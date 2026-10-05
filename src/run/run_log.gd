@@ -26,6 +26,8 @@ enum Action {
 	## Option, then the pick or -1.
 	CHOOSE_EVENT,
 	FINISH_EVENT,
+	## The player gave the run up.
+	ABANDON,
 }
 
 const FORMAT: int = 1

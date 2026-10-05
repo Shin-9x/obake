@@ -113,6 +113,7 @@ func _init() -> void:
 		_save(_map_icon(node), "map_" + node)
 	for mark: String in MARKS:
 		_save(_mark(MARKS[mark][0], MARKS[mark][1]), mark)
+	_save(_pause_icon(), "icon_pause")
 	_save(_mascot("idle"), "mascot_obo")
 	for mood: String in ["happy", "worried", "sad", "excited"]:
 		_save(_mascot(mood), "mascot_obo_" + mood)
@@ -463,6 +464,15 @@ func _mascot(mood: String) -> Image:
 		"excited", "happy":
 			for x: int in [6, 7, 16, 17]:
 				image.set_pixel(x, 13, Color("#ff8fa3"))
+	return image
+
+
+## Two upright bars, for the pause button.
+func _pause_icon() -> Image:
+	var image: Image = _blank(12, 12)
+	for y: int in range(2, 10):
+		for x: int in [3, 4, 7, 8]:
+			image.set_pixel(x, y, Color("#f4e9c9"))
 	return image
 
 

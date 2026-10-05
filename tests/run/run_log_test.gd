@@ -71,3 +71,22 @@ func _entries(run: Run) -> Array[Array]:
 	for entry: PackedInt32Array in run.run_log.actions:
 		entries.append(Array(entry))
 	return entries
+
+
+func test_abandoning_ends_the_run_as_a_loss_and_is_logged() -> void:
+	var run: Run = Fixtures.run()
+	run.choose_node(run.reachable_nodes()[0])
+	run.shoot(300, 0)
+	assert_bool(run.abandon()).is_true()
+	assert_int(run.phase).is_equal(Run.Phase.DEFEAT)
+	assert_bool(run.abandon()).is_false()
+	var last: PackedInt32Array = run.run_log.actions[run.run_log.size() - 1]
+	assert_int(last[0]).is_equal(RunLog.Action.ABANDON)
+	var replayed: Run = RunReplay.replay(
+		run.run_log, run.config, Fixtures.content(), LayoutLibrary.load_from(), Fixtures.base_pegs()
+	)
+	assert_int(replayed.phase).is_equal(Run.Phase.DEFEAT)
+	var profile: Profile = Profile.new()
+	Progression.finish_run(load("res://data/progression.tres"), profile, run)
+	assert_int(profile.runs).is_equal(1)
+	assert_dict(profile.wins_by_character).is_empty()

@@ -1,8 +1,7 @@
 extends GdUnitTestSuite
-## The run screen follows the run from character choice through the map, a board and its
-## rewards, to the end screen and back.
+## The game screen goes from the title through a run, its pause menu and its end, and back.
 
-const SCENE: String = "res://src/presentation/run/run_screen.tscn"
+const SCENE: String = "res://src/presentation/game_screen.tscn"
 const Screens: GDScript = preload("res://tests/presentation/run/support.gd")
 const SEED: int = 777
 ## Keeps the tests away from the player's own saves.
@@ -19,8 +18,11 @@ func after_test() -> void:
 	SaveService.directory = "user://"
 
 
-func test_a_run_starts_with_the_choice_of_a_character() -> void:
-	var screen: RunScreen = scene_runner(SCENE).scene() as RunScreen
+func test_a_run_starts_from_the_title_with_the_choice_of_a_character() -> void:
+	var screen: GameScreen = scene_runner(SCENE).scene() as GameScreen
+	assert_object(screen.current).is_instanceof(TitleScreen)
+	assert_object(Screens.button(screen.current, "BUTTON_CONTINUE_RUN")).is_null()
+	Screens.button(screen.current, "BUTTON_NEW_RUN").pressed.emit()
 	assert_object(screen.current).is_instanceof(CharacterSelectScreen)
 	var cards: Array[Node] = Screens.find_all(screen.current, Button).filter(
 		func(node: Node) -> bool: return (node as Button).text.is_empty()
@@ -32,7 +34,7 @@ func test_a_run_starts_with_the_choice_of_a_character() -> void:
 
 
 func test_the_map_lets_only_reachable_nodes_be_picked() -> void:
-	var screen: RunScreen = _started()
+	var screen: GameScreen = _started()
 	var enabled: int = 0
 	for button: Node in Screens.find_all(screen.current, Button):
 		enabled += 0 if (button as Button).disabled else 1
@@ -40,7 +42,7 @@ func test_the_map_lets_only_reachable_nodes_be_picked() -> void:
 
 
 func test_a_board_node_plays_the_board_then_shows_the_rewards() -> void:
-	var screen: RunScreen = _started()
+	var screen: GameScreen = _started()
 	var node: int = screen.run.reachable_nodes()[0]
 	screen._on_node_chosen(node)
 	assert_object(screen.current).is_instanceof(BoardScreen)
@@ -53,7 +55,7 @@ func test_a_board_node_plays_the_board_then_shows_the_rewards() -> void:
 
 
 func test_a_lost_board_ends_the_run_and_a_new_run_can_start() -> void:
-	var screen: RunScreen = _started()
+	var screen: GameScreen = _started()
 	screen._on_node_chosen(screen.run.reachable_nodes()[0])
 	_end_board(screen, BoardGame.Outcome.FAILED)
 	assert_object(screen.current).is_instanceof(RunEndScreen)
@@ -62,7 +64,7 @@ func test_a_lost_board_ends_the_run_and_a_new_run_can_start() -> void:
 
 
 func test_boss_boards_show_the_boss() -> void:
-	var screen: RunScreen = _started()
+	var screen: GameScreen = _started()
 	var map: FloorMap = screen.run.state.current_map()
 	screen.run.state.node = map.steps[map.steps.size() - 2][0]
 	screen._on_node_chosen(map.boss())
@@ -72,14 +74,14 @@ func test_boss_boards_show_the_boss() -> void:
 	assert_array(board.game.simulation.zones).is_not_empty()
 
 
-func test_runs_are_saved_and_continued_from_the_character_screen() -> void:
-	var screen: RunScreen = _started()
+func test_runs_are_saved_and_continued_from_the_title() -> void:
+	var screen: GameScreen = _started()
 	screen._on_node_chosen(screen.run.reachable_nodes()[0])
 	var board: BoardScreen = screen.current as BoardScreen
 	board.shoot()
 	var played: Run = screen.run
 	assert_bool(SaveService.has_run()).is_true()
-	screen.show_character_select()
+	screen.show_title()
 	Screens.button(screen.current, "BUTTON_CONTINUE_RUN").pressed.emit()
 	assert_object(screen.current).is_instanceof(BoardScreen)
 	assert_array(screen.run.run_log.actions).is_equal(played.run_log.actions)
@@ -87,7 +89,7 @@ func test_runs_are_saved_and_continued_from_the_character_screen() -> void:
 
 
 func test_board_feats_reach_the_profile_and_a_lost_run_clears_its_save() -> void:
-	var screen: RunScreen = _started()
+	var screen: GameScreen = _started()
 	screen._on_node_chosen(screen.run.reachable_nodes()[0])
 	var result: BoardResult = BoardResult.new()
 	result.outcome = BoardGame.Outcome.FAILED
@@ -104,7 +106,7 @@ func test_board_feats_reach_the_profile_and_a_lost_run_clears_its_save() -> void
 
 
 func test_hard_mode_shows_once_earned_and_a_typed_seed_counts_for_nothing() -> void:
-	var screen: RunScreen = scene_runner(SCENE).scene() as RunScreen
+	var screen: GameScreen = scene_runner(SCENE).scene() as GameScreen
 	assert_array(Screens.find_all(screen.current, CheckBox)).is_empty()
 	screen.profile.add_mark(&"kitsune", Profile.Mark.SHUTEN)
 	screen.show_character_select()
@@ -122,13 +124,62 @@ func test_hard_mode_shows_once_earned_and_a_typed_seed_counts_for_nothing() -> v
 
 
 func test_the_compendium_and_the_statistics_open_and_close() -> void:
-	var screen: RunScreen = scene_runner(SCENE).scene() as RunScreen
+	var screen: GameScreen = scene_runner(SCENE).scene() as GameScreen
 	Screens.button(screen.current, "BUTTON_COMPENDIUM").pressed.emit()
 	assert_object(screen.current).is_instanceof(CompendiumScreen)
 	Screens.button(screen.current, "BUTTON_BACK").pressed.emit()
-	assert_object(screen.current).is_instanceof(CharacterSelectScreen)
+	assert_object(screen.current).is_instanceof(TitleScreen)
 	Screens.button(screen.current, "BUTTON_STATISTICS").pressed.emit()
 	assert_object(screen.current).is_instanceof(StatisticsScreen)
+
+
+func test_the_pause_menu_stops_the_run_and_resumes_it() -> void:
+	var screen: GameScreen = _started()
+	screen._on_node_chosen(screen.run.reachable_nodes()[0])
+	var key: InputEventAction = InputEventAction.new()
+	key.action = "pause"
+	key.pressed = true
+	screen._unhandled_input(key)
+	assert_bool(screen.get_tree().paused).is_true()
+	assert_object(screen.pause_menu).is_not_null()
+	Screens.button(screen.pause_menu, "PAUSE_RESUME").pressed.emit()
+	assert_bool(screen.get_tree().paused).is_false()
+	assert_object(screen.pause_menu).is_null()
+
+
+func test_quitting_to_the_title_keeps_the_run_saved() -> void:
+	var screen: GameScreen = _started()
+	screen.pause()
+	Screens.button(screen.pause_menu, "PAUSE_QUIT_MENU").pressed.emit()
+	assert_bool(screen.get_tree().paused).is_false()
+	assert_object(screen.current).is_instanceof(TitleScreen)
+	assert_bool(SaveService.has_run()).is_true()
+	assert_object(Screens.button(screen.current, "BUTTON_CONTINUE_RUN")).is_not_null()
+
+
+func test_abandoning_ends_the_run_as_a_loss() -> void:
+	var screen: GameScreen = _started()
+	screen.pause()
+	Screens.button(screen.pause_menu, "PAUSE_ABANDON").pressed.emit()
+	await get_tree().process_frame
+	Screens.button(screen.pause_menu, "BUTTON_YES").pressed.emit()
+	assert_object(screen.current).is_instanceof(RunEndScreen)
+	assert_int(screen.profile.runs).is_equal(1)
+	assert_bool(SaveService.has_run()).is_false()
+
+
+func test_settings_open_from_the_title_and_change_the_language() -> void:
+	var screen: GameScreen = scene_runner(SCENE).scene() as GameScreen
+	var language: String = Settings.values.language
+	Screens.button(screen.current, "BUTTON_SETTINGS").pressed.emit()
+	assert_object(screen.current).is_instanceof(SettingsScreen)
+	var options: OptionButton = Screens.find_all(screen.current, OptionButton)[0] as OptionButton
+	options.item_selected.emit(2)
+	assert_str(TranslationServer.get_locale()).is_equal("it")
+	Settings.values.language = language
+	Settings.commit()
+	Screens.button(screen.current, "BUTTON_BACK").pressed.emit()
+	assert_object(screen.current).is_instanceof(TitleScreen)
 
 
 func _wipe() -> void:
@@ -139,14 +190,14 @@ func _wipe() -> void:
 	DirAccess.remove_absolute(SAVES)
 
 
-func _started() -> RunScreen:
-	var screen: RunScreen = scene_runner(SCENE).scene() as RunScreen
+func _started() -> GameScreen:
+	var screen: GameScreen = scene_runner(SCENE).scene() as GameScreen
 	screen.start_run(load("res://data/characters/kitsune.tres"), SEED)
 	return screen
 
 
 ## Ends the board on screen with [param outcome] without simulating it, then continues.
-func _end_board(screen: RunScreen, outcome: BoardGame.Outcome) -> void:
+func _end_board(screen: GameScreen, outcome: BoardGame.Outcome) -> void:
 	var result: BoardResult = BoardResult.new()
 	result.outcome = outcome
 	result.interest_cap = 5

@@ -1,14 +1,11 @@
 class_name CharacterSelectScreen
 extends Control
 ## The start of a run: one card per character with portrait, power, passive, starting bag and
-## completion marks, the Hard switch once it is earned, an optional seed, and the way back into
-## a saved run.
+## completion marks, the Hard switch once it is earned, and an optional seed.
 
 ## [param hard] is the card's Hard switch; [param seed_text] is what the player typed, if any.
 signal character_chosen(character: CharacterDefinition, hard: bool, seed_text: String)
-signal continue_requested
-signal compendium_requested
-signal statistics_requested
+signal back_requested
 
 const CARD_SIZE: Vector2 = Vector2(184, 262)
 const PORTRAIT_SIZE: Vector2 = Vector2(48, 48)
@@ -23,9 +20,7 @@ var _seed: LineEdit
 var _hard: Dictionary[StringName, CheckBox] = {}
 
 
-func open(
-	content: RunContent, progression: ProgressionDefinition, profile: Profile, can_continue: bool
-) -> void:
+func open(content: RunContent, progression: ProgressionDefinition, profile: Profile) -> void:
 	UiKit.clear(self)
 	_hard.clear()
 	var page: Control = UiKit.page(self)
@@ -46,16 +41,9 @@ func open(
 	_seed.custom_minimum_size = Vector2(SEED_WIDTH, 0)
 	_seed.placeholder_text = "SEED_RANDOM"
 	footer.add_child(_seed)
-	var compendium: Button = UiKit.button("BUTTON_COMPENDIUM")
-	compendium.pressed.connect(compendium_requested.emit)
-	footer.add_child(compendium)
-	var statistics: Button = UiKit.button("BUTTON_STATISTICS")
-	statistics.pressed.connect(statistics_requested.emit)
-	footer.add_child(statistics)
-	if can_continue:
-		var resume: Button = UiKit.button("BUTTON_CONTINUE_RUN")
-		resume.pressed.connect(continue_requested.emit)
-		footer.add_child(resume)
+	var back: Button = UiKit.button("BUTTON_BACK", true, AudioService.UI_BACK)
+	back.pressed.connect(back_requested.emit)
+	footer.add_child(back)
 	body.add_child(footer)
 
 

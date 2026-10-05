@@ -258,3 +258,29 @@ STATS_FEATS,Feats: %d/%d,Feat: %d/%d
 STATS_DISCOVERED,Compendium: %d/%d,Compendio: %d/%d
 TOAST_UNLOCKED,Unlocked: %s,Sbloccato: %s
 TOAST_MARK,Mark earned by %s,Marchio guadagnato da %s
+BUTTON_SETTINGS,Settings,Impostazioni
+BUTTON_QUIT,Quit,Esci
+BUTTON_YES,Yes,Sì
+BUTTON_NO,No,No
+PAUSE_TITLE,Paused,In pausa
+PAUSE_RESUME,Resume,Riprendi
+PAUSE_ABANDON,Abandon run,Abbandona la run
+PAUSE_ABANDON_CONFIRM,Abandon this run? It counts as a loss.,Abbandonare questa run? Conta come una sconfitta.
+PAUSE_QUIT_MENU,Quit to title,Torna al titolo
+SETTINGS_TITLE,Settings,Impostazioni
+SETTINGS_MASTER,Volume,Volume
+SETTINGS_MUSIC,Music,Musica
+SETTINGS_SFX,Sound effects,Effetti sonori
+SETTINGS_LANGUAGE,Language,Lingua
+LANGUAGE_SYSTEM,System,Sistema
+LANGUAGE_EN,English,English
+LANGUAGE_IT,Italiano,Italiano
+SETTINGS_SCALING,Scaling,Scaling
+SCALING_INTEGER,Pixel perfect,Pixel perfetti
+SCALING_FRACTIONAL,Fill the screen,Riempi lo schermo
+SETTINGS_FULLSCREEN,Full screen,Schermo intero
+SETTINGS_SHAKE,Screen shake,Scuotimento dello schermo
+SETTINGS_FAST_FORWARD,Fast-forward,Avanti veloce
+SETTINGS_SPEED,×%d,×%d
+SETTINGS_DRAG,Drag sensitivity,Sensibilità del trascinamento
+SETTINGS_VIBRATION,Vibration,Vibrazione

@@ -74,6 +74,8 @@ static func apply(run: Run, action: PackedInt32Array) -> bool:
 			return run.choose_event(first, second) != null
 		RunLog.Action.FINISH_EVENT:
 			return run.finish_event()
+		RunLog.Action.ABANDON:
+			return run.abandon()
 	return false
 
 

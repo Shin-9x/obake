@@ -1,9 +1,12 @@
-class_name RunScreen
+class_name GameScreen
 extends Control
-## The game from the choice of a character to the end of a run: owns the [Run] and shows the
-## screen of its current phase, swapping screens as the phase changes. The run is saved after
-## every action and resumed from the character screen; the profile learns of feats after every
-## board and of marks and statistics when the run ends.
+## The whole game in one place: the title and its menus, then a run from the choice of a
+## character to its end. Holds the [Run] and shows the screen of its current phase, swapping
+## screens as the phase changes. The run is saved after every action and resumed from the title;
+## the profile learns of feats after every board and of marks and statistics when the run ends.
+##
+## A run pauses with the pause action or button: the run's screen stops, the pause menu and the
+## settings keep working.
 
 const BALANCE: BalanceConfig = preload("res://data/balance.tres")
 const CONTENT: RunContent = preload("res://data/run_content.tres")
@@ -13,6 +16,8 @@ const PROGRESSION: ProgressionDefinition = preload("res://data/progression.tres"
 const UI_SKIN: UiSkin = preload("res://data/skins/ui_skin.tres")
 const MARK_KEYS: Array[String] = ["MARK_SHUTEN", "MARK_HARD", "MARK_FESTIVAL"]
 const BOARD_SCENE: PackedScene = preload("res://src/presentation/board/board_screen.tscn")
+const PAUSE_BUTTON_SIZE: Vector2 = Vector2(20, 18)
+const PAUSE_MARGIN: float = 4.0
 
 var run: Run
 var profile: Profile
@@ -20,42 +25,77 @@ var profile: Profile
 var current: Control
 ## Unlock notes, drawn over every screen.
 var toasts: UnlockToasts
+## Shown over a paused run; null while the run is playing.
+var pause_menu: PauseMenu
 
 var _library: LayoutLibrary
+var _pause_button: Button
+## Settings opened over the pause menu.
+var _overlay_settings: SettingsScreen
 
 
 func _ready() -> void:
+	process_mode = Node.PROCESS_MODE_ALWAYS
 	_library = LayoutLibrary.load_from()
 	profile = SaveService.load_profile()
 	toasts = UnlockToasts.new()
 	toasts.skin = UI_SKIN
 	add_child(toasts)
-	show_character_select()
+	_pause_button = UiKit.button("")
+	_pause_button.icon = UI_SKIN.pause_icon
+	_pause_button.custom_minimum_size = PAUSE_BUTTON_SIZE
+	_pause_button.anchor_left = 1.0
+	_pause_button.anchor_right = 1.0
+	_pause_button.offset_left = -PAUSE_BUTTON_SIZE.x - PAUSE_MARGIN
+	_pause_button.offset_right = -PAUSE_MARGIN
+	_pause_button.offset_top = PAUSE_MARGIN
+	_pause_button.offset_bottom = PAUSE_MARGIN + PAUSE_BUTTON_SIZE.y
+	_pause_button.pressed.connect(pause)
+	add_child(_pause_button)
+	show_title()
+
+
+func show_title() -> void:
+	run = null
+	var screen: TitleScreen = TitleScreen.new()
+	_swap(screen)
+	screen.open(UI_SKIN, SaveService.has_run())
+	screen.continue_requested.connect(continue_run)
+	screen.new_run_requested.connect(show_character_select)
+	screen.compendium_requested.connect(show_compendium)
+	screen.statistics_requested.connect(show_statistics)
+	screen.settings_requested.connect(show_settings)
+	screen.quit_requested.connect(get_tree().quit)
 
 
 func show_character_select() -> void:
 	run = null
 	var screen: CharacterSelectScreen = CharacterSelectScreen.new()
 	_swap(screen)
-	screen.open(CONTENT, PROGRESSION, profile, SaveService.has_run())
+	screen.open(CONTENT, PROGRESSION, profile)
 	screen.character_chosen.connect(_on_character_chosen)
-	screen.continue_requested.connect(continue_run)
-	screen.compendium_requested.connect(show_compendium)
-	screen.statistics_requested.connect(show_statistics)
+	screen.back_requested.connect(show_title)
 
 
 func show_compendium() -> void:
 	var screen: CompendiumScreen = CompendiumScreen.new()
 	_swap(screen)
 	screen.open(CONTENT, PROGRESSION, profile)
-	screen.closed.connect(show_character_select)
+	screen.closed.connect(show_title)
 
 
 func show_statistics() -> void:
 	var screen: StatisticsScreen = StatisticsScreen.new()
 	_swap(screen)
 	screen.open(CONTENT, PROGRESSION, profile)
-	screen.closed.connect(show_character_select)
+	screen.closed.connect(show_title)
+
+
+func show_settings() -> void:
+	var screen: SettingsScreen = SettingsScreen.new()
+	_swap(screen)
+	screen.open()
+	screen.closed.connect(show_title)
 
 
 ## Starts a run with the items the profile has unlocked. A [param custom_seed] run earns no
@@ -77,7 +117,7 @@ func continue_run() -> void:
 	run = Run.resume(SaveService.load_run(), BALANCE, CONTENT, _library, BASE_PEGS)
 	if run == null:
 		SaveService.clear_run()
-		show_character_select()
+		show_title()
 		return
 	_watch(run)
 	show_phase()
@@ -120,6 +160,77 @@ func show_phase() -> void:
 			ending.new_run_requested.connect(show_character_select)
 
 
+func can_pause() -> bool:
+	return run != null and not run.is_over() and pause_menu == null
+
+
+## Stops the run where it stands and opens the pause menu.
+func pause() -> void:
+	if not can_pause():
+		return
+	get_tree().paused = true
+	pause_menu = PauseMenu.new()
+	add_child(pause_menu)
+	pause_menu.open()
+	pause_menu.resumed.connect(resume)
+	pause_menu.settings_requested.connect(_open_pause_settings)
+	pause_menu.abandon_confirmed.connect(_abandon)
+	pause_menu.quit_requested.connect(_quit_to_title)
+	_refresh_overlays()
+
+
+func resume() -> void:
+	if pause_menu == null:
+		return
+	pause_menu.queue_free()
+	pause_menu = null
+	get_tree().paused = false
+	_refresh_overlays()
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if not event.is_action_pressed("pause"):
+		return
+	if _overlay_settings != null:
+		_close_pause_settings()
+	elif pause_menu != null:
+		resume()
+	else:
+		pause()
+	get_viewport().set_input_as_handled()
+
+
+func _open_pause_settings() -> void:
+	_overlay_settings = SettingsScreen.new()
+	_overlay_settings.process_mode = Node.PROCESS_MODE_ALWAYS
+	add_child(_overlay_settings)
+	_overlay_settings.open()
+	_overlay_settings.closed.connect(_close_pause_settings)
+
+
+func _close_pause_settings() -> void:
+	if _overlay_settings != null:
+		_overlay_settings.queue_free()
+		_overlay_settings = null
+
+
+## Gives the run up: it ends as a loss and the end screen shows.
+func _abandon() -> void:
+	resume()
+	if not run.abandon():
+		return
+	Progression.finish_run(PROGRESSION, profile, run)
+	SaveService.clear_run()
+	SaveService.save_profile(profile)
+	show_phase()
+
+
+## Leaves the run for the title; its save stays for later.
+func _quit_to_title() -> void:
+	resume()
+	show_title()
+
+
 func _show_board() -> void:
 	var board: BoardScreen = BOARD_SCENE.instantiate() as BoardScreen
 	board.standalone = false
@@ -138,9 +249,20 @@ func _swap(screen: Control) -> void:
 		remove_child(current)
 		current.queue_free()
 	current = screen
+	screen.process_mode = Node.PROCESS_MODE_PAUSABLE
 	screen.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(screen)
+	_refresh_overlays()
+
+
+## Keeps the pause button, the toasts and the pause menu above the screen, and the pause button
+## only while a run can pause.
+func _refresh_overlays() -> void:
+	_pause_button.visible = can_pause()
+	move_child(_pause_button, -1)
 	move_child(toasts, -1)
+	if pause_menu != null:
+		move_child(pause_menu, -1)
 
 
 func _watch(watched: Run) -> void:

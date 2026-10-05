@@ -1,13 +1,15 @@
 [gd_resource type="Resource" script_class="UiSkin" format=3 uid="uid://blqf51u748ri8"]
 
-[ext_resource type="Texture2D" uid="uid://flbonas28jtn" path="res://assets/sprites/placeholder/mascot_obo.png" id="1_6dvp4"]
-[ext_resource type="Texture2D" uid="uid://bddyimho3rf04" path="res://assets/sprites/placeholder/mascot_obo_happy.png" id="2_latbw"]
-[ext_resource type="Texture2D" uid="uid://dxg1si36xykpe" path="res://assets/sprites/placeholder/mascot_obo_worried.png" id="3_50a04"]
-[ext_resource type="Texture2D" uid="uid://dx584nke1fxff" path="res://assets/sprites/placeholder/mascot_obo_sad.png" id="4_ssrnq"]
-[ext_resource type="Texture2D" uid="uid://d0yiq8w5rx4si" path="res://assets/sprites/placeholder/mascot_obo_excited.png" id="5_phgi6"]
-[ext_resource type="Script" uid="uid://dscys2igl5qv7" path="res://data/definitions/ui_skin.gd" id="6_ptjjs"]
+[ext_resource type="Texture2D" uid="uid://flbonas28jtn" path="res://assets/sprites/placeholder/mascot_obo.png" id="1_latbw"]
+[ext_resource type="Texture2D" uid="uid://bddyimho3rf04" path="res://assets/sprites/placeholder/mascot_obo_happy.png" id="2_50a04"]
+[ext_resource type="Texture2D" uid="uid://dxg1si36xykpe" path="res://assets/sprites/placeholder/mascot_obo_worried.png" id="3_ssrnq"]
+[ext_resource type="Texture2D" uid="uid://dx584nke1fxff" path="res://assets/sprites/placeholder/mascot_obo_sad.png" id="4_phgi6"]
+[ext_resource type="Texture2D" uid="uid://d0yiq8w5rx4si" path="res://assets/sprites/placeholder/mascot_obo_excited.png" id="5_ptjjs"]
+[ext_resource type="Texture2D" uid="uid://cgwj5ymo4f1mr" path="res://assets/sprites/placeholder/icon_pause.png" id="6_lokq8"]
+[ext_resource type="Script" uid="uid://dscys2igl5qv7" path="res://data/definitions/ui_skin.gd" id="7_de8vi"]
 
 [resource]
-script = ExtResource("6_ptjjs")
-mascot = ExtResource("1_6dvp4")
-mascot_moods = Array[Texture2D]([ExtResource("1_6dvp4"), ExtResource("2_latbw"), ExtResource("3_50a04"), ExtResource("4_ssrnq"), ExtResource("5_phgi6")])
+script = ExtResource("7_de8vi")
+mascot = ExtResource("1_latbw")
+mascot_moods = Array[Texture2D]([ExtResource("1_latbw"), ExtResource("2_50a04"), ExtResource("3_ssrnq"), ExtResource("4_phgi6"), ExtResource("5_ptjjs")])
+pause_icon = ExtResource("6_lokq8")

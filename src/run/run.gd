@@ -321,6 +321,15 @@ func finish_event() -> bool:
 	return true
 
 
+## Gives the run up: it ends as a loss, wherever it stood.
+func abandon() -> bool:
+	if is_over():
+		return false
+	phase = Phase.DEFEAT
+	_did(RunLog.Action.ABANDON)
+	return true
+
+
 static func _create(
 	run_config: BalanceConfig, run_content: RunContent, layouts: LayoutLibrary, base_pegs: BasePegs
 ) -> Run:

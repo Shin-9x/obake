@@ -6,3 +6,5 @@ extends Resource
 @export var mascot: Texture2D
 ## Obo's faces on the board, in [enum MascotMood.Mood] order: idle, happy, worried, sad, excited.
 @export var mascot_moods: Array[Texture2D] = []
+## Icon of the pause button.
+@export var pause_icon: Texture2D
