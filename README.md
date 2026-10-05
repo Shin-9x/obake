@@ -105,6 +105,10 @@ Debug and release builds carry different signatures, so uninstall one before ins
 other, which deletes the saves on the phone. Install on a phone connected over USB with
 `adb install -r build/android/obake.apk`.
 
+Pushing a `v*` tag, or starting the **Release builds** workflow by hand on GitHub, exports Linux,
+Windows and an Android build signed with a throwaway debug key, and keeps them as artifacts of
+the workflow run. Release-signed Android builds are only made locally.
+
 macOS and iOS builds come later.
 
 ## Layout

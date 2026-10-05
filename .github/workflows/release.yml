@@ -1,0 +1,82 @@
+name: Release builds
+
+# Exports the game for every platform the presets cover and keeps the builds as artifacts.
+# The Android build is signed with a throwaway debug key: release-signed builds are made locally
+# with `make export-android`, so no signing secret lives in CI.
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  GODOT_VERSION: 4.7.2
+  GODOT_SHA512: 9aa00f7a605200940bce3027a567b782f49bd8e940dd06ae9e987bd65aee1b1467edd56ed84fcdcbdd44354bf613bdbb4e5d2913e925850368e150c59ed54c65
+
+jobs:
+  export:
+    name: Export
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Cache Godot and its export templates
+        id: cache-godot
+        uses: actions/cache@v6
+        with:
+          path: |
+            ~/godot
+            build/cache
+          key: godot-export-${{ env.GODOT_VERSION }}-linux-x86_64
+      - name: Download Godot
+        if: steps.cache-godot.outputs.cache-hit != 'true'
+        run: |
+          archive="Godot_v${GODOT_VERSION}-stable_linux.x86_64"
+          curl -fsSL -o "$RUNNER_TEMP/godot.zip" \
+            "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/${archive}.zip"
+          echo "${GODOT_SHA512}  $RUNNER_TEMP/godot.zip" | sha512sum --check --strict
+          mkdir -p ~/godot
+          unzip -q "$RUNNER_TEMP/godot.zip" -d "$RUNNER_TEMP"
+          mv "$RUNNER_TEMP/${archive}" ~/godot/godot
+      - name: Install the export templates
+        run: make templates
+      # The runner provides the Android SDK and a JDK through ANDROID_HOME and JAVA_HOME, which
+      # Godot reads when its editor settings are empty.
+      - name: Create a throwaway Android debug key
+        run: |
+          keystore="$RUNNER_TEMP/debug.keystore"
+          keytool -genkeypair -keystore "$keystore" -alias androiddebugkey -keyalg RSA \
+            -keysize 2048 -validity 10000 -storepass android -keypass android \
+            -dname "CN=Android Debug,O=Android,C=US"
+          {
+            echo "GODOT_ANDROID_KEYSTORE_DEBUG_PATH=$keystore"
+            echo "GODOT_ANDROID_KEYSTORE_DEBUG_USER=androiddebugkey"
+            echo "GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD=android"
+          } >> "$GITHUB_ENV"
+      - run: make export-linux GODOT="$HOME/godot/godot"
+      - run: make export-windows GODOT="$HOME/godot/godot"
+      - run: make export-android-debug GODOT="$HOME/godot/godot"
+      # Artifacts lose file modes, so the Linux build travels in a tarball to stay executable.
+      - name: Pack the Linux build
+        run: tar -czf build/obake-linux.tar.gz -C build/linux obake.x86_64
+      - uses: actions/upload-artifact@v7
+        with:
+          name: obake-${{ github.ref_name }}-linux
+          path: build/obake-linux.tar.gz
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v7
+        with:
+          name: obake-${{ github.ref_name }}-windows
+          path: build/windows/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v7
+        with:
+          name: obake-${{ github.ref_name }}-android-debug
+          path: build/android/obake-debug.apk
+          if-no-files-found: error
