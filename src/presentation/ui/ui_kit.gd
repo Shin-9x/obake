@@ -2,6 +2,7 @@ class_name UiKit
 ## Small builders for the run screens, so they share one look: colours, text sizes and the
 ## centred 640 x 360 page every screen lays out in.
 
+const SKIN: UiSkin = preload("res://data/skins/ui_skin.tres")
 const PAGE_SIZE: Vector2 = Vector2(640, 360)
 const BACKGROUND: Color = Color("#1b1d2b")
 const PANEL: Color = Color("#22263a")
@@ -19,7 +20,8 @@ const TITLE_SIZE: int = 18
 const SMALL_SIZE: int = 8
 
 
-## A full-screen background holding a centred page; the screen's content goes in the page.
+## A full-screen patterned background holding a centred page; the screen's content goes in the
+## page. On screens wider or taller than the page the pattern fills the margins.
 static func page(screen: Control) -> Control:
 	screen.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var background: ColorRect = ColorRect.new()
@@ -27,6 +29,7 @@ static func page(screen: Control) -> Control:
 	background.set_anchors_preset(Control.PRESET_FULL_RECT)
 	background.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	screen.add_child(background)
+	background.add_child(pattern())
 	var centred: Control = Control.new()
 	centred.set_anchors_preset(Control.PRESET_CENTER)
 	centred.custom_minimum_size = PAGE_SIZE
@@ -38,6 +41,16 @@ static func page(screen: Control) -> Control:
 
 
 ## A label showing translation key [param key], or plain text when [param translate] is false.
+## The background pattern, tiled over its parent.
+static func pattern() -> TextureRect:
+	var tiles: TextureRect = TextureRect.new()
+	tiles.texture = SKIN.background_pattern
+	tiles.stretch_mode = TextureRect.STRETCH_TILE
+	tiles.set_anchors_preset(Control.PRESET_FULL_RECT)
+	tiles.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return tiles
+
+
 static func label(
 	key: String, font_size: int = 0, colour: Color = TEXT, translate: bool = true
 ) -> Label:

@@ -1,8 +1,11 @@
 class_name RunBar
 extends HBoxContainer
-## The strip across the top of the run screens: floor, mon, bag size and omamori.
+## The strip across the top of the run screens: floor, mon, bag size and omamori. A tap on an
+## omamori shows its card, since touch screens have no tooltips.
 
 const SLOT_SIZE: Vector2 = Vector2(18, 18)
+
+var _info: InfoPopup
 
 
 func show_run(run: Run) -> void:
@@ -24,5 +27,17 @@ func show_run(run: Run) -> void:
 			var picture: TextureRect = UiKit.icon(charm.icon, SLOT_SIZE)
 			frame.add_child(picture)
 			frame.tooltip_text = "%s\n%s" % [tr(charm.name_key), tr(charm.description_key)]
+			frame.gui_input.connect(_on_slot_input.bind(charm, frame))
 		slots.add_child(frame)
 	add_child(slots)
+
+
+func _on_slot_input(event: InputEvent, charm: OmamoriDefinition, frame: Control) -> void:
+	if not (event is InputEventScreenTouch and (event as InputEventScreenTouch).pressed):
+		return
+	if _info == null:
+		_info = InfoPopup.new()
+		get_parent().add_child(_info)
+	_info.show_item(
+		charm, frame.global_position - _info.get_parent().global_position + Vector2(0, 20)
+	)

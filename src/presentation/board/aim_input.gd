@@ -12,7 +12,7 @@ signal shoot_requested
 
 ## A tenth of a degree.
 const FINE_STEP: int = 10
-## Centidegrees of aim per viewport pixel of horizontal drag.
+## Centidegrees of aim per viewport pixel of horizontal drag, at the default sensitivity setting.
 const DRAG_SENSITIVITY: float = 40.0
 ## Seconds before a held fine-aim control starts repeating, then between repeats.
 const REPEAT_DELAY: float = 0.35
@@ -107,7 +107,8 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event is InputEventMouseButton:
 		_on_mouse_button(event as InputEventMouseButton)
 	elif event is InputEventScreenDrag:
-		_drag_remainder += (event as InputEventScreenDrag).relative.x * DRAG_SENSITIVITY
+		var sensitivity: float = DRAG_SENSITIVITY * Settings.values.drag_sensitivity / 100.0
+		_drag_remainder += (event as InputEventScreenDrag).relative.x * sensitivity
 		var whole: int = int(_drag_remainder)
 		_drag_remainder -= whole
 		set_aim(aim + whole)

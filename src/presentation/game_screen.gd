@@ -18,6 +18,8 @@ const MARK_KEYS: Array[String] = ["MARK_SHUTEN", "MARK_HARD", "MARK_FESTIVAL"]
 const BOARD_SCENE: PackedScene = preload("res://src/presentation/board/board_screen.tscn")
 const PAUSE_BUTTON_SIZE: Vector2 = Vector2(20, 18)
 const PAUSE_MARGIN: float = 4.0
+## Seconds a new screen takes to fade in.
+const FADE_TIME: float = 0.15
 
 var run: Run
 var profile: Profile
@@ -31,6 +33,9 @@ var pause_menu: PauseMenu
 var _library: LayoutLibrary
 var _navigator: FocusNavigator = FocusNavigator.new()
 var _pause_button: Button
+## Covers a new screen and fades away.
+var _fade: ColorRect
+var _fade_tween: Tween
 ## Settings opened over the pause menu.
 var _overlay_settings: SettingsScreen
 
@@ -40,6 +45,11 @@ func _ready() -> void:
 	_library = LayoutLibrary.load_from()
 	profile = SaveService.load_profile()
 	add_child(_navigator)
+	_fade = ColorRect.new()
+	_fade.color = UiKit.BACKGROUND
+	_fade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_fade.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_fade)
 	toasts = UnlockToasts.new()
 	toasts.skin = UI_SKIN
 	add_child(toasts)
@@ -267,12 +277,18 @@ func _swap(screen: Control) -> void:
 	add_child(screen)
 	_refresh_overlays()
 	_navigator.focus(screen)
+	if _fade_tween != null:
+		_fade_tween.kill()
+	_fade.modulate.a = 1.0
+	_fade_tween = create_tween()
+	_fade_tween.tween_property(_fade, "modulate:a", 0.0, FADE_TIME)
 
 
 ## Keeps the pause button, the toasts and the pause menu above the screen, and the pause button
 ## only while a run can pause.
 func _refresh_overlays() -> void:
 	_pause_button.visible = can_pause()
+	move_child(_fade, -1)
 	move_child(_pause_button, -1)
 	move_child(toasts, -1)
 	if pause_menu != null:

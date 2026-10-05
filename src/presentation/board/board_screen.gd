@@ -30,6 +30,9 @@ const SHAKE_TIMES: float = 2.5
 const SHAKE_BLAST: float = 2.0
 const SHAKE_MATSURI: float = 5.0
 const CONFETTI: int = 40
+## Vibration on phones, in milliseconds, for a won board and for a Matsuri.
+const VIBRATE_WIN: int = 40
+const VIBRATE_MATSURI: int = 120
 ## Ticks between aim guide refreshes while pegs move (10 Hz); predictions cost too much to
 ## repeat every tick on low-end phones.
 const GUIDE_REFRESH_TICKS: int = 12
@@ -72,6 +75,7 @@ var _puffed: PackedByteArray = PackedByteArray()
 
 func _ready() -> void:
 	_background.color = SKIN.background_color
+	_background.add_child(UiKit.pattern())
 	_board_background.color = SKIN.board_color
 	_guide.color = SKIN.guide_color
 	_hud.apply_skin(SKIN)
@@ -273,7 +277,10 @@ func _consume_events() -> void:
 				_hud.update_counts(game)
 				_hud.show_mood(MascotMood.after_shot(game, event.amount))
 			SimEvent.Kind.BOARD_ENDED:
+				if event.amount != BoardGame.Outcome.FAILED:
+					_vibrate(VIBRATE_WIN)
 				if event.amount == BoardGame.Outcome.MATSURI:
+					_vibrate(VIBRATE_MATSURI)
 					_hud.celebrate("RESULT_MATSURI")
 					_sparks.confetti(Vector2(_camera.size.x / 2.0, _camera.size.y * 0.6), CONFETTI)
 					_shake(SHAKE_MATSURI)
@@ -284,6 +291,11 @@ func _consume_events() -> void:
 	if pegs_changed:
 		_view.refresh_pegs()
 	events.clear()
+
+
+func _vibrate(milliseconds: int) -> void:
+	if Settings.values.vibration and OS.has_feature("mobile"):
+		Input.vibrate_handheld(milliseconds)
 
 
 func _shake(strength: float) -> void:

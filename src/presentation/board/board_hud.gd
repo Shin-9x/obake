@@ -32,6 +32,9 @@ var _portrait_age: float = -1.0
 var _pop_age: float = -1.0
 var _banner_age: float = -1.0
 var _mood: MascotMood.Mood = MascotMood.Mood.IDLE
+## The omamori in each slot, for the info card a tap shows.
+var _charms: Array[OmamoriDefinition] = []
+var _info: InfoPopup
 
 @onready var _shots: Label = %ShotsValue
 @onready var _ball: Label = %BallValue
@@ -74,6 +77,8 @@ func _ready() -> void:
 	_continue.pressed.connect(continue_requested.emit)
 	for child: Node in _slot_row.get_children():
 		_add_icon(child as ColorRect)
+	_info = InfoPopup.new()
+	add_child(_info)
 	set_process(false)
 
 
@@ -106,6 +111,7 @@ func show_loadout(loadout: LoadoutDefinition, slots: int) -> void:
 		frame.color = SLOT_COLOUR
 		_slot_row.add_child(frame)
 		_add_icon(frame)
+	_charms.resize(_slots.size())
 	for index: int in _slots.size():
 		_slots[index].visible = index < slots
 		var slot: ColorRect = _slots[index]
@@ -113,6 +119,7 @@ func show_loadout(loadout: LoadoutDefinition, slots: int) -> void:
 		var charm: OmamoriDefinition = (
 			loadout.omamori[index] if index < loadout.omamori.size() else null
 		)
+		_charms[index] = charm
 		icon.texture = charm.icon if charm != null else null
 		slot.tooltip_text = (
 			"" if charm == null else tr(charm.name_key) + "\n" + tr(charm.description_key)
@@ -308,6 +315,7 @@ func _set_result_visible(shown: bool) -> void:
 
 
 func _add_icon(frame: ColorRect) -> void:
+	frame.gui_input.connect(_on_slot_input.bind(_slots.size()))
 	_slots.append(frame)
 	_slot_ages.append(-1.0)
 	var icon: TextureRect = TextureRect.new()
@@ -315,6 +323,18 @@ func _add_icon(frame: ColorRect) -> void:
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_CENTERED
 	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	frame.add_child(icon)
+
+
+## A tap on a slot shows its omamori, since touch screens have no tooltips.
+func _on_slot_input(event: InputEvent, index: int) -> void:
+	var tapped: bool = event is InputEventScreenTouch and (event as InputEventScreenTouch).pressed
+	if not tapped or index >= _charms.size() or _charms[index] == null:
+		return
+	var slot: ColorRect = _slots[index]
+	var at: Vector2 = (
+		slot.global_position - global_position + Vector2(-InfoPopup.WIDTH, slot.size.y)
+	)
+	_info.show_item(_charms[index], at)
 
 
 func _show_ball(ball: BagBall, label: Label, icon: TextureRect) -> void:

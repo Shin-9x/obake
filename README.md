@@ -18,6 +18,7 @@ make test     # run the gdUnit4 test suite headless
 make check    # lint, then test
 make bench    # measure simulation cost per tick
 make placeholder-art  # regenerate the placeholder sprites
+make placeholder-audio  # regenerate the placeholder sounds and music loops
 make layouts  # export every layout source scene to data/layouts
 ```
 
@@ -37,7 +38,9 @@ as Jorōgumo's webs.
 
 ## Playing
 
-Press **F5** to play a run: choose a character, then pick your way through four floors of
+Press **F5** to start at the title screen, where the settings (volumes, language, scaling, screen
+shake, fast-forward speed) also live. **New run** asks for a character, then you pick your way
+through four floors of
 boards, shops, shrines and yōkai events, each ending with a boss. Numbers such as targets,
 prices and odds live in `data/balance.tres`; what a run can offer lives in
 `data/run_content.tres`.
@@ -56,12 +59,14 @@ definitions live in `data/`, with their behaviour in `src/sim/effects/`; events 
 
 ## Controls
 
-| Action | Mouse and keyboard | Touch |
-| --- | --- | --- |
-| Aim | Move the mouse | Drag anywhere |
-| Fine aim | Mouse wheel, A/D or arrow keys | `<` `>` buttons |
-| Shoot | Left click or Enter | Shoot button |
-| Fast-forward | Hold Space or the right mouse button | Keep a finger on the screen |
+| Action | Mouse and keyboard | Gamepad | Touch |
+| --- | --- | --- | --- |
+| Aim | Move the mouse | Left stick | Drag anywhere |
+| Fine aim | Mouse wheel, A/D or arrow keys | Triggers | `<` `>` buttons |
+| Shoot | Left click or Enter | A | Shoot button |
+| Fast-forward | Hold Space or the right mouse button | Hold RB | Keep a finger on the screen |
+| Pause | Esc | Start | Pause button |
+| Menus | Mouse, or arrows and Enter | D-pad, A, B | Tap |
 
 ## Layout
 

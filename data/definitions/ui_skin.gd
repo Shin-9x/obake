@@ -8,3 +8,5 @@ extends Resource
 @export var mascot_moods: Array[Texture2D] = []
 ## Icon of the pause button.
 @export var pause_icon: Texture2D
+## Tile laid over the background of every screen and around the board.
+@export var background_pattern: Texture2D

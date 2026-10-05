@@ -114,6 +114,7 @@ func _init() -> void:
 	for mark: String in MARKS:
 		_save(_mark(MARKS[mark][0], MARKS[mark][1]), mark)
 	_save(_pause_icon(), "icon_pause")
+	_save(_seigaiha(), "pattern_seigaiha")
 	_save(_mascot("idle"), "mascot_obo")
 	for mood: String in ["happy", "worried", "sad", "excited"]:
 		_save(_mascot(mood), "mascot_obo_" + mood)
@@ -464,6 +465,34 @@ func _mascot(mood: String) -> Image:
 		"excited", "happy":
 			for x: int in [6, 7, 16, 17]:
 				image.set_pixel(x, 13, Color("#ff8fa3"))
+	return image
+
+
+## A seigaiha wave tile: rows of concentric half circles, each row overlapping the one above.
+## Lines are white with low alpha, so the background colour shows through.
+func _seigaiha() -> Image:
+	var width: int = 32
+	var height: int = 16
+	var radius: float = 16.0
+	var image: Image = _blank(width, height)
+	for y: int in height:
+		for x: int in width:
+			var best: float = -1.0
+			# Rows of centres every 8 px, shifted by half a tile on odd rows; the lowest row
+			# whose circle reaches the pixel covers it.
+			for row: int in range(4, -1, -1):
+				var centre_y: float = row * 8.0
+				var shift: float = 16.0 if row % 2 == 1 else 0.0
+				for column: int in range(-1, 3):
+					var centre: Vector2 = Vector2(column * 32.0 + shift, centre_y)
+					var distance: float = Vector2(x, y).distance_to(centre)
+					if centre_y >= y and distance <= radius:
+						best = distance
+						break
+				if best >= 0.0:
+					break
+			if best >= 0.0 and fmod(best, 4.0) < 1.0:
+				image.set_pixel(x, y, Color(1, 1, 1, 0.07))
 	return image
 
 

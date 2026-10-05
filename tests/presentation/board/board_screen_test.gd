@@ -90,3 +90,18 @@ func test_a_run_board_shows_its_boss_and_continues_with_the_result() -> void:
 	(screen.get_node("%PlayAgainButton") as Button).pressed.emit()
 	assert_array(finished).has_size(1)
 	assert_object(finished[0]).is_same(screen.game.result)
+
+
+func test_a_tap_on_an_omamori_slot_shows_its_card() -> void:
+	var runner: GdUnitSceneRunner = scene_runner(SCENE)
+	var screen: BoardScreen = runner.scene() as BoardScreen
+	screen.start_board(SEED)
+	var slot: ColorRect = screen.get_node("%OmamoriSlots").get_child(0) as ColorRect
+	var tap: InputEventScreenTouch = InputEventScreenTouch.new()
+	tap.pressed = true
+	slot.gui_input.emit(tap)
+	var popups: Array[Node] = screen.get_node("%Hud").get_children().filter(
+		func(node: Node) -> bool: return node is InfoPopup
+	)
+	assert_array(popups).has_size(1)
+	assert_bool((popups[0] as InfoPopup).visible).is_true()
