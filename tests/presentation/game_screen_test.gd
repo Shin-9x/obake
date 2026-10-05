@@ -189,6 +189,42 @@ func test_settings_open_from_the_title_and_change_the_language() -> void:
 	assert_object(screen.current).is_instanceof(TitleScreen)
 
 
+func test_the_performance_overlay_follows_its_setting() -> void:
+	var runner: GdUnitSceneRunner = scene_runner(SCENE)
+	var screen: GameScreen = runner.scene() as GameScreen
+	assert_bool(screen.perf_overlay.visible).is_false()
+	Screens.button(screen.current, "BUTTON_SETTINGS").pressed.emit()
+	var toggles: Array[Node] = Screens.find_all(screen.current, CheckButton)
+	(toggles[toggles.size() - 1] as CheckButton).toggled.emit(true)
+	assert_bool(Settings.values.show_performance).is_true()
+	assert_bool(screen.perf_overlay.visible).is_true()
+	await runner.simulate_frames(40, 20)
+	assert_str(screen.perf_overlay.text).contains("FPS")
+	assert_int(screen.get_child_count() - 1).is_equal(screen.perf_overlay.get_index())
+	Settings.values.show_performance = false
+	Settings.commit()
+	assert_bool(screen.perf_overlay.visible).is_false()
+
+
+func test_the_frame_benchmark_runs_from_the_settings_in_debug_builds() -> void:
+	var runner: GdUnitSceneRunner = scene_runner(SCENE)
+	var screen: GameScreen = runner.scene() as GameScreen
+	Screens.button(screen.current, "BUTTON_SETTINGS").pressed.emit()
+	Screens.button(screen.current, "BUTTON_BENCHMARK").pressed.emit()
+	var benchmark: FrameBenchmark = screen.current as FrameBenchmark
+	assert_object(benchmark).is_not_null()
+	benchmark.shots = 2
+	for attempt: int in 40:
+		if benchmark.stats != null:
+			break
+		await runner.simulate_frames(20, 100)
+	assert_object(benchmark.stats).is_not_null()
+	assert_int(benchmark.stats.frames).is_greater(0)
+	assert_int(benchmark.result_lines().size()).is_equal(4)
+	Screens.button(benchmark, "BUTTON_BACK").pressed.emit()
+	assert_object(screen.current).is_instanceof(SettingsScreen)
+
+
 func _wipe() -> void:
 	if not DirAccess.dir_exists_absolute(SAVES):
 		return

@@ -3,6 +3,7 @@ extends Control
 ## Every setting on one page. Changes apply at once; sliders are saved when the player leaves.
 
 signal closed
+signal benchmark_requested
 
 const LABEL_WIDTH: float = 200.0
 const CONTROL_WIDTH: float = 200.0
@@ -10,9 +11,12 @@ const LANGUAGE_KEYS: Array[String] = ["LANGUAGE_SYSTEM", "LANGUAGE_EN", "LANGUAG
 const SCALING_KEYS: Array[String] = ["SCALING_INTEGER", "SCALING_FRACTIONAL"]
 
 var _body: VBoxContainer
+var _allow_benchmark: bool = false
 
 
-func open() -> void:
+## [param allow_benchmark] offers the frame benchmark, which debug builds show from the title.
+func open(allow_benchmark: bool = false) -> void:
+	_allow_benchmark = allow_benchmark
 	UiKit.clear(self)
 	var page: Control = UiKit.page(self)
 	_body = UiKit.body(page, 12)
@@ -49,10 +53,17 @@ func open() -> void:
 			GameSettings.MAX_DRAG_SENSITIVITY
 		)
 		_toggle("SETTINGS_VIBRATION", values.vibration, _set_vibration)
-	var back: Button = UiKit.button("BUTTON_BACK", true, AudioService.UI_BACK)
-	back.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-	back.pressed.connect(_close)
-	_body.add_child(back)
+	_toggle("SETTINGS_PERFORMANCE", values.show_performance, _set_performance)
+	var actions: HBoxContainer = UiKit.row(8)
+	actions.alignment = BoxContainer.ALIGNMENT_BEGIN
+	var leave: Button = UiKit.button("BUTTON_BACK", true, AudioService.UI_BACK)
+	leave.pressed.connect(_close)
+	actions.add_child(leave)
+	if _allow_benchmark:
+		var benchmark: Button = UiKit.button("BUTTON_BENCHMARK")
+		benchmark.pressed.connect(_start_benchmark)
+		actions.add_child(benchmark)
+	_body.add_child(actions)
 
 
 func back() -> void:
@@ -121,7 +132,7 @@ func _set_drag(value: int) -> void:
 func _set_language(index: int) -> void:
 	Settings.values.language = GameSettings.LANGUAGES[index]
 	Settings.commit()
-	open()
+	open(_allow_benchmark)
 
 
 func _set_scaling(index: int) -> void:
@@ -147,6 +158,16 @@ func _set_fast_forward(index: int) -> void:
 func _set_vibration(on: bool) -> void:
 	Settings.values.vibration = on
 	Settings.commit()
+
+
+func _set_performance(on: bool) -> void:
+	Settings.values.show_performance = on
+	Settings.commit()
+
+
+func _start_benchmark() -> void:
+	Settings.commit()
+	benchmark_requested.emit()
 
 
 func _close() -> void:

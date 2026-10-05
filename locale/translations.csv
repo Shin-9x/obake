@@ -284,3 +284,12 @@ SETTINGS_FAST_FORWARD,Fast-forward,Avanti veloce
 SETTINGS_SPEED,×%d,×%d
 SETTINGS_DRAG,Drag sensitivity,Sensibilità del trascinamento
 SETTINGS_VIBRATION,Vibration,Vibrazione
+SETTINGS_PERFORMANCE,Show performance,Mostra prestazioni
+BUTTON_BENCHMARK,Benchmark,Benchmark
+BENCHMARK_PROGRESS,Benchmark: shot %d of %d,Benchmark: tiro %d di %d
+BENCHMARK_FRAMES,"%d frames, %d shots, %d boards","%d frame, %d tiri, %d board"
+BENCHMARK_PERCENTILES,Frame time: p50 %.1f ms · p95 %.1f ms · p99 %.1f ms · worst %.1f ms,Tempo dei frame: p50 %.1f ms · p95 %.1f ms · p99 %.1f ms · peggiore %.1f ms
+BENCHMARK_DROPPED,Over 16.7 ms: %d (%.1f%%) · over 33.3 ms: %d,"Oltre 16,7 ms: %d (%.1f%%) · oltre 33,3 ms: %d"
+BENCHMARK_TICKS,Ticks per frame: average %d µs · worst %d µs,Tick per frame: media %d µs · peggiore %d µs
+PERF_FRAMES,%d FPS · frame %.1f ms (max %.1f),%d FPS · frame %.1f ms (max %.1f)
+PERF_DETAILS,ticks %d µs · draw calls %d · memory %.0f MB · objects %d,tick %d µs · draw call %d · memoria %.0f MB · oggetti %d

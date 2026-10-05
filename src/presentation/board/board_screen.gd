@@ -50,6 +50,9 @@ var shooter: Callable
 var game: BoardGame
 var placed: PlacedBoard
 var board_seed: int = 0
+## Microseconds spent on simulation ticks and their events in the last frame, for the
+## performance tools.
+var tick_usec: int = 0
 
 var _library: LayoutLibrary
 ## Run-wide modifiers kept across boards of this session.
@@ -93,6 +96,16 @@ func _ready() -> void:
 	_hud.continue_requested.connect(_on_continue)
 	if standalone:
 		start_board(_new_seed())
+
+
+func _enter_tree() -> void:
+	if not Performance.has_custom_monitor(PerfOverlay.TICK_MONITOR):
+		Performance.add_custom_monitor(PerfOverlay.TICK_MONITOR, func() -> int: return tick_usec)
+
+
+func _exit_tree() -> void:
+	if Performance.has_custom_monitor(PerfOverlay.TICK_MONITOR):
+		Performance.remove_custom_monitor(PerfOverlay.TICK_MONITOR)
 
 
 ## Plays a development board for [param seed_value] with the development loadout.
@@ -151,6 +164,11 @@ func _show(
 	_refresh_guide()
 
 
+## Turns the launcher to [param aim], in centidegrees, as the player would.
+func aim_at(aim: int) -> void:
+	_aim.set_aim(aim)
+
+
 ## Fires along the current aim. Ignored while a shot is in flight or once the board is over.
 func shoot() -> void:
 	if not game.can_shoot():
@@ -181,9 +199,11 @@ func _process(delta: float) -> void:
 	else:
 		_camera.focus(Vector2.ZERO, false)
 	_accumulator = minf(_accumulator + delta * speed, MAX_TICKS_PER_FRAME * TICK_SECONDS)
+	var started: int = Time.get_ticks_usec()
 	while _accumulator >= TICK_SECONDS:
 		_accumulator -= TICK_SECONDS
 		_tick()
+	tick_usec = Time.get_ticks_usec() - started
 	_view.render(_accumulator / TICK_SECONDS)
 	_camera.update(delta)
 

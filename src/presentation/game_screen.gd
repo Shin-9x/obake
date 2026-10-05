@@ -27,6 +27,8 @@ var profile: Profile
 var current: Control
 ## Unlock notes, drawn over every screen.
 var toasts: UnlockToasts
+## Frame rate and frame times over everything, when the settings ask for them.
+var perf_overlay: PerfOverlay
 ## Shown over a paused run; null while the run is playing.
 var pause_menu: PauseMenu
 
@@ -64,6 +66,10 @@ func _ready() -> void:
 	_pause_button.offset_bottom = PAUSE_MARGIN + PAUSE_BUTTON_SIZE.y
 	_pause_button.pressed.connect(pause)
 	add_child(_pause_button)
+	perf_overlay = PerfOverlay.new()
+	add_child(perf_overlay)
+	Settings.changed.connect(_on_settings_changed)
+	_on_settings_changed()
 	show_title()
 
 
@@ -106,8 +112,17 @@ func show_statistics() -> void:
 func show_settings() -> void:
 	var screen: SettingsScreen = SettingsScreen.new()
 	_swap(screen)
-	screen.open()
+	screen.open(OS.is_debug_build())
 	screen.closed.connect(show_title)
+	screen.benchmark_requested.connect(show_benchmark)
+
+
+## Measures how smoothly this device plays a busy board; see [FrameBenchmark].
+func show_benchmark() -> void:
+	var screen: FrameBenchmark = FrameBenchmark.new()
+	_swap(screen)
+	screen.start()
+	screen.closed.connect(show_settings)
 
 
 ## Starts a run with the items the profile has unlocked. A [param custom_seed] run earns no
@@ -293,6 +308,12 @@ func _refresh_overlays() -> void:
 	move_child(toasts, -1)
 	if pause_menu != null:
 		move_child(pause_menu, -1)
+	move_child(perf_overlay, -1)
+
+
+func _on_settings_changed() -> void:
+	if perf_overlay.visible != Settings.values.show_performance:
+		perf_overlay.show_values(Settings.values.show_performance)
 
 
 func _watch(watched: Run) -> void:

@@ -23,6 +23,8 @@ var fast_forward_speed: int = 3
 ## Touch drag sensitivity in percent of the default.
 var drag_sensitivity: int = 100
 var vibration: bool = true
+## Frame rate, frame times and draw calls in a corner of the screen.
+var show_performance: bool = false
 
 
 func to_dictionary() -> Dictionary[String, Variant]:
@@ -37,6 +39,7 @@ func to_dictionary() -> Dictionary[String, Variant]:
 		"fast_forward_speed": fast_forward_speed,
 		"drag_sensitivity": drag_sensitivity,
 		"vibration": vibration,
+		"show_performance": show_performance,
 	}
 
 
@@ -65,6 +68,7 @@ static func from_dictionary(data: Variant) -> GameSettings:
 		MAX_DRAG_SENSITIVITY
 	)
 	settings.vibration = source.get("vibration", true) == true
+	settings.show_performance = source.get("show_performance", false) == true
 	return settings
 
 

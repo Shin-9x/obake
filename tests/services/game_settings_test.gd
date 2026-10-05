@@ -8,6 +8,7 @@ func test_defaults_round_trip_through_json() -> void:
 	settings.scaling = GameSettings.Scaling.FRACTIONAL
 	settings.fast_forward_speed = 2
 	settings.vibration = false
+	settings.show_performance = true
 	var text: String = JSON.stringify(settings.to_dictionary())
 	var restored: GameSettings = GameSettings.from_dictionary(JSON.parse_string(text))
 	assert_dict(restored.to_dictionary()).is_equal(settings.to_dictionary())
@@ -35,3 +36,4 @@ func test_values_read_back_are_clamped_or_fall_back_to_defaults() -> void:
 	assert_int(restored.fast_forward_speed).is_equal(defaults.fast_forward_speed)
 	assert_int(restored.drag_sensitivity).is_equal(GameSettings.MAX_DRAG_SENSITIVITY)
 	assert_int(GameSettings.from_dictionary("garbage").master_volume).is_equal(80)
+	assert_bool(restored.show_performance).is_false()
