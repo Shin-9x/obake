@@ -1,8 +1,16 @@
 extends SceneTree
-## Generates the placeholder pixel-art sprites under assets/sprites/placeholder/.
+## Generates the placeholder pixel-art sprites under assets/sprites/placeholder/, and the app
+## icons and boot splash under assets/icons/.
 ## Run with `make placeholder-art`; the output is committed, so this only runs when it changes.
 
 const OUTPUT_DIR: String = "res://assets/sprites/placeholder"
+const ICON_DIR: String = "res://assets/icons"
+## The game's background colour, as in UiKit.BACKGROUND.
+const ICON_BACKGROUND: Color = Color("#1b1d2b")
+## Android adaptive icons are 432 px; launchers mask them to a circle about 264 px wide.
+const ADAPTIVE_SIZE: int = 432
+## The boot splash is scaled to the screen like the game, so Obo keeps its size in the menus.
+const SPLASH_SIZE: Vector2i = Vector2i(640, 360)
 const LANTERN_SIZE: int = 10
 const BALL_SIZE: int = 8
 
@@ -122,6 +130,13 @@ func _init() -> void:
 		_save(_omamori(OMAMORI_COLOURS[index], index), "omamori_" + OMAMORI[index])
 	_save(_bucket(), "bucket")
 	_save(_launcher(), "launcher")
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(ICON_DIR))
+	_save(_app_icon(256), "icon", ICON_DIR)
+	_save(_app_icon(192), "icon_192", ICON_DIR)
+	_save(_adaptive_foreground(), "adaptive_foreground", ICON_DIR)
+	_save(_adaptive_background(), "adaptive_background", ICON_DIR)
+	_save(_adaptive_monochrome(), "adaptive_monochrome", ICON_DIR)
+	_save(_splash(), "splash", ICON_DIR)
 	quit()
 
 
@@ -551,13 +566,83 @@ func _launcher() -> Image:
 	return image
 
 
+## Obo on a rounded square of the background colour, filling three quarters of the icon.
+func _app_icon(size: int) -> Image:
+	var image: Image = _blank(size, size)
+	var corner: float = size * 0.16
+	var tile: Image = _upscaled(_seigaiha(), 4)
+	for y: int in size:
+		for x: int in size:
+			var inner: Vector2 = Vector2(
+				clampf(x + 0.5, corner, size - corner), clampf(y + 0.5, corner, size - corner)
+			)
+			if Vector2(x + 0.5, y + 0.5).distance_to(inner) > corner:
+				continue
+			var wave: Color = tile.get_pixel(x % tile.get_width(), y % tile.get_height())
+			image.set_pixel(x, y, ICON_BACKGROUND.blend(wave))
+	var scale: int = size * 3 / 4 / MASCOT_SIZE
+	_stamp(image, _upscaled(_mascot("idle"), scale))
+	return image
+
+
+func _adaptive_foreground() -> Image:
+	var image: Image = _blank(ADAPTIVE_SIZE, ADAPTIVE_SIZE)
+	_stamp(image, _upscaled(_mascot("idle"), 9))
+	return image
+
+
+func _adaptive_background() -> Image:
+	var image: Image = _blank(ADAPTIVE_SIZE, ADAPTIVE_SIZE)
+	var tile: Image = _upscaled(_seigaiha(), 6)
+	for y: int in ADAPTIVE_SIZE:
+		for x: int in ADAPTIVE_SIZE:
+			var wave: Color = tile.get_pixel(x % tile.get_width(), y % tile.get_height())
+			image.set_pixel(x, y, ICON_BACKGROUND.blend(wave))
+	return image
+
+
+## Obo in white with its ink lines cut out; the launcher tints it for themed icons.
+func _adaptive_monochrome() -> Image:
+	var image: Image = _blank(ADAPTIVE_SIZE, ADAPTIVE_SIZE)
+	var mascot: Image = _upscaled(_mascot("idle"), 9)
+	for y: int in mascot.get_height():
+		for x: int in mascot.get_width():
+			var pixel: Color = mascot.get_pixel(x, y)
+			if pixel.a > 0.0:
+				mascot.set_pixel(
+					x, y, Color.WHITE if pixel.get_luminance() > 0.3 else Color.TRANSPARENT
+				)
+	_stamp(image, mascot)
+	return image
+
+
+func _splash() -> Image:
+	var image: Image = _blank(SPLASH_SIZE.x, SPLASH_SIZE.y)
+	_stamp(image, _upscaled(_mascot("idle"), 4))
+	return image
+
+
+func _upscaled(source: Image, factor: int) -> Image:
+	var result: Image = source.duplicate() as Image
+	result.resize(
+		source.get_width() * factor, source.get_height() * factor, Image.INTERPOLATE_NEAREST
+	)
+	return result
+
+
+## Draws [param top] centred on [param image].
+func _stamp(image: Image, top: Image) -> void:
+	var at: Vector2i = (image.get_size() - top.get_size()) / 2
+	image.blend_rect(top, Rect2i(Vector2i.ZERO, top.get_size()), at)
+
+
 func _blank(width: int, height: int) -> Image:
 	var image: Image = Image.create_empty(width, height, false, Image.FORMAT_RGBA8)
 	image.fill(Color(0, 0, 0, 0))
 	return image
 
 
-func _save(image: Image, file_name: String) -> void:
-	var path: String = OUTPUT_DIR.path_join(file_name + ".png")
+func _save(image: Image, file_name: String, directory: String = OUTPUT_DIR) -> void:
+	var path: String = directory.path_join(file_name + ".png")
 	var error: Error = image.save_png(ProjectSettings.globalize_path(path))
 	print("%s: %s" % [path, error_string(error)])

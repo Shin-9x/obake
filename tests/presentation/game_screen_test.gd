@@ -33,6 +33,13 @@ func test_a_run_starts_from_the_title_with_the_choice_of_a_character() -> void:
 	assert_str(String(screen.run.state.inventory.loadout.character.id)).is_equal("tanuki")
 
 
+func test_the_title_shows_the_game_version() -> void:
+	var screen: GameScreen = scene_runner(SCENE).scene() as GameScreen
+	var title: TitleScreen = screen.current as TitleScreen
+	assert_str(title.version_label.text).is_equal("v" + BuildInfo.version())
+	assert_bool(title.version_label.get_global_rect().end.x <= screen.size.x).is_true()
+
+
 func test_the_map_lets_only_reachable_nodes_be_picked() -> void:
 	var screen: GameScreen = _started()
 	var enabled: int = 0

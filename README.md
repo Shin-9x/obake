@@ -17,7 +17,7 @@ make lint     # check formatting and run gdlint
 make test     # run the gdUnit4 test suite headless
 make check    # lint, then test
 make bench    # measure simulation cost per tick
-make placeholder-art  # regenerate the placeholder sprites
+make placeholder-art  # regenerate the placeholder sprites, app icons and boot splash
 make placeholder-audio  # regenerate the placeholder sounds and music loops
 make layouts  # export every layout source scene to data/layouts
 ```

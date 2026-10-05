@@ -11,9 +11,13 @@ config_version=5
 [application]
 
 config/name="Obake!"
+config/version="0.8.0"
 run/main_scene="res://src/presentation/game_screen.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
-config/icon="res://icon.svg"
+boot_splash/bg_color=Color(0.105882, 0.113725, 0.168627, 1)
+boot_splash/image="res://assets/icons/splash.png"
+boot_splash/use_filter=false
+config/icon="res://assets/icons/icon.png"
 
 [autoload]
 

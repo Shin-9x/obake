@@ -12,12 +12,21 @@ signal quit_requested
 const MASCOT_SIZE: Vector2 = Vector2(72, 72)
 const BUTTON_WIDTH: float = 180.0
 const TITLE_SIZE: int = 36
+const VERSION_MARGIN: int = 4
+
+## The game version in a corner of the page.
+var version_label: Label
 
 
 ## [param can_continue] offers to resume the saved run.
 func open(skin: UiSkin, can_continue: bool) -> void:
 	UiKit.clear(self)
 	var page: Control = UiKit.page(self)
+	version_label = UiKit.label("v" + BuildInfo.version(), UiKit.SMALL_SIZE, UiKit.MUTED, false)
+	page.add_child(version_label)
+	version_label.set_anchors_and_offsets_preset(
+		Control.PRESET_BOTTOM_RIGHT, Control.PRESET_MODE_MINSIZE, VERSION_MARGIN
+	)
 	var body: VBoxContainer = UiKit.body(page, 24)
 	body.alignment = BoxContainer.ALIGNMENT_CENTER
 	var title: Label = UiKit.label("GAME_TITLE", TITLE_SIZE, UiKit.MON)
