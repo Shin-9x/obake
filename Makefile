@@ -3,7 +3,7 @@ PYTHON ?= python3
 VENV ?= .venv
 GD_SOURCES := src tests data
 
-.PHONY: setup format lint test check bench placeholder-art layouts replays
+.PHONY: setup format lint test check bench placeholder-art placeholder-audio layouts replays
 
 setup:
 	$(PYTHON) -m venv $(VENV)
@@ -33,6 +33,14 @@ bench:
 
 placeholder-art:
 	$(GODOT) --headless --path . -s res://src/tools/generate_placeholder_art.gd
+	$(GODOT) --headless --path . --import
+
+# Music files loop forward; the importer's default already compresses everything with QOA.
+placeholder-audio:
+	$(GODOT) --headless --path . --import
+	$(GODOT) --headless --path . -s res://src/tools/generate_placeholder_audio.gd
+	$(GODOT) --headless --path . --import
+	sed -i 's|^edit/loop_mode=.*|edit/loop_mode=2|' assets/music/*.wav.import
 	$(GODOT) --headless --path . --import
 
 layouts:

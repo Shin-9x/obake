@@ -1,0 +1,58 @@
+[gd_resource type="Resource" script_class="SoundBank" format=3 uid="uid://t7no42hkr1vg"]
+
+[ext_resource type="AudioStream" uid="uid://b7f448senxylw" path="res://assets/music/board_loop.wav" id="1_rbjxk"]
+[ext_resource type="AudioStream" uid="uid://bxwsestxahi08" path="res://assets/sfx/peg_hit.wav" id="2_2sadd"]
+[ext_resource type="AudioStream" uid="uid://bq5wblhgw3uej" path="res://assets/sfx/wall_bounce.wav" id="3_gdxse"]
+[ext_resource type="AudioStream" uid="uid://sq3xniock13u" path="res://assets/sfx/bucket.wav" id="4_j8m74"]
+[ext_resource type="AudioStream" uid="uid://xjrobaxpu8gy" path="res://assets/sfx/ball_lost.wav" id="5_mv3sf"]
+[ext_resource type="AudioStream" uid="uid://dtkf4xnxyg0on" path="res://assets/sfx/mon.wav" id="6_n46y7"]
+[ext_resource type="AudioStream" uid="uid://cpqp24p0g1oa6" path="res://assets/sfx/mult.wav" id="7_sei3t"]
+[ext_resource type="AudioStream" uid="uid://d1kwlb3kpebaw" path="res://assets/sfx/times.wav" id="8_da57c"]
+[ext_resource type="AudioStream" uid="uid://isfa6qy1tqt2" path="res://assets/sfx/explosion.wav" id="9_46htt"]
+[ext_resource type="AudioStream" uid="uid://bx6k0wxs0tx1n" path="res://assets/sfx/fire.wav" id="10_8pmpq"]
+[ext_resource type="AudioStream" uid="uid://dedyceakbkjdl" path="res://assets/sfx/split.wav" id="11_f5jwi"]
+[ext_resource type="AudioStream" uid="uid://bcskm1f6oksvy" path="res://assets/sfx/launch.wav" id="12_vim1x"]
+[ext_resource type="AudioStream" uid="uid://ds4dk3j45sx2x" path="res://assets/sfx/shot_scored.wav" id="13_4usny"]
+[ext_resource type="AudioStream" uid="uid://3asajke2a6n5" path="res://assets/sfx/board_won.wav" id="14_xfp70"]
+[ext_resource type="AudioStream" uid="uid://dm3rw4q4tlho3" path="res://assets/sfx/matsuri.wav" id="15_8c2j0"]
+[ext_resource type="AudioStream" uid="uid://3ysq6phu3np3" path="res://assets/sfx/board_lost.wav" id="16_7h2cj"]
+[ext_resource type="AudioStream" uid="uid://d1hfnhw2quyo7" path="res://assets/sfx/power.wav" id="17_nkhbh"]
+[ext_resource type="AudioStream" uid="uid://dujbm1obr58k3" path="res://assets/sfx/boss_hit.wav" id="18_gul8s"]
+[ext_resource type="AudioStream" uid="uid://ccopxjhve7qws" path="res://assets/sfx/vanish.wav" id="19_fr0a0"]
+[ext_resource type="AudioStream" uid="uid://cirwkwckq3vr3" path="res://assets/sfx/ui_click.wav" id="20_tqfst"]
+[ext_resource type="AudioStream" uid="uid://c1yh5q40nkuft" path="res://assets/sfx/ui_confirm.wav" id="21_1s214"]
+[ext_resource type="AudioStream" uid="uid://bnv8rug45l5a1" path="res://assets/sfx/ui_back.wav" id="22_jk2hk"]
+[ext_resource type="AudioStream" uid="uid://cafa0ciuy6goe" path="res://assets/sfx/purchase.wav" id="23_hp3oj"]
+[ext_resource type="AudioStream" uid="uid://dc8ohbx33bpks" path="res://assets/sfx/unlock.wav" id="24_vg1ug"]
+[ext_resource type="AudioStream" uid="uid://deg0rx5bru317" path="res://assets/music/menu_loop.wav" id="25_bc1vq"]
+[ext_resource type="Script" uid="uid://c474dhrbekfdk" path="res://data/definitions/sound_bank.gd" id="26_u7lm5"]
+
+[resource]
+script = ExtResource("26_u7lm5")
+cues = Dictionary[StringName, AudioStream]({
+&"ball_lost": ExtResource("5_mv3sf"),
+&"board_lost": ExtResource("16_7h2cj"),
+&"board_won": ExtResource("14_xfp70"),
+&"boss_hit": ExtResource("18_gul8s"),
+&"bucket": ExtResource("4_j8m74"),
+&"explosion": ExtResource("9_46htt"),
+&"fire": ExtResource("10_8pmpq"),
+&"launch": ExtResource("12_vim1x"),
+&"matsuri": ExtResource("15_8c2j0"),
+&"mon": ExtResource("6_n46y7"),
+&"mult": ExtResource("7_sei3t"),
+&"peg_hit": ExtResource("2_2sadd"),
+&"power": ExtResource("17_nkhbh"),
+&"purchase": ExtResource("23_hp3oj"),
+&"shot_scored": ExtResource("13_4usny"),
+&"split": ExtResource("11_f5jwi"),
+&"times": ExtResource("8_da57c"),
+&"ui_back": ExtResource("22_jk2hk"),
+&"ui_click": ExtResource("20_tqfst"),
+&"ui_confirm": ExtResource("21_1s214"),
+&"unlock": ExtResource("24_vg1ug"),
+&"vanish": ExtResource("19_fr0a0"),
+&"wall_bounce": ExtResource("3_gdxse")
+})
+menu_music = ExtResource("25_bc1vq")
+board_music = ExtResource("1_rbjxk")

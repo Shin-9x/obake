@@ -23,7 +23,6 @@ static func encode(profile: Profile) -> Dictionary[String, Variant]:
 			"matsuri": profile.matsuri,
 			"boards_won": profile.boards_won,
 		},
-		"settings": profile.settings,
 	}
 
 
@@ -54,8 +53,6 @@ static func decode(data: Variant) -> Profile:
 	profile.best_shot = int(stats.get("best_shot", 0))
 	profile.matsuri = int(stats.get("matsuri", 0))
 	profile.boards_won = int(stats.get("boards_won", 0))
-	if source.get("settings") is Dictionary:
-		profile.settings = source["settings"]
 	return profile
 
 

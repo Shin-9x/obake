@@ -1,10 +1,12 @@
 extends Node
-## Reads and writes the player's files as JSON: the profile and the run in progress. A file is
-## written beside its final name and then renamed over it, so a crash never leaves half a file.
-## An unreadable profile is kept aside as a backup before a fresh one replaces it.
+## Reads and writes the player's files as JSON: the profile, the run in progress and the
+## settings. A file is written beside its final name and then renamed over it, so a crash never
+## leaves half a file. An unreadable profile is kept aside as a backup before a fresh one
+## replaces it.
 
 const PROFILE_FILE: String = "profile.json"
 const RUN_FILE: String = "run.json"
+const SETTINGS_FILE: String = "settings.json"
 const BACKUP_SUFFIX: String = ".bak"
 
 ## Where the files live; tests point it elsewhere.
@@ -24,6 +26,15 @@ func load_profile() -> Profile:
 
 func save_profile(profile: Profile) -> Error:
 	return _write(_path(PROFILE_FILE), ProfileCodec.encode(profile))
+
+
+func load_settings() -> GameSettings:
+	var path: String = _path(SETTINGS_FILE)
+	return GameSettings.from_dictionary(_read(path) if FileAccess.file_exists(path) else null)
+
+
+func save_settings(settings: GameSettings) -> Error:
+	return _write(_path(SETTINGS_FILE), settings.to_dictionary())
 
 
 func has_run() -> bool:

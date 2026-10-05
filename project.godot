@@ -18,6 +18,8 @@ config/icon="res://icon.svg"
 [autoload]
 
 SaveService="*res://src/services/save_service.gd"
+Settings="*res://src/services/settings.gd"
+AudioService="*res://src/services/audio_service.gd"
 
 [debug]
 

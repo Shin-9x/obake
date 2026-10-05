@@ -1,6 +1,6 @@
 class_name Profile
 ## What the player has achieved across runs: feats, completion marks per character, discovered
-## entries of the compendium and statistics, plus settings once they exist.
+## entries of the compendium and statistics.
 
 ## GDD completion marks, earned per character.
 enum Mark { SHUTEN, HARD, FESTIVAL }
@@ -18,8 +18,6 @@ var wins_by_character: Dictionary[StringName, int] = {}
 var best_shot: int = 0
 var matsuri: int = 0
 var boards_won: int = 0
-## Opaque until the settings arrive.
-var settings: Dictionary = {}
 
 
 func has_feat(id: StringName) -> bool:
