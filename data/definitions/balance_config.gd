@@ -83,8 +83,6 @@ extends Resource
 @export var board_target_growth: int = 1350
 ## Elite target over the standard one, in permille.
 @export var elite_target_factor: int = 1500
-## Boss target over the previous board's, in permille; it replaces the usual growth.
-@export var boss_target_factor: int = 1800
 @export var target_rounding: int = 10
 
 @export_group("Hard mode")

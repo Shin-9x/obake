@@ -99,11 +99,14 @@ func _node_button(map: FloorMap, index: int, reachable: bool) -> Button:
 
 func _describe(node: MapNode) -> String:
 	var text: String = tr(KIND_KEYS[node.kind])
+	var boss: BossDefinition = null
 	if node.kind == MapNode.Kind.BOSS:
-		var boss: BossDefinition = _run.current_boss()
+		boss = _run.current_boss()
 		text += "\n%s\n%s" % [tr(boss.name_key), tr(boss.description_key)]
 	if node.is_board():
-		var target: int = TargetSchedule.target(_run.config, node.kind, _run.state.boards_played)
+		var hard: bool = _run.run_log.options.hard
+		var played: int = _run.state.boards_played
+		var target: int = TargetSchedule.target(_run.config, node.kind, played, hard, boss)
 		text += "\n" + tr("MAP_TARGET") % target
 	return text
 

@@ -425,6 +425,8 @@ func _prepare_board(kind: MapNode.Kind) -> BoardSpec:
 			fresh = pool
 		spec.layout = fresh[rng.next_below(fresh.size())]
 		state.floor_layouts.append(spec.layout.id)
-	var target: int = TargetSchedule.target(config, kind, state.boards_played, run_log.options.hard)
+	var target: int = TargetSchedule.target(
+		config, kind, state.boards_played, run_log.options.hard, boss
+	)
 	spec.rules = BoardRules.new(target, state.shot_delta, boss)
 	return spec

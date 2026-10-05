@@ -7,10 +7,15 @@ const PROGRESSION: String = "res://data/progression.tres"
 
 func test_hard_targets_are_a_quarter_higher() -> void:
 	var config: BalanceConfig = Fixtures.config()
+	config.first_board_target = 800
+	config.board_target_growth = 1350
+	config.hard_target_factor = 1250
+	var boss: BossDefinition = BossDefinition.new()
+	boss.target_factor = 1800
 	assert_int(TargetSchedule.target(config, MapNode.Kind.BOARD, 0, true)).is_equal(1000)
 	# 1080 x 1.25 = 1350.
 	assert_int(TargetSchedule.target(config, MapNode.Kind.BOARD, 1, true)).is_equal(1350)
-	assert_int(TargetSchedule.target(config, MapNode.Kind.BOSS, 0, true)).is_equal(1800)
+	assert_int(TargetSchedule.target(config, MapNode.Kind.BOSS, 0, true, boss)).is_equal(1800)
 
 
 func test_a_hard_run_plays_harder_boards() -> void:
