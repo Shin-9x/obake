@@ -111,6 +111,12 @@ the workflow run. Release-signed Android builds are only made locally.
 
 macOS and iOS builds come later.
 
+**Performance.** **Show performance** in the settings puts frame rate, frame times, simulation
+tick cost and draw calls in a corner of the screen. Debug builds also offer **Benchmark** in the
+settings opened from the title: it plays busy development boards on its own for 20 shots and
+reports frame time percentiles and dropped frames, also to the log (`adb logcat -s godot` on a
+phone). The tick cost appears in the editor's Monitors tab as `obake/tick_usec`.
+
 ## Layout
 
 | Folder | Content |

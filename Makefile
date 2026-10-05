@@ -28,6 +28,7 @@ lint:
 # The import pass builds the class cache that a fresh checkout lacks.
 # -c keeps running a suite after its first failure so every failing test is reported.
 test:
+	mkdir -p reports && touch reports/.gdignore
 	$(GODOT) --headless --path . --import
 	GODOT_BIN="$$(command -v $(GODOT))" addons/gdUnit4/runtest.sh \
 		--headless --ignoreHeadlessMode -c -a res://tests
@@ -68,7 +69,9 @@ templates:
 	unzip -o -j -q $(TEMPLATES_ARCHIVE) 'templates/version.txt' 'templates/linux_*.x86_64' \
 		'templates/windows_*_x86_64*' 'templates/android_*' -d $(TEMPLATES_DIR)
 
+# Build output and test reports stay out of Godot's file system, and so out of every export.
 import:
+	mkdir -p build reports && touch build/.gdignore reports/.gdignore
 	$(GODOT) --headless --path . --import
 
 exports: export-linux export-windows export-android

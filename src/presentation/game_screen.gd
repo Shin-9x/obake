@@ -7,6 +7,9 @@ extends Control
 ##
 ## A run pauses with the pause action or button: the run's screen stops, the pause menu and the
 ## settings keep working.
+##
+## On phones everything stays inside the display's safe area, clear of camera holes and rounded
+## corners. Menus let the engine skip frames where nothing changes, which saves battery.
 
 const BALANCE: BalanceConfig = preload("res://data/balance.tres")
 const CONTENT: RunContent = preload("res://data/run_content.tres")
@@ -70,6 +73,8 @@ func _ready() -> void:
 	add_child(perf_overlay)
 	Settings.changed.connect(_on_settings_changed)
 	_on_settings_changed()
+	get_viewport().size_changed.connect(_fit_safe_area)
+	_fit_safe_area()
 	show_title()
 
 
@@ -187,6 +192,23 @@ func show_phase() -> void:
 			ending.new_run_requested.connect(show_character_select)
 
 
+## Margins, in viewport pixels (left, top, right, bottom), that keep content inside [param safe],
+## the part of a [param window] in pixels that no camera hole or rounded corner covers. The
+## viewport of [param viewport_size] is scaled evenly and centred in the window.
+static func safe_margins(safe: Rect2i, window: Vector2i, viewport_size: Vector2) -> Vector4:
+	var factor: float = minf(window.x / viewport_size.x, window.y / viewport_size.y)
+	var origin: Vector2 = (Vector2(window) - viewport_size * factor) / 2.0
+	var start: Vector2 = ((Vector2(safe.position) - origin) / factor).max(Vector2.ZERO)
+	var end: Vector2 = ((Vector2(window - safe.end) - origin) / factor).max(Vector2.ZERO)
+	return Vector4(ceilf(start.x), ceilf(start.y), ceilf(end.x), ceilf(end.y))
+
+
+## Whether the engine may skip unchanged frames while [param screen] is on show; only the
+## screens that move every frame need them all.
+static func wants_low_power(screen: Control) -> bool:
+	return not (screen is BoardScreen or screen is FrameBenchmark)
+
+
 func can_pause() -> bool:
 	return run != null and not run.is_over() and pause_menu == null
 
@@ -287,6 +309,8 @@ func _swap(screen: Control) -> void:
 		remove_child(current)
 		current.queue_free()
 	current = screen
+	if DisplayServer.get_name() != "headless":
+		OS.low_processor_usage_mode = wants_low_power(screen)
 	screen.process_mode = Node.PROCESS_MODE_PAUSABLE
 	screen.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(screen)
@@ -309,6 +333,20 @@ func _refresh_overlays() -> void:
 	if pause_menu != null:
 		move_child(pause_menu, -1)
 	move_child(perf_overlay, -1)
+
+
+func _fit_safe_area() -> void:
+	var margins: Vector4 = Vector4.ZERO
+	if OS.has_feature("mobile"):
+		margins = safe_margins(
+			DisplayServer.get_display_safe_area(),
+			DisplayServer.window_get_size(),
+			get_viewport_rect().size
+		)
+	offset_left = margins.x
+	offset_top = margins.y
+	offset_right = -margins.z
+	offset_bottom = -margins.w
 
 
 func _on_settings_changed() -> void:

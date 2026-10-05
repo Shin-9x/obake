@@ -225,6 +225,34 @@ func test_the_frame_benchmark_runs_from_the_settings_in_debug_builds() -> void:
 	assert_object(screen.current).is_instanceof(SettingsScreen)
 
 
+func test_safe_margins_keep_content_clear_of_a_camera_hole() -> void:
+	var window: Vector2i = Vector2i(2400, 1080)
+	var viewport_size: Vector2 = Vector2(800, 360)
+	var hole: Rect2i = Rect2i(Vector2i(110, 0), Vector2i(2290, 1080))
+	assert_that(GameScreen.safe_margins(hole, window, viewport_size)).is_equal(Vector4(37, 0, 0, 0))
+	var rounded: Rect2i = Rect2i(Vector2i(0, 0), Vector2i(2340, 1050))
+	assert_that(GameScreen.safe_margins(rounded, window, viewport_size)).is_equal(
+		Vector4(0, 0, 20, 10)
+	)
+	var whole: Rect2i = Rect2i(Vector2i.ZERO, window)
+	assert_that(GameScreen.safe_margins(whole, window, viewport_size)).is_equal(Vector4.ZERO)
+
+
+func test_safe_margins_ignore_the_bars_around_a_letterboxed_viewport() -> void:
+	var window: Vector2i = Vector2i(2340, 1080)
+	var hole: Rect2i = Rect2i(Vector2i(100, 0), Vector2i(2240, 1080))
+	assert_that(GameScreen.safe_margins(hole, window, Vector2(640, 360))).is_equal(Vector4.ZERO)
+
+
+func test_only_screens_that_move_every_frame_need_every_frame() -> void:
+	var board: BoardScreen = auto_free(BoardScreen.new())
+	var benchmark: FrameBenchmark = auto_free(FrameBenchmark.new())
+	var title: TitleScreen = auto_free(TitleScreen.new())
+	assert_bool(GameScreen.wants_low_power(board)).is_false()
+	assert_bool(GameScreen.wants_low_power(benchmark)).is_false()
+	assert_bool(GameScreen.wants_low_power(title)).is_true()
+
+
 func _wipe() -> void:
 	if not DirAccess.dir_exists_absolute(SAVES):
 		return

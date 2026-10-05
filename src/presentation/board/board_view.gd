@@ -5,6 +5,9 @@ extends Node2D
 ## Static pegs are drawn in a single pass and redrawn only on [method refresh_pegs]. Moving pegs
 ## live on their own layer, redrawn every frame only when the board has moving groups. Balls and
 ## the bucket are sprites moved every frame from the previous and current simulation states.
+##
+## Pegs are drawn in passes, lines and then sprites grouped by texture, because every change
+## between a texture and plain shapes, or between two textures, costs the renderer a draw call.
 
 ## Milli-pixels per pixel, as a float for rendering.
 const PX: float = 1000.0
@@ -32,6 +35,8 @@ var _bucket_previous: float = 0.0
 var _moving_layer: Node2D
 var _bucket_sprite: Sprite2D
 var _launcher: Sprite2D
+## Every round peg texture seen on this board, in the order the passes draw them.
+var _peg_textures: Array[Texture2D] = []
 
 
 func setup(game: BoardGame, config: BalanceConfig, skin: BoardSkin) -> void:
@@ -53,6 +58,7 @@ func setup(game: BoardGame, config: BalanceConfig, skin: BoardSkin) -> void:
 	for sprite: Sprite2D in _balls:
 		sprite.visible = false
 	_ball_textures.fill(skin.ball_texture)
+	_peg_textures.clear()
 	_was_active.fill(0)
 	_peg_previous.resize(game.simulation.pegs.size())
 	capture_previous()
@@ -144,11 +150,7 @@ func _draw() -> void:
 		return
 	for zone: SimZone in _game.simulation.zones:
 		_draw_zone(zone)
-	var pegs: Array[SimPeg] = _game.simulation.pegs
-	for index: int in pegs.size():
-		var peg: SimPeg = pegs[index]
-		if peg.group < 0 and not peg.removed:
-			_draw_peg(self, index, Vector2(peg.x, peg.y) / PX)
+	_draw_pegs(self, false)
 
 
 func _draw_zone(zone: SimZone) -> void:
@@ -164,33 +166,62 @@ func _draw_zone(zone: SimZone) -> void:
 
 
 func _draw_moving_pegs() -> void:
-	if _game == null:
-		return
-	var simulation: BoardSimulation = _game.simulation
-	for group: MovingGroup in simulation.groups:
-		for index: int in group.pegs:
-			var peg: SimPeg = simulation.pegs[index]
-			if peg.removed:
-				continue
-			var current: Vector2 = Vector2(peg.x, peg.y) / PX
-			_draw_peg(_moving_layer, index, _peg_previous[index].lerp(current, _alpha))
+	if _game != null:
+		_draw_pegs(_moving_layer, true)
 
 
-func _draw_peg(canvas: CanvasItem, index: int, centre: Vector2) -> void:
-	var peg: SimPeg = _game.simulation.pegs[index]
-	var definition: PegDefinition = _game.definition_of(index)
-	var tint: Color = LIT_TINT if peg.lit else Color.WHITE
-	if _game.is_burning(index):
-		canvas.draw_arc(centre, peg.extent / PX + 2.0, 0.0, TAU, 16, BURN_COLOUR, 1.0)
-	if peg.shape == SimPeg.Shape.ROUND:
-		var texture: Texture2D = definition.texture
-		canvas.draw_texture(texture, centre - texture.get_size() / 2.0, tint)
-		if peg.lit:
-			canvas.draw_arc(centre, peg.radius / PX + 1.0, 0.0, TAU, 16, _skin.lit_color, 1.0)
-		return
-	var half: Vector2 = Vector2(peg.half_width, peg.half_height) / PX
-	var rect: Rect2 = Rect2(-half, half * 2.0)
-	canvas.draw_set_transform(centre, deg_to_rad(peg.angle_cd / 100.0))
-	canvas.draw_rect(rect, definition.color * tint)
-	canvas.draw_rect(rect, _skin.lit_color if peg.lit else definition.color.darkened(0.5), false)
+## Draws the pegs that stay put, or those of the moving groups: fire rings first, then the round
+## pegs one texture at a time, then the rings of lit pegs and the rectangular pegs.
+func _draw_pegs(canvas: CanvasItem, moving: bool) -> void:
+	var pegs: Array[SimPeg] = _game.simulation.pegs
+	for index: int in pegs.size():
+		var peg: SimPeg = pegs[index]
+		if not _shows(peg, moving):
+			continue
+		if _game.is_burning(index):
+			var extent: float = peg.extent / PX + 2.0
+			canvas.draw_arc(_peg_centre(index, moving), extent, 0.0, TAU, 16, BURN_COLOUR, 1.0)
+		if peg.shape == SimPeg.Shape.ROUND:
+			var seen: Texture2D = _game.definition_of(index).texture
+			if not _peg_textures.has(seen):
+				_peg_textures.append(seen)
+	for texture: Texture2D in _peg_textures:
+		var half_size: Vector2 = texture.get_size() / 2.0
+		for index: int in pegs.size():
+			var peg: SimPeg = pegs[index]
+			if (
+				_shows(peg, moving)
+				and peg.shape == SimPeg.Shape.ROUND
+				and _game.definition_of(index).texture == texture
+			):
+				var tint: Color = LIT_TINT if peg.lit else Color.WHITE
+				canvas.draw_texture(texture, _peg_centre(index, moving) - half_size, tint)
+	for index: int in pegs.size():
+		var peg: SimPeg = pegs[index]
+		if not _shows(peg, moving):
+			continue
+		var centre: Vector2 = _peg_centre(index, moving)
+		if peg.shape == SimPeg.Shape.ROUND:
+			if peg.lit:
+				canvas.draw_arc(centre, peg.radius / PX + 1.0, 0.0, TAU, 16, _skin.lit_color, 1.0)
+			continue
+		var definition: PegDefinition = _game.definition_of(index)
+		var tint: Color = LIT_TINT if peg.lit else Color.WHITE
+		var half: Vector2 = Vector2(peg.half_width, peg.half_height) / PX
+		var rect: Rect2 = Rect2(-half, half * 2.0)
+		var outline: Color = _skin.lit_color if peg.lit else definition.color.darkened(0.5)
+		canvas.draw_set_transform(centre, deg_to_rad(peg.angle_cd / 100.0))
+		canvas.draw_rect(rect, definition.color * tint)
+		canvas.draw_rect(rect, outline, false)
 	canvas.draw_set_transform(Vector2.ZERO)
+
+
+func _shows(peg: SimPeg, moving: bool) -> bool:
+	return not peg.removed and (peg.group >= 0) == moving
+
+
+## Where peg [param index] is drawn: moving pegs are interpolated between ticks.
+func _peg_centre(index: int, moving: bool) -> Vector2:
+	var peg: SimPeg = _game.simulation.pegs[index]
+	var current: Vector2 = Vector2(peg.x, peg.y) / PX
+	return _peg_previous[index].lerp(current, _alpha) if moving else current
