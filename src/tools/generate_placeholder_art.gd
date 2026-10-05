@@ -113,7 +113,9 @@ func _init() -> void:
 		_save(_map_icon(node), "map_" + node)
 	for mark: String in MARKS:
 		_save(_mark(MARKS[mark][0], MARKS[mark][1]), mark)
-	_save(_mascot(), "mascot_obo")
+	_save(_mascot("idle"), "mascot_obo")
+	for mood: String in ["happy", "worried", "sad", "excited"]:
+		_save(_mascot(mood), "mascot_obo_" + mood)
 	for index: int in OMAMORI.size():
 		_save(_omamori(OMAMORI_COLOURS[index], index), "omamori_" + OMAMORI[index])
 	_save(_bucket(), "bucket")
@@ -398,8 +400,9 @@ func _map_icon(node: String) -> Image:
 	return image
 
 
-## Obo, the chōchin-obake: a paper lantern with one big eye and its tongue hanging out.
-func _mascot() -> Image:
+## Obo, the chōchin-obake: a paper lantern with one big eye and its tongue hanging out. The
+## [param mood] changes the eye and adds a sweat drop, a tear or a blush.
+func _mascot(mood: String) -> Image:
 	var image: Image = _blank(MASCOT_SIZE, MASCOT_SIZE)
 	var paper: Color = Color("#f2c46b")
 	var rib: Color = Color("#c98f3a")
@@ -420,19 +423,46 @@ func _mascot() -> Image:
 		image.set_pixel(x, 2, ink)
 		image.set_pixel(x, 21, ink)
 		image.set_pixel(x, 22, ink)
-	for y: int in range(6, 13):
+	var tongue: Color = Color("#e0475b")
+	if mood == "happy":
+		# A closed, smiling eye.
 		for x: int in range(8, 16):
-			var eye: float = Vector2(x - 11.5, y - 9.0).length()
-			if eye <= 3.6:
-				image.set_pixel(x, y, ink if eye > 2.9 else Color.WHITE)
-	for y: int in range(8, 11):
-		image.set_pixel(12, y, ink)
-		image.set_pixel(13, y, ink)
+			var arc: int = 9 - int(absf(x - 11.5) < 2.5)
+			image.set_pixel(x, arc, ink)
+	else:
+		for y: int in range(6, 13):
+			for x: int in range(8, 16):
+				var eye: float = Vector2(x - 11.5, y - 9.0).length()
+				if eye <= 3.6:
+					image.set_pixel(x, y, ink if eye > 2.9 else Color.WHITE)
+		var pupil: int = 9 if mood != "worried" else 10
+		for y: int in range(pupil - 1, pupil + 2):
+			image.set_pixel(12, y, ink)
+			image.set_pixel(13, y, ink)
+		if mood == "sad":
+			for x: int in range(8, 16):
+				image.set_pixel(x, 6, ink)
+				image.set_pixel(x, 7, paper.darkened(0.15))
+		if mood == "excited":
+			image.set_pixel(11, 8, Color("#ffd866"))
+			image.set_pixel(10, 9, Color("#ffd866"))
 	for x: int in range(9, 15):
 		image.set_pixel(x, 15, ink)
-	for y: int in range(16, 21):
-		image.set_pixel(13, y, Color("#e0475b"))
-		image.set_pixel(14, y, Color("#e0475b"))
+	if mood != "sad":
+		for y: int in range(16, 21):
+			image.set_pixel(13, y, tongue)
+			image.set_pixel(14, y, tongue)
+	match mood:
+		"worried":
+			for y: int in range(5, 9):
+				image.set_pixel(19, y, Color("#6fc3ff"))
+			image.set_pixel(18, 8, Color("#6fc3ff"))
+		"sad":
+			for y: int in range(12, 15):
+				image.set_pixel(8, y, Color("#6fc3ff"))
+		"excited", "happy":
+			for x: int in [6, 7, 16, 17]:
+				image.set_pixel(x, 13, Color("#ff8fa3"))
 	return image
 
 

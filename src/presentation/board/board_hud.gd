@@ -16,12 +16,22 @@ const JOLT_TIME: float = 0.3
 const JOLT_DISTANCE: float = 3.0
 const SLOT_SIZE: Vector2 = Vector2(20, 20)
 const SLOT_COLOUR: Color = Color(0.180392, 0.203922, 0.286275, 1)
+## Seconds and size of Obo's pop when its mood changes, and of the celebration banner.
+const POP_TIME: float = 0.25
+const POP_SCALE: float = 1.4
+const BANNER_TIME: float = 2.0
+
+## Obo's faces, by [enum MascotMood.Mood].
+var mascot_moods: Array[Texture2D] = []
 
 var _burst_age: float = -1.0
 var _slot_ages: PackedFloat32Array = PackedFloat32Array()
 var _slots: Array[ColorRect] = []
 var _jolt_age: float = -1.0
 var _portrait_age: float = -1.0
+var _pop_age: float = -1.0
+var _banner_age: float = -1.0
+var _mood: MascotMood.Mood = MascotMood.Mood.IDLE
 
 @onready var _shots: Label = %ShotsValue
 @onready var _ball: Label = %BallValue
@@ -55,6 +65,8 @@ var _portrait_age: float = -1.0
 @onready var _boss_portrait: TextureRect = %BossPortrait
 @onready var _boss_name: Label = %BossName
 @onready var _boss_rule: Label = %BossRule
+@onready var _obo: TextureRect = %Obo
+@onready var _banner: Label = %Celebration
 
 
 func _ready() -> void:
@@ -129,6 +141,26 @@ func show_boss(boss: BossDefinition) -> void:
 	_boss_rule.text = boss.description_key
 
 
+## Shows Obo's [param mood], with a little pop when it changes.
+func show_mood(mood: MascotMood.Mood) -> void:
+	if mood < mascot_moods.size():
+		_obo.texture = mascot_moods[mood]
+	if mood == _mood:
+		return
+	_mood = mood
+	_pop_age = 0.0
+	set_process(true)
+
+
+## Flashes a big banner across the board, such as the Matsuri; the end-of-board overlay waits
+## for it to finish.
+func celebrate(key: String) -> void:
+	_banner.text = tr(key)
+	_banner.visible = true
+	_banner_age = 0.0
+	set_process(true)
+
+
 ## Text of the end-of-board button: play again on its own, continue in a run.
 func set_continue_text(key: String) -> void:
 	_continue.text = key
@@ -162,6 +194,9 @@ func update_bag(game: BoardGame) -> void:
 
 
 func show_board(placed: PlacedBoard, board_seed: int) -> void:
+	_result_title.text = ""
+	_banner_age = -1.0
+	_banner.visible = false
 	_seed.text = "%s %X" % [tr("HUD_SEED"), board_seed]
 	_layout.text = placed.layout.id
 	if placed.mirrored:
@@ -203,7 +238,7 @@ func show_result(game: BoardGame) -> void:
 	_result_total.text = tr("RESULT_TOTAL") % game.total
 	_result_shots.text = tr("RESULT_UNUSED_SHOTS") % game.shots_left
 	_result_shots.visible = game.outcome != BoardGame.Outcome.FAILED
-	_result.visible = true
+	_result.visible = _banner_age < 0.0
 
 
 func _process(delta: float) -> void:
@@ -222,6 +257,25 @@ func _process(delta: float) -> void:
 		_boss_portrait.position.x = sin(_jolt_age * 60.0) * JOLT_DISTANCE * left
 		if left <= 0.0:
 			_jolt_age = -1.0
+		else:
+			busy = true
+	if _pop_age >= 0.0:
+		_pop_age += delta
+		var settle: float = clampf(_pop_age / POP_TIME, 0.0, 1.0)
+		_obo.scale = Vector2.ONE * lerpf(POP_SCALE, 1.0, settle)
+		if settle >= 1.0:
+			_pop_age = -1.0
+		else:
+			busy = true
+	if _banner_age >= 0.0:
+		_banner_age += delta
+		var shown: float = clampf(_banner_age / BANNER_TIME, 0.0, 1.0)
+		_banner.scale = Vector2.ONE * lerpf(1.6, 1.0, minf(1.0, shown * 6.0))
+		_banner.modulate.a = 1.0 - maxf(0.0, shown - 0.7) / 0.3
+		if shown >= 1.0:
+			_banner_age = -1.0
+			_banner.visible = false
+			_result.visible = not _result_title.text.is_empty()
 		else:
 			busy = true
 	if _portrait_age >= 0.0:

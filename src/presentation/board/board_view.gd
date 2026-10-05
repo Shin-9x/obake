@@ -16,6 +16,9 @@ const ZONE_RINGS: int = 3
 ## Ring drawn around pegs that are about to be hit by fire.
 const BURN_COLOUR: Color = Color("#ff7a2f")
 
+## Trail drawn behind each ball, fed the positions the balls are drawn at.
+var trails: BallTrails
+
 var _game: BoardGame
 var _skin: BoardSkin
 var _bucket_y: float = 0.0
@@ -120,10 +123,16 @@ func render(alpha: float) -> void:
 		var ball: SimBall = balls[index] if index < balls.size() else null
 		sprite.visible = ball != null and ball.active
 		if not sprite.visible:
+			if trails != null:
+				trails.track(index, Vector2.ZERO, false)
 			continue
 		var current: Vector2 = Vector2(ball.x, ball.y) / PX
 		var interpolate: bool = index < _was_active.size() and _was_active[index] == 1
 		sprite.position = _previous[index].lerp(current, alpha) if interpolate else current
+		if trails != null:
+			trails.track(index, sprite.position, true)
+	if trails != null:
+		trails.queue_redraw()
 	var bucket_x: float = lerpf(_bucket_previous, simulation.bucket.x / PX, alpha)
 	_bucket_sprite.position = Vector2(bucket_x, _bucket_y)
 	if not simulation.groups.is_empty():

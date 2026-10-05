@@ -7,6 +7,8 @@
 [ext_resource type="Script" uid="uid://b23dxxjgbabmh" path="res://src/presentation/board/board_hud.gd" id="5_hud"]
 [ext_resource type="Script" uid="uid://b86u1dyc308tv" path="res://src/presentation/board/aim_input.gd" id="6_aim"]
 [ext_resource type="Script" uid="uid://b7ktdf18bhrte" path="res://src/presentation/board/blast_rings.gd" id="7_blasts"]
+[ext_resource type="Script" path="res://src/presentation/board/hit_sparks.gd" id="8_sparks"]
+[ext_resource type="Script" path="res://src/presentation/board/ball_trails.gd" id="9_trails"]
 
 [node name="BoardScreen" type="Control"]
 layout_mode = 3
@@ -54,19 +56,30 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="BoardView" type="Node2D" parent="Board"]
+[node name="World" type="Node2D" parent="Board"]
+unique_name_in_owner = true
+
+[node name="BoardView" type="Node2D" parent="Board/World"]
 unique_name_in_owner = true
 script = ExtResource("2_view")
 
-[node name="AimGuide" type="Node2D" parent="Board"]
+[node name="BallTrails" type="Node2D" parent="Board/World"]
+unique_name_in_owner = true
+script = ExtResource("9_trails")
+
+[node name="AimGuide" type="Node2D" parent="Board/World"]
 unique_name_in_owner = true
 script = ExtResource("3_guide")
 
-[node name="ScorePopups" type="Node2D" parent="Board"]
+[node name="HitSparks" type="Node2D" parent="Board/World"]
+unique_name_in_owner = true
+script = ExtResource("8_sparks")
+
+[node name="ScorePopups" type="Node2D" parent="Board/World"]
 unique_name_in_owner = true
 script = ExtResource("4_popups")
 
-[node name="BlastRings" type="Node2D" parent="Board"]
+[node name="BlastRings" type="Node2D" parent="Board/World"]
 unique_name_in_owner = true
 script = ExtResource("7_blasts")
 
@@ -238,6 +251,23 @@ auto_translate_mode = 2
 theme_override_font_sizes/font_size = 8
 text = "0"
 
+[node name="Obo" type="TextureRect" parent="Hud/LeftPanel"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -40.0
+offset_top = -44.0
+offset_right = -8.0
+offset_bottom = -12.0
+pivot_offset = Vector2(16, 16)
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
 [node name="RightPanel" type="ColorRect" parent="Hud"]
 unique_name_in_owner = true
 layout_mode = 1
@@ -350,6 +380,28 @@ color = Color(0.180392, 0.203922, 0.286275, 1)
 custom_minimum_size = Vector2(20, 20)
 layout_mode = 2
 color = Color(0.180392, 0.203922, 0.286275, 1)
+
+[node name="Celebration" type="Label" parent="Hud"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -120.0
+offset_top = -60.0
+offset_right = 120.0
+offset_bottom = -20.0
+pivot_offset = Vector2(120, 20)
+auto_translate_mode = 2
+theme_override_colors/font_color = Color(1, 0.847059, 0.4, 1)
+theme_override_colors/font_outline_color = Color(0.352941, 0.0392157, 0.0784314, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 28
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="TouchControls" type="Control" parent="Hud"]
 unique_name_in_owner = true
