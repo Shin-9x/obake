@@ -13,9 +13,21 @@ TEMPLATES_DIR ?= $(HOME)/.local/share/godot/export_templates/$(GODOT_VERSION).st
 ADB ?= adb
 ANDROID_PACKAGE := io.github.shin9x.obake
 
+# Balance bot runs: how many, aims tried per shot, parallel processes, Hard mode (1), items of a
+# new profile only (1), the seed of the first run, and where their lines go.
+RUNS ?= 60
+SKILL ?= 8
+JOBS ?= 10
+HARD ?= 0
+FRESH ?= 0
+FIRST_SEED ?= 1
+LOGS ?= reports/balance
+# Balance numbers to try instead of the shipped ones, as name:value pairs separated by commas.
+SET ?=
+
 .PHONY: setup format lint test check bench placeholder-art placeholder-audio layouts replays \
 	templates import exports export-linux export-windows export-android export-android-debug \
-	pull-logs
+	pull-logs balance-sim balance-report
 
 setup:
 	$(PYTHON) -m venv $(VENV)
@@ -106,3 +118,15 @@ pull-logs:
 	mkdir -p reports/logs
 	$(ADB) exec-out run-as $(ANDROID_PACKAGE) cat files/run_logs/runs.jsonl > reports/logs/phone.jsonl.part
 	mv reports/logs/phone.jsonl.part reports/logs/phone.jsonl
+
+# Plays bot runs in parallel processes, each writing its own file, then sums them up.
+balance-sim: import
+	rm -rf $(LOGS) && mkdir -p $(LOGS)
+	seq 0 $$(($(JOBS) - 1)) | xargs -P $(JOBS) -I{} $(GODOT) --headless --path . \
+		-s res://src/tools/balance/balance_sim.gd -- --runs=$(RUNS) --jobs=$(JOBS) --job={} \
+		--skill=$(SKILL) --hard=$(HARD) --fresh=$(FRESH) --first-seed=$(FIRST_SEED) \
+		--set=$(SET) --out=$(LOGS)/job_{}.jsonl
+	$(MAKE) --no-print-directory balance-report LOGS=$(LOGS)
+
+balance-report: import
+	$(GODOT) --headless --path . -s res://src/tools/balance/balance_report.gd -- --logs=$(LOGS)

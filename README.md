@@ -130,6 +130,22 @@ over USB:
 make pull-logs ADB=~/Android/Sdk/platform-tools/adb  # writes reports/logs/phone.jsonl
 ```
 
+The balance bot plays whole runs headless and writes the same lines. For each shot it tries
+`SKILL` aims spread across the launcher's range on copies of the run and keeps the one that
+scores most, so a skill of 1 shoots at random; in shops and rewards it favours rare items and
+keeps some mon for interest. The characters take turns.
+
+```bash
+make balance-sim RUNS=60 SKILL=8 JOBS=10 HARD=0 FRESH=0  # bot runs into reports/balance, then a report
+make balance-report LOGS=reports/logs                    # sums up any folder of run logs
+```
+
+`FRESH=1` limits the items to those a new profile has unlocked, and `SET` tries other balance
+numbers without editing them, for example `SET=first_board_target:700,board_target_growth:1250`. The report gives, for Normal and
+Hard apart, how many runs were won and on which floor the others ended, wins by character, and
+for each board of a run how often it was reached, won and turned into a Matsuri, the median
+score against the target, the shots left when won and the mon held afterwards.
+
 ## Layout
 
 | Folder | Content |
