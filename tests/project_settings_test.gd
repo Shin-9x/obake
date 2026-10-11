@@ -13,10 +13,10 @@ func test_base_resolution_is_640x360() -> void:
 	assert_that(_setting("display/window/size/viewport_height")).is_equal(BASE_HEIGHT)
 
 
-func test_stretch_scales_whole_viewport_by_integer_factors() -> void:
+func test_stretch_scales_the_whole_viewport_to_fill_the_window() -> void:
 	assert_that(_setting("display/window/stretch/mode")).is_equal("viewport")
 	assert_that(_setting("display/window/stretch/aspect")).is_equal("expand")
-	assert_that(_setting("display/window/stretch/scale_mode")).is_equal("integer")
+	assert_that(_setting("display/window/stretch/scale_mode")).is_equal("fractional")
 
 
 func test_canvas_textures_use_nearest_filter() -> void:

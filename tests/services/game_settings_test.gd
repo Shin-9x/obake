@@ -5,13 +5,27 @@ extends GdUnitTestSuite
 func test_defaults_round_trip_through_json() -> void:
 	var settings: GameSettings = GameSettings.new()
 	settings.language = "it"
-	settings.scaling = GameSettings.Scaling.FRACTIONAL
+	settings.scaling = GameSettings.Scaling.INTEGER
 	settings.fast_forward_speed = 2
 	settings.vibration = false
 	settings.show_performance = true
 	var text: String = JSON.stringify(settings.to_dictionary())
 	var restored: GameSettings = GameSettings.from_dictionary(JSON.parse_string(text))
 	assert_dict(restored.to_dictionary()).is_equal(settings.to_dictionary())
+
+
+func test_the_picture_fills_the_screen_by_default() -> void:
+	assert_int(GameSettings.new().scaling).is_equal(GameSettings.Scaling.FRACTIONAL)
+	assert_int(GameSettings.from_dictionary({}).scaling).is_equal(GameSettings.Scaling.FRACTIONAL)
+
+
+func test_scaling_saved_before_the_new_default_is_dropped_once() -> void:
+	var old: GameSettings = GameSettings.from_dictionary({"scaling": "integer", "music_volume": 30})
+	assert_int(old.scaling).is_equal(GameSettings.Scaling.FRACTIONAL)
+	assert_int(old.music_volume).is_equal(30)
+	old.scaling = GameSettings.Scaling.INTEGER
+	var saved: Variant = JSON.parse_string(JSON.stringify(old.to_dictionary()))
+	assert_int(GameSettings.from_dictionary(saved).scaling).is_equal(GameSettings.Scaling.INTEGER)
 
 
 func test_values_read_back_are_clamped_or_fall_back_to_defaults() -> void:

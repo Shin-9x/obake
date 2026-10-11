@@ -4,6 +4,9 @@ class_name GameSettings
 
 enum Scaling { INTEGER, FRACTIONAL }
 
+## Version of the saved form. Files older than 2 chose their scaling when whole-number scaling
+## was the default, so their choice is dropped once for the new default.
+const FORMAT: int = 2
 ## Languages offered, by locale code; an empty code follows the system.
 const LANGUAGES: Array[String] = ["", "en", "it"]
 const MAX_VOLUME: int = 100
@@ -16,7 +19,8 @@ var master_volume: int = 80
 var music_volume: int = 70
 var sfx_volume: int = 80
 var language: String = ""
-var scaling: Scaling = Scaling.INTEGER
+## The picture fills the screen by default; whole-number scaling keeps every pixel the same size.
+var scaling: Scaling = Scaling.FRACTIONAL
 var fullscreen: bool = false
 var screen_shake: bool = true
 var fast_forward_speed: int = 3
@@ -29,6 +33,7 @@ var show_performance: bool = false
 
 func to_dictionary() -> Dictionary[String, Variant]:
 	return {
+		"format": FORMAT,
 		"master_volume": master_volume,
 		"music_volume": music_volume,
 		"sfx_volume": sfx_volume,
@@ -54,9 +59,8 @@ static func from_dictionary(data: Variant) -> GameSettings:
 	var language: Variant = source.get("language")
 	if language is String and LANGUAGES.has(language):
 		settings.language = language
-	settings.scaling = (
-		Scaling.FRACTIONAL if source.get("scaling") == "fractional" else Scaling.INTEGER
-	)
+	if int(source.get("format", 1)) >= FORMAT and source.get("scaling") == "integer":
+		settings.scaling = Scaling.INTEGER
 	settings.fullscreen = source.get("fullscreen", false) == true
 	settings.screen_shake = source.get("screen_shake", true) == true
 	var speed: int = int(source.get("fast_forward_speed", settings.fast_forward_speed))
