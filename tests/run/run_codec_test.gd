@@ -16,8 +16,12 @@ func test_a_state_round_trips_through_json_and_keeps_its_streams() -> void:
 	state.inventory.add_peg(load("res://data/pegs/bell.tres"))
 	state.carry.add_role_bonus(BoardGame.Role.BLUE, 2)
 	var data: Dictionary = JSON.parse_string(JSON.stringify(RunCodec.encode(state)))
-	var restored: RunState = RunCodec.decode(data, config, ItemCatalog.new(Fixtures.content()))
+	var bosses: int = Fixtures.content().floor_bosses.size()
+	var restored: RunState = RunCodec.decode(
+		data, config, ItemCatalog.new(Fixtures.content()), bosses
+	)
 	assert_object(restored).is_not_null()
+	assert_array(restored.boss_order).is_equal(state.boss_order)
 	assert_dict(RunCodec.encode(restored)).is_equal(RunCodec.encode(state))
 	for domain: int in RngStreams.Domain.size():
 		assert_int(restored.streams.stream(domain).next_u32()).is_equal(
@@ -30,7 +34,5 @@ func test_a_state_round_trips_through_json_and_keeps_its_streams() -> void:
 func test_unknown_items_make_the_state_unreadable() -> void:
 	var data: Dictionary = RunCodec.encode(Fixtures.state())
 	data["omamori"] = ["no_such_charm"]
-	(
-		assert_object(RunCodec.decode(data, Fixtures.config(), ItemCatalog.new(Fixtures.content())))
-		. is_null()
-	)
+	var catalog: ItemCatalog = ItemCatalog.new(Fixtures.content())
+	assert_object(RunCodec.decode(data, Fixtures.config(), catalog, 4)).is_null()

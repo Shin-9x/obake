@@ -13,7 +13,8 @@ signal action_recorded
 
 enum Phase { MAP, BOARD, REWARD, SHOP, SHRINE, EVENT, VICTORY, DEFEAT }
 
-const SAVE_FORMAT: int = 1
+## 2: the bosses of the early floors are dealt by the seed.
+const SAVE_FORMAT: int = 2
 
 var phase: Phase = Phase.MAP
 var state: RunState
@@ -54,7 +55,7 @@ static func start(
 ) -> Run:
 	var used: RunOptions = options if options != null else RunOptions.new()
 	var run: Run = _create(run_config, used.filter(run_content), layouts, base_pegs)
-	run.state = RunState.start(run_config, character, seed_value)
+	run.state = RunState.start(run_config, character, seed_value, run_content.floor_bosses.size())
 	if used.hard:
 		run.state.shot_delta += run_config.hard_shot_delta
 	run.run_log = RunLog.new(seed_value, character.id, used)
@@ -79,7 +80,9 @@ static func resume(
 	if saved == null or not data is Dictionary:
 		return null
 	var run: Run = _create(run_config, saved.options.filter(run_content), layouts, base_pegs)
-	run.state = RunCodec.decode(data, run_config, ItemCatalog.new(run_content))
+	run.state = RunCodec.decode(
+		data, run_config, ItemCatalog.new(run_content), run_content.floor_bosses.size()
+	)
 	if run.state == null:
 		return null
 	var start: int = clampi(int(save.get("snapshot_at", 0)), 0, saved.size())
@@ -145,8 +148,9 @@ func choose_node(node: int) -> bool:
 	return true
 
 
+## The boss of the current floor, as the seed dealt it.
 func current_boss() -> BossDefinition:
-	return content.floor_bosses[state.floor_index]
+	return content.floor_bosses[state.boss_order[state.floor_index]]
 
 
 ## Fires the next shot of the board; [param clock] is the board clock when the player shot.

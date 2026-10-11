@@ -376,7 +376,7 @@
 			],
 			[
 				17,
-				1,
+				2,
 				-1
 			],
 			[
@@ -577,8 +577,8 @@
 			"seed": 13,
 			"streams": [
 				[
-					4008696891,
-					35547815,
+					4210637159,
+					44067885,
 					0,
 					1
 				],
@@ -723,8 +723,8 @@
 			],
 			"bet": 0,
 			"events_seen": [
-				"fox_merchant",
-				"kappa"
+				"hot_spring",
+				"abandoned_temple"
 			],
 			"boards_won": 10,
 			"matsuri": 1,

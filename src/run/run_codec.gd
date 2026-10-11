@@ -1,6 +1,7 @@
 class_name RunCodec
 ## Turns a [RunState] into JSON-friendly data and back. Items are stored by id and random
-## streams by their 32-bit words; floor maps are not stored, since the seed draws them again.
+## streams by their 32-bit words; floor maps and the order of the bosses are not stored, since
+## the seed draws them again.
 
 
 static func encode(state: RunState) -> Dictionary[String, Variant]:
@@ -34,12 +35,15 @@ static func encode(state: RunState) -> Dictionary[String, Variant]:
 	}
 
 
-## Rebuilds the state written by [method encode]; null when an item is unknown.
-static func decode(data: Dictionary, config: BalanceConfig, catalog: ItemCatalog) -> RunState:
+## Rebuilds the state written by [method encode], for a game with [param bosses] bosses; null
+## when an item is unknown.
+static func decode(
+	data: Dictionary, config: BalanceConfig, catalog: ItemCatalog, bosses: int
+) -> RunState:
 	var character: CharacterDefinition = catalog.find(StringName(str(data["character"])))
 	if character == null:
 		return null
-	var state: RunState = RunState.start(config, character, int(data["seed"]))
+	var state: RunState = RunState.start(config, character, int(data["seed"]), bosses)
 	var inventory: Inventory = Inventory.new(config, character)
 	inventory.loadout.balls.clear()
 	inventory.loadout.ball_levels.clear()

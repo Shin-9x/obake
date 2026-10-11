@@ -100,6 +100,7 @@ func test_a_lost_board_ends_the_run_and_a_new_run_can_start() -> void:
 
 func test_boss_boards_show_the_boss() -> void:
 	var screen: GameScreen = _started()
+	screen.run.state.boss_order = PackedInt32Array([0, 1, 2, 3])
 	var map: FloorMap = screen.run.state.current_map()
 	screen.run.state.node = map.steps[map.steps.size() - 2][0]
 	screen._on_node_chosen(map.boss())

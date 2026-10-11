@@ -93,6 +93,7 @@ func test_a_full_set_of_slots_needs_an_omamori_to_replace() -> void:
 
 func test_beating_a_boss_offers_omamori_and_opens_the_next_floor() -> void:
 	var run: Run = _run()
+	run.state.boss_order = PackedInt32Array([0, 1, 2, 3])
 	_enter_boss(run)
 	assert_object(run.board.rules.boss).is_same(run.content.floor_bosses[0])
 	assert_str(run.board.layout.id).is_equal("jorogumo")
@@ -108,16 +109,27 @@ func test_beating_a_boss_offers_omamori_and_opens_the_next_floor() -> void:
 
 func test_nue_brings_its_second_form() -> void:
 	var run: Run = _run()
+	run.state.boss_order = PackedInt32Array([0, 1, 2, 3])
 	run.state.floor_index = 1
 	_enter_boss(run)
 	assert_str(run.board.layout.id).is_equal("nue_a")
 	assert_str(run.board.next_layer.id).is_equal("nue_b")
 
 
+func test_each_floor_meets_the_boss_the_seed_dealt() -> void:
+	var run: Run = _run()
+	run.state.boss_order = PackedInt32Array([2, 0, 1, 3])
+	_enter_boss(run)
+	assert_str(String(run.board.rules.boss.id)).is_equal("tamamo")
+	run.state.floor_index = 3
+	assert_str(String(run.current_boss().id)).is_equal("shuten_doji")
+
+
 func test_beating_the_last_boss_wins_the_run() -> void:
 	var run: Run = _run()
 	run.state.floor_index = 3
 	_enter_boss(run)
+	assert_str(String(run.board.rules.boss.id)).is_equal("shuten_doji")
 	Fixtures.finish(run, BoardGame.Outcome.TARGET_REACHED, 0)
 	assert_int(run.phase).is_equal(Run.Phase.VICTORY)
 

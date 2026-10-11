@@ -44,7 +44,9 @@ func test_six_events_with_scripts_and_texts() -> void:
 		assert_bool(event.event_script.new() is RunEvent).is_true()
 		for key: String in [event.title_key, event.text_key]:
 			assert_bool(texts.has(key)).override_failure_message("missing %s" % key).is_true()
-		var state: RunState = RunState.start(BalanceConfig.new(), content.characters[0], 1)
+		var state: RunState = RunState.start(
+			BalanceConfig.new(), content.characters[0], 1, content.floor_bosses.size()
+		)
 		for choice: EventChoice in RunEvent.create(event).choices(state):
 			(
 				assert_bool(texts.has(choice.text_key))

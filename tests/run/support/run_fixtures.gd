@@ -20,7 +20,7 @@ static func character(id: String = "yamabushi") -> CharacterDefinition:
 
 
 static func state(id: String = "yamabushi", seed_value: int = SEED) -> RunState:
-	return RunState.start(config(), character(id), seed_value)
+	return RunState.start(config(), character(id), seed_value, content().floor_bosses.size())
 
 
 static func omamori(id: String) -> OmamoriDefinition:
