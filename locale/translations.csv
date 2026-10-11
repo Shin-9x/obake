@@ -295,3 +295,27 @@ BENCHMARK_DROPPED,Over 16.7 ms: %d (%.1f%%) · over 33.3 ms: %d,"Oltre 16,7 ms: 
 BENCHMARK_TICKS,Ticks per frame: average %d µs · worst %d µs,Tick per frame: media %d µs · peggiore %d µs
 PERF_FRAMES,%d FPS · frame %.1f ms (max %.1f),%d FPS · frame %.1f ms (max %.1f)
 PERF_DETAILS,ticks %d µs · draw calls %d · memory %.0f MB · objects %d,tick %d µs · draw call %d · memoria %.0f MB · oggetti %d
+BUTTON_HOW_TO,How to play,Come si gioca
+BUTTON_NEXT,Next,Avanti
+BUTTON_DONE,Got it,Ho capito
+HOWTO_PAGE,%d / %d,%d / %d
+HOWTO_LANTERNS,Lanterns,Le lanterne
+HOWTO_BLUE,Blue lantern: +10 points.,Lanterna blu: +10 punti.
+HOWTO_RED,Red lantern: +1 mult. Light them all and it is a Matsuri.,Lanterna rossa: +1 mult. Accendile tutte ed è Matsuri.
+HOWTO_GREEN,Green lantern: +10 points and your character's power.,Lanterna verde: +10 punti e il potere del tuo personaggio.
+HOWTO_GOLD,Gold lantern: ×2 mult. It moves after every shot.,Lanterna d'oro: mult ×2. Si sposta dopo ogni tiro.
+HOWTO_SHOTS,Shots and target,Tiri e target
+HOWTO_SHOT_SCORE,"Aim and shoot: every lantern the ball touches lights up. When the ball leaves the board, the shot is worth its points × its mult.","Mira e tira: ogni lanterna toccata dalla pallina si accende. Quando la pallina esce dalla board, il tiro vale punti × mult."
+HOWTO_TARGET,Reach the target before your shots run out to win the board. Shots left over become mon.,Raggiungi il target prima di finire i tiri per vincere la board. I tiri avanzati diventano mon.
+HOWTO_LOSE,"If the shots run out below the target, the run ends.","Se finisci i tiri sotto il target, la run finisce."
+HOWTO_MATSURI_TITLE,Matsuri and the bucket,Matsuri e secchio
+HOWTO_MATSURI,"Light every red lantern for a Matsuri: the board is won, its total doubles and you earn extra mon.","Accendi tutte le lanterne rosse per fare Matsuri: la board è vinta, il totale raddoppia e guadagni mon in più."
+HOWTO_BUCKET,Land the ball in the moving bucket and the shot is free.,Fai cadere la pallina nel secchio in movimento e il tiro è gratis.
+HOWTO_ITEMS,"Bag, omamori and mon","Borsa, omamori e mon"
+HOWTO_BAG,Every shot draws a ball from your bag. Special balls have effects of their own.,Ogni tiro pesca una pallina dalla borsa. Le palline speciali hanno effetti propri.
+HOWTO_OMAMORI,Omamori are charms that act on every shot. Tap one to read what it does.,Gli omamori sono amuleti che agiscono a ogni tiro. Toccane uno per leggere cosa fa.
+HOWTO_MON,Spend mon in the shops. The mon you keep earn interest after every board.,Spendi i mon nei negozi. Quelli che tieni fruttano interessi dopo ogni board.
+HOWTO_CONTROLS,Controls,Comandi
+HOWTO_CONTROLS_TOUCH,"Drag anywhere to aim, use the < > buttons for fine aim and press Shoot. Keep a finger on the screen to fast-forward.","Trascina ovunque per mirare, usa i pulsanti < > per la mira fine e premi Tira. Tieni un dito sullo schermo per l'avanti veloce."
+HOWTO_CONTROLS_MOUSE,"Move the mouse to aim, use the wheel or A/D for fine aim, click or press Enter to shoot. Hold Space to fast-forward; Esc pauses.","Muovi il mouse per mirare, usa la rotella o A/D per la mira fine, clicca o premi Invio per tirare. Tieni Spazio per l'avanti veloce; Esc mette in pausa."
+HOWTO_CONTROLS_PAD,"With a gamepad: left stick to aim, triggers for fine aim, A to shoot, RB to fast-forward, Start to pause.","Con il controller: stick sinistro per mirare, grilletti per la mira fine, A per tirare, RB per l'avanti veloce, Start per la pausa."

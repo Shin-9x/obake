@@ -41,8 +41,8 @@ as Jorōgumo's webs.
 ## Playing
 
 Press **F5** to start at the title screen, where the settings (volumes, language, scaling, screen
-shake, fast-forward speed) also live. **New run** asks for a character, then you pick your way
-through four floors of
+shake, fast-forward speed) also live. **New run** asks for a character, after showing the
+**How to play** pages the first time, then you pick your way through four floors of
 boards, shops, shrines and yōkai events, each ending with a boss. Numbers such as targets,
 prices and odds live in `data/balance.tres`; what a run can offer lives in
 `data/run_content.tres`.

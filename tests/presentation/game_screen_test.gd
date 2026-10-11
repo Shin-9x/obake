@@ -22,6 +22,7 @@ func test_a_run_starts_from_the_title_with_the_choice_of_a_character() -> void:
 	var screen: GameScreen = scene_runner(SCENE).scene() as GameScreen
 	assert_object(screen.current).is_instanceof(TitleScreen)
 	assert_object(Screens.button(screen.current, "BUTTON_CONTINUE_RUN")).is_null()
+	screen.profile.how_to_seen = true
 	Screens.button(screen.current, "BUTTON_NEW_RUN").pressed.emit()
 	assert_object(screen.current).is_instanceof(CharacterSelectScreen)
 	var cards: Array[Node] = Screens.find_all(screen.current, Button).filter(
@@ -31,6 +32,33 @@ func test_a_run_starts_from_the_title_with_the_choice_of_a_character() -> void:
 	(cards[2] as Button).pressed.emit()
 	assert_object(screen.current).is_instanceof(MapScreen)
 	assert_str(String(screen.run.state.inventory.loadout.character.id)).is_equal("tanuki")
+
+
+func test_the_first_run_starts_with_the_how_to_play_pages() -> void:
+	var screen: GameScreen = scene_runner(SCENE).scene() as GameScreen
+	Screens.button(screen.current, "BUTTON_NEW_RUN").pressed.emit()
+	var pages: HowToPlayScreen = screen.current as HowToPlayScreen
+	assert_object(pages).is_not_null()
+	for page: int in pages.page_count():
+		assert_int(pages.page_index).is_equal(page)
+		pages.next()
+	assert_object(screen.current).is_instanceof(CharacterSelectScreen)
+	assert_bool(SaveService.load_profile().how_to_seen).is_true()
+	screen.show_title()
+	Screens.button(screen.current, "BUTTON_NEW_RUN").pressed.emit()
+	assert_object(screen.current).is_instanceof(CharacterSelectScreen)
+
+
+func test_the_how_to_play_pages_open_from_the_title_and_go_back_to_it() -> void:
+	var screen: GameScreen = scene_runner(SCENE).scene() as GameScreen
+	Screens.button(screen.current, "BUTTON_HOW_TO").pressed.emit()
+	var pages: HowToPlayScreen = screen.current as HowToPlayScreen
+	pages.next()
+	assert_int(pages.page_index).is_equal(1)
+	screen.go_back()
+	assert_int(pages.page_index).is_equal(0)
+	screen.go_back()
+	assert_object(screen.current).is_instanceof(TitleScreen)
 
 
 func test_the_title_shows_the_game_version() -> void:

@@ -93,9 +93,10 @@ func show_title() -> void:
 	_swap(screen)
 	screen.open(UI_SKIN, SaveService.has_run())
 	screen.continue_requested.connect(continue_run)
-	screen.new_run_requested.connect(show_character_select)
+	screen.new_run_requested.connect(_on_new_run)
 	screen.compendium_requested.connect(show_compendium)
 	screen.statistics_requested.connect(show_statistics)
+	screen.how_to_requested.connect(show_how_to)
 	screen.settings_requested.connect(show_settings)
 	screen.quit_requested.connect(func() -> void: leave.call())
 
@@ -121,6 +122,14 @@ func show_statistics() -> void:
 	_swap(screen)
 	screen.open(CONTENT, PROGRESSION, profile)
 	screen.closed.connect(show_title)
+
+
+## Shows the "How to play" pages, then goes on with [param after]: the title unless told otherwise.
+func show_how_to(after: Callable = show_title) -> void:
+	var screen: HowToPlayScreen = HowToPlayScreen.new()
+	_swap(screen)
+	screen.open()
+	screen.closed.connect(_on_how_to_closed.bind(after))
 
 
 func show_settings() -> void:
@@ -390,6 +399,21 @@ func _fit_safe_area() -> void:
 ## The run log's view of the run on show; the profile counts runs only once they end.
 func _record() -> RunRecord:
 	return RunRecord.new(profile.runs + 1, BuildInfo.version())
+
+
+## A first run starts with the "How to play" pages.
+func _on_new_run() -> void:
+	if profile.how_to_seen:
+		show_character_select()
+	else:
+		show_how_to(show_character_select)
+
+
+func _on_how_to_closed(after: Callable) -> void:
+	if not profile.how_to_seen:
+		profile.how_to_seen = true
+		SaveService.save_profile(profile)
+	after.call()
 
 
 func _on_settings_changed() -> void:

@@ -14,6 +14,7 @@ func test_a_profile_round_trips_through_json() -> void:
 	profile.best_shot = 2400
 	profile.matsuri = 5
 	profile.boards_won = 30
+	profile.how_to_seen = true
 	var text: String = JSON.stringify(ProfileCodec.encode(profile))
 	var restored: Profile = ProfileCodec.decode(JSON.parse_string(text))
 	assert_dict(ProfileCodec.encode(restored)).is_equal(ProfileCodec.encode(profile))
@@ -28,6 +29,7 @@ func test_an_older_profile_is_read_with_defaults() -> void:
 	assert_bool(restored.has_feat(&"first_matsuri")).is_true()
 	assert_int(restored.runs).is_equal(0)
 	assert_dict(restored.marks).is_empty()
+	assert_bool(restored.how_to_seen).is_false()
 
 
 func test_broken_or_newer_profiles_are_refused() -> void:
