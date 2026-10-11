@@ -118,8 +118,10 @@ offset_top = 8.0
 offset_right = -8.0
 offset_bottom = -8.0
 mouse_filter = 2
+theme_override_constants/separation = 3
 
-[node name="Title" type="Label" parent="Hud/LeftPanel/Content"]
+[node name="GameTitle" type="Label" parent="Hud/LeftPanel/Content" unique_id=1284650173]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "GAME_TITLE"
@@ -151,11 +153,16 @@ theme_override_colors/font_color = Color(0.603922, 0.627451, 0.709804, 1)
 theme_override_font_sizes/font_size = 8
 autowrap_mode = 3
 
-[node name="ShotsCaption" type="Label" parent="Hud/LeftPanel/Content"]
+[node name="ShotsRow" type="HBoxContainer" parent="Hud/LeftPanel/Content" unique_id=1649302857]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 8
+
+[node name="ShotsCaption" type="Label" parent="Hud/LeftPanel/Content/ShotsRow"]
 layout_mode = 2
 text = "HUD_SHOTS"
 
-[node name="ShotsValue" type="Label" parent="Hud/LeftPanel/Content"]
+[node name="ShotsValue" type="Label" parent="Hud/LeftPanel/Content/ShotsRow"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
@@ -181,6 +188,15 @@ stretch_mode = 5
 unique_name_in_owner = true
 layout_mode = 2
 text = "BALL_HITODAMA"
+
+[node name="BallPower" type="Label" parent="Hud/LeftPanel/Content" unique_id=1837264519]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(124, 0)
+layout_mode = 2
+auto_translate_mode = 2
+theme_override_colors/font_color = Color(0.603922, 0.627451, 0.709804, 1)
+theme_override_font_sizes/font_size = 8
+autowrap_mode = 3
 
 [node name="NextCaption" type="Label" parent="Hud/LeftPanel/Content"]
 layout_mode = 2

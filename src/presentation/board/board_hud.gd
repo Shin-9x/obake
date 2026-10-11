@@ -20,6 +20,12 @@ const SLOT_COLOUR: Color = Color(0.180392, 0.203922, 0.286275, 1)
 const POP_TIME: float = 0.25
 const POP_SCALE: float = 1.4
 const BANNER_TIME: float = 2.0
+## Gap between the left panel's edge and its text.
+const PANEL_MARGIN: float = 8.0
+## Height of the strip at the bottom of the screen that the touch buttons cover.
+const TOUCH_STRIP: float = 52.0
+## Obo's size beside the character's name in the touch layout.
+const TOUCH_OBO_SIZE: float = 24.0
 
 ## Obo's faces, by [enum MascotMood.Mood].
 var mascot_moods: Array[Texture2D] = []
@@ -39,6 +45,7 @@ var _info: InfoPopup
 @onready var _shots: Label = %ShotsValue
 @onready var _ball: Label = %BallValue
 @onready var _ball_icon: TextureRect = %BallIcon
+@onready var _ball_power: Label = %BallPower
 @onready var _next: Label = %NextValue
 @onready var _next_icon: TextureRect = %NextIcon
 @onready var _mon: Label = %MonValue
@@ -69,17 +76,36 @@ var _info: InfoPopup
 @onready var _boss_name: Label = %BossName
 @onready var _boss_rule: Label = %BossRule
 @onready var _obo: TextureRect = %Obo
+@onready var _game_title: Label = %GameTitle
+@onready var _left_content: VBoxContainer = %LeftPanel.get_node("Content")
 @onready var _banner: Label = %Celebration
 
 
 func _ready() -> void:
-	_touch_controls.visible = DisplayServer.is_touchscreen_available()
+	use_touch_layout(DisplayServer.is_touchscreen_available())
 	_continue.pressed.connect(continue_requested.emit)
 	for child: Node in _slot_row.get_children():
 		_add_icon(child as ColorRect)
 	_info = InfoPopup.new()
 	add_child(_info)
 	set_process(false)
+
+
+## Lays the board out for fingers: the aim and shoot buttons show, and the left panel keeps clear
+## of them by dropping the game's name and the layout's, moving Obo to the top and ending its
+## text above the buttons.
+func use_touch_layout(on: bool) -> void:
+	_touch_controls.visible = on
+	_game_title.visible = not on
+	_layout.visible = not on
+	_left_content.offset_bottom = -PANEL_MARGIN - (TOUCH_STRIP if on else 0.0)
+	if on:
+		_obo.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+		_obo.offset_left = -PANEL_MARGIN - TOUCH_OBO_SIZE
+		_obo.offset_right = -PANEL_MARGIN
+		_obo.offset_top = PANEL_MARGIN
+		_obo.offset_bottom = PANEL_MARGIN + TOUCH_OBO_SIZE
+		_obo.pivot_offset = Vector2.ONE * TOUCH_OBO_SIZE / 2.0
 
 
 ## Formats a permille mult for display: 2000 is "2", 1500 is "1.5".
@@ -195,9 +221,15 @@ func flash_slot(slot: int) -> void:
 	set_process(true)
 
 
+## Shows the ball about to be fired, with what it does at its level, and the one after it.
 func update_bag(game: BoardGame) -> void:
-	_show_ball(game.bag.peek(0), _ball, _ball_icon)
+	var ball: BagBall = game.bag.peek(0)
+	_show_ball(ball, _ball, _ball_icon)
 	_show_ball(game.bag.peek(1), _next, _next_icon)
+	if ball != null:
+		_ball_power.text = UiKit.describe(ball.definition, ball.level)
+	else:
+		_ball_power.text = tr("BALL_HITODAMA_DESC")
 
 
 func show_board(placed: PlacedBoard, board_seed: int) -> void:
@@ -339,4 +371,6 @@ func _on_slot_input(event: InputEvent, index: int) -> void:
 
 func _show_ball(ball: BagBall, label: Label, icon: TextureRect) -> void:
 	label.text = tr(ball.definition.name_key) if ball != null else tr("BALL_HITODAMA")
+	if ball != null and ball.definition.level_values.size() > 1:
+		label.text += " " + UiKit.level_text(ball.level)
 	icon.texture = ball.definition.texture if ball != null else null

@@ -16,8 +16,12 @@ const RARITY_COLOURS: Dictionary[int, Color] = {
 	ItemDefinition.Rarity.RARE: Color("#ffd866"),
 	ItemDefinition.Rarity.LEGENDARY: Color("#ff8fa3"),
 }
+## Values listed level by level in a description, such as "2/3/4", "×2/×3/×4" or "0.5/1/1.5".
+const LEVEL_VALUES: String = "[×+]?\\d+(?:[.,]\\d+)?(?:/[×+]?\\d+(?:[.,]\\d+)?)+"
 const TITLE_SIZE: int = 18
 const SMALL_SIZE: int = 8
+
+static var _level_values: RegEx
 
 
 ## A full-screen patterned background holding a centred page; the screen's content goes in the
@@ -129,3 +133,19 @@ static func clear(node: Node) -> void:
 ## Roman numerals for item levels.
 static func level_text(level: int) -> String:
 	return ["", "I", "II", "III"][clampi(level, 0, 3)]
+
+
+## What [param item] does at [param level], in the current language: where its description lists
+## one value per level, as in "2/3/4", only the value of that level is kept.
+static func describe(item: ItemDefinition, level: int) -> String:
+	var text: String = TranslationServer.translate(item.description_key)
+	if _level_values == null:
+		_level_values = RegEx.create_from_string(LEVEL_VALUES)
+	var result: String = ""
+	var from: int = 0
+	for found: RegExMatch in _level_values.search_all(text):
+		var values: PackedStringArray = found.get_string().split("/")
+		result += text.substr(from, found.get_start() - from)
+		result += values[clampi(level - 1, 0, values.size() - 1)]
+		from = found.get_end()
+	return result + text.substr(from)

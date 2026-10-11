@@ -28,6 +28,38 @@ func test_a_shot_plays_through_and_updates_the_hud() -> void:
 	assert_str(total.text).starts_with(str(screen.game.total) + " /")
 
 
+func test_the_ball_about_to_be_fired_says_what_it_does() -> void:
+	var runner: GdUnitSceneRunner = scene_runner(SCENE)
+	var screen: BoardScreen = runner.scene() as BoardScreen
+	screen.start_board(SEED)
+	var power: Label = screen.get_node("%BallPower") as Label
+	var ball: BagBall = screen.game.bag.peek(0)
+	assert_str(power.text).is_not_empty()
+	assert_str(power.text).is_equal(UiKit.describe(ball.definition, ball.level))
+	screen.shoot()
+	var next: BagBall = screen.game.bag.peek(0)
+	assert_str(power.text).is_equal(UiKit.describe(next.definition, next.level))
+
+
+func test_the_touch_layout_keeps_the_left_panel_clear_of_the_buttons() -> void:
+	var runner: GdUnitSceneRunner = scene_runner(SCENE)
+	var screen: BoardScreen = runner.scene() as BoardScreen
+	screen.start_board(SEED)
+	var hud: BoardHud = screen.get_node("%Hud") as BoardHud
+	hud.use_touch_layout(true)
+	await runner.simulate_frames(2)
+	var buttons_top: float = (
+		(screen.get_node("%AimLeftButton") as Control).get_global_rect().position.y
+	)
+	var seed_line: Control = screen.get_node("%SeedValue") as Control
+	assert_bool((screen.get_node("%TouchControls") as Control).visible).is_true()
+	assert_float(seed_line.get_global_rect().end.y).is_less_equal(buttons_top)
+	assert_bool((screen.get_node("%GameTitle") as Control).visible).is_false()
+	assert_bool((screen.get_node("%LayoutValue") as Control).visible).is_false()
+	var obo: Control = screen.get_node("%Obo") as Control
+	assert_float(obo.get_global_rect().end.y).is_less(buttons_top)
+
+
 func test_play_again_starts_a_fresh_board() -> void:
 	var runner: GdUnitSceneRunner = scene_runner(SCENE)
 	var screen: BoardScreen = runner.scene() as BoardScreen
