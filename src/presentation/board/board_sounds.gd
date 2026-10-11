@@ -46,6 +46,8 @@ func hear(event: SimEvent) -> void:
 		SimEvent.Kind.EFFECT_TRIGGERED:
 			if event.target == Effect.CHARACTER_SLOT:
 				AudioService.play(AudioService.POWER)
+		SimEvent.Kind.STYLE_BONUS:
+			AudioService.play(AudioService.POWER)
 		SimEvent.Kind.LAYOUT_CHANGED:
 			AudioService.play(AudioService.BOSS_HIT)
 		SimEvent.Kind.SHOT_SCORED:

@@ -13,10 +13,10 @@ const HASH_MODULUS: int = 2_147_483_647
 const HASH_MULTIPLIER: int = 1_000_003
 ## Total and hash chain per boss.
 const GOLDEN: Dictionary[String, Array] = {
-	"jorogumo": [1380, 577019640],
-	"nue": [1010, 2028664732],
-	"tamamo": [685, 493019329],
-	"shuten_doji": [850, 445596392],
+	"jorogumo": [1570, 1750542289],
+	"nue": [910, 1641638949],
+	"tamamo": [1165, 678303207],
+	"shuten_doji": [1350, 1119755871],
 }
 
 

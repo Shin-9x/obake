@@ -90,6 +90,7 @@ var _burn_due: PackedInt32Array = PackedInt32Array()
 var _burn_count: int = 0
 var _due: PackedInt32Array = PackedInt32Array()
 var _is_burning: PackedByteArray = PackedByteArray()
+var _style: StyleShots
 
 
 ## [param board] must already hold its pegs. [param rng] is the board's own random stream.
@@ -107,6 +108,7 @@ func _init(
 	events = board.events
 	_config = config
 	_rng = rng
+	_style = StyleShots.new(config)
 	carry = run_carry if run_carry != null else RunCarry.new()
 	_definitions = [base_pegs.blue, base_pegs.red, base_pegs.green, base_pegs.gold, null]
 	shots_left = config.shots_per_board
@@ -184,6 +186,7 @@ func shoot(input: ShotInput) -> bool:
 	shot_wall_bounces = 0
 	shot_caught = false
 	_scored.fill(0)
+	_style.start_shot()
 	_refunded = false
 	_end_mult_factor = _PERMILLE
 	_keep_on_top = false
@@ -223,7 +226,7 @@ func step() -> void:
 		var event: SimEvent = events.at(index)
 		match event.kind:
 			SimEvent.Kind.PEG_HIT:
-				score_hit(event.target, PegHit.Source.BALL, event.ball)
+				touch(event.target, event.ball)
 			SimEvent.Kind.WALL_BOUNCE:
 				shot_wall_bounces += 1
 				_dispatch_wall_bounce()
@@ -241,8 +244,23 @@ func step() -> void:
 		_burn_due_pegs(simulation.tick)
 
 
+## [param ball] touched [param peg], as physics reports for every contact: the peg is scored if
+## this is its first hit of the shot, then any style bonus the touch earned is paid.
+func touch(peg: int, ball: int) -> void:
+	var where: SimPeg = simulation.pegs[peg]
+	if where.illusion:
+		score_hit(peg, PegHit.Source.BALL, ball)
+		return
+	var lit: bool = _scored[peg] == 0
+	var lit_red: bool = lit and roles[peg] == Role.RED
+	score_hit(peg, PegHit.Source.BALL, ball)
+	_pay_style(_style.long_shot(ball, where.x, where.y, lit_red), ball, where)
+	var brick: bool = where.shape == SimPeg.Shape.RECT
+	_pay_style(_style.slide(ball, brick, lit, simulation.tick), ball, where)
+
+
 ## Lights and scores [param peg], once per shot, running every effect's [method Effect.on_peg_hit].
-## Physics calls it for each touch; effects reach it through explosions and fire.
+## Ball contacts come through [method touch]; effects reach it through explosions and fire.
 func score_hit(peg: int, source: PegHit.Source = PegHit.Source.BALL, ball: int = -1) -> void:
 	var outer: bool = not _acting
 	_acting = true
@@ -522,6 +540,14 @@ func _score(peg: int, source: PegHit.Source, ball: int) -> void:
 	if hit.role == Role.GREEN:
 		for effect: Effect in _effects:
 			effect.on_power(self, hit)
+
+
+func _pay_style(style: StyleShots.Style, ball: int, where: SimPeg) -> void:
+	if style == StyleShots.Style.NONE:
+		return
+	var points: int = _style.points_of(style)
+	shot_points += points
+	events.push(SimEvent.Kind.STYLE_BONUS, simulation.tick, ball, style, where.x, where.y, points)
 
 
 func _vanish(peg: int) -> void:

@@ -319,3 +319,7 @@ HOWTO_CONTROLS,Controls,Comandi
 HOWTO_CONTROLS_TOUCH,"Drag anywhere to aim, use the < > buttons for fine aim and press Shoot. Keep a finger on the screen to fast-forward.","Trascina ovunque per mirare, usa i pulsanti < > per la mira fine e premi Tira. Tieni un dito sullo schermo per l'avanti veloce."
 HOWTO_CONTROLS_MOUSE,"Move the mouse to aim, use the wheel or A/D for fine aim, click or press Enter to shoot. Hold Space to fast-forward; Esc pauses.","Muovi il mouse per mirare, usa la rotella o A/D per la mira fine, clicca o premi Invio per tirare. Tieni Spazio per l'avanti veloce; Esc mette in pausa."
 HOWTO_CONTROLS_PAD,"With a gamepad: left stick to aim, triggers for fine aim, A to shoot, RB to fast-forward, Start to pause.","Con il controller: stick sinistro per mirare, grilletti per la mira fine, A per tirare, RB per l'avanti veloce, Start per la pausa."
+STYLE_LONG_SHOT,Long shot! +%d,Tiro lungo! +%d
+STYLE_SUPER_LONG_SHOT,Super long shot! +%d,Tiro super lungo! +%d
+STYLE_SLIDE,Slide! +%d,Scivolata! +%d
+STYLE_EXTREME_SLIDE,Extreme slide! +%d,Scivolata estrema! +%d

@@ -29,6 +29,7 @@ const SHAKE_MULT: float = 1.0
 const SHAKE_TIMES: float = 2.5
 const SHAKE_BLAST: float = 2.0
 const SHAKE_MATSURI: float = 5.0
+const SHAKE_STYLE: float = 2.0
 const CONFETTI: int = 40
 ## Vibration on phones, in milliseconds, for a won board and for a Matsuri.
 const VIBRATE_WIN: int = 40
@@ -41,6 +42,13 @@ const POINTS_COLOR: Color = Color("#bfe0ff")
 const MULT_COLOR: Color = Color("#ff9a8a")
 const TIMES_COLOR: Color = Color("#ffd866")
 const MON_COLOR: Color = Color("#ffe08a")
+const STYLE_COLOR: Color = Color("#9ff0c8")
+## Text of each [enum StyleShots.Style] bonus, and how far above its peg it shows, clear of the
+## peg's own points.
+const STYLE_KEYS: Array[String] = [
+	"", "STYLE_LONG_SHOT", "STYLE_SUPER_LONG_SHOT", "STYLE_SLIDE", "STYLE_EXTREME_SLIDE"
+]
+const STYLE_RISE: Vector2 = Vector2(0, -12)
 
 ## Plays random development boards when true; the run sets it to false before adding the screen.
 var standalone: bool = true
@@ -274,6 +282,11 @@ func _consume_events() -> void:
 				_shake(SHAKE_TIMES)
 				score_changed = true
 				pegs_changed = true
+			SimEvent.Kind.STYLE_BONUS:
+				var style: String = tr(STYLE_KEYS[event.target]) % event.amount
+				_popups.show_text(style, at + STYLE_RISE, STYLE_COLOR)
+				_shake(SHAKE_STYLE)
+				score_changed = true
 			SimEvent.Kind.MON_GAINED:
 				_popups.show_text(tr("POPUP_MON") % event.amount, at, MON_COLOR)
 				_hud.update_counts(game)

@@ -85,6 +85,21 @@ extends Resource
 @export var elite_target_factor: int = 1300
 @export var target_rounding: int = 10
 
+@export_group("Style shots")
+## Distance between two lanterns a ball touches in a row, in milli-pixels, from which lighting
+## the second, a red one, is a long shot or a super long shot.
+@export var long_shot_distance: int = 120_000
+@export var super_long_shot_distance: int = 200_000
+@export var long_shot_points: int = 20
+@export var super_long_shot_points: int = 50
+## Rectangular pegs a ball lights in a row for a slide and for an extreme slide.
+@export var slide_pegs: int = 5
+@export var extreme_slide_pegs: int = 10
+@export var slide_points: int = 20
+@export var extreme_slide_points: int = 50
+## Longest pause, in ticks, between two pegs of a slide.
+@export var slide_gap_ticks: int = 30
+
 @export_group("Hard mode")
 ## Hard targets over the normal ones, in permille.
 @export var hard_target_factor: int = 1250

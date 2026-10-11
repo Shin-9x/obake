@@ -36,6 +36,15 @@ static func gdd_config() -> BalanceConfig:
 	result.launcher_x = 180 * PX
 	result.launcher_y = 12 * PX
 	result.aim_limit = 8500
+	result.long_shot_distance = 120 * PX
+	result.super_long_shot_distance = 200 * PX
+	result.long_shot_points = 20
+	result.super_long_shot_points = 50
+	result.slide_pegs = 5
+	result.extreme_slide_pegs = 10
+	result.slide_points = 20
+	result.extreme_slide_points = 50
+	result.slide_gap_ticks = 30
 	return result
 
 

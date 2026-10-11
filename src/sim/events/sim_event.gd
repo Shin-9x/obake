@@ -46,6 +46,9 @@ enum Kind {
 	PEG_VANISHED,
 	## Another layer of the layout is now in play; [code]amount[/code] is the layer.
 	LAYOUT_CHANGED,
+	## [code]ball[/code] earned a style bonus at a peg: [code]target[/code] is the
+	## [enum StyleShots.Style] and [code]amount[/code] the points.
+	STYLE_BONUS,
 }
 
 var kind: Kind = Kind.PEG_HIT
