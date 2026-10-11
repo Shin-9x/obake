@@ -113,6 +113,19 @@ func test_rotated_rect_peg_deflects_the_ball() -> void:
 	assert_int(_sim.balls[0].vx).is_greater(0)
 
 
+func test_a_rectangular_peg_bounces_the_ball_with_its_own_restitution() -> void:
+	_config.brick_restitution = 400
+	_sim = BoardSimulation.new(_config)
+	_sim.add_rect_peg(_config.launcher_x, 100 * PX, 20 * PX, 3 * PX, 0)
+	_sim.launch(_aimed(STRAIGHT_DOWN))
+	var incoming: int = 0
+	while _sim.events.size() == 0:
+		incoming = _sim.balls[0].vy + _expected_gravity_step()
+		_sim.step()
+	var expected: int = -incoming * 400 / FixedMath.PERMILLE
+	assert_int(_sim.balls[0].vy).is_between(expected - 2, expected + 2)
+
+
 func test_shot_waits_for_every_ball_and_balls_pass_through_each_other() -> void:
 	_sim.launch(_aimed(STRAIGHT_DOWN))
 	_sim.step()

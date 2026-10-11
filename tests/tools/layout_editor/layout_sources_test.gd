@@ -5,9 +5,9 @@ const SOURCES: String = "res://src/tools/layout_editor/layouts"
 const BIOMES: Array[String] = ["bamboo_forest", "haunted_village"]
 
 
-## Four standard boards per biome and five boss layouts, Nue counting two.
-func test_there_are_thirteen_sources() -> void:
-	assert_array(_source_paths()).has_size(13)
+## Five standard boards per biome and five boss layouts, Nue counting two.
+func test_there_are_fifteen_sources() -> void:
+	assert_array(_source_paths()).has_size(15)
 
 
 func test_exported_json_matches_every_source() -> void:

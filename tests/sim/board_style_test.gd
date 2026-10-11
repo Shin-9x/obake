@@ -67,11 +67,12 @@ func test_bricks_lit_in_a_row_are_a_slide() -> void:
 	Harness.shoot(game)
 	var ball: int = game.simulation.launched_ball
 	game.events.clear()
-	for peg: int in 4:
+	for peg: int in 3:
 		game.touch(peg, ball)
 	assert_array(Harness.events_of(game, SimEvent.Kind.STYLE_BONUS)).is_empty()
-	game.touch(4, ball)
+	game.touch(3, ball)
 	var bonuses: Array[SimEvent] = Harness.events_of(game, SimEvent.Kind.STYLE_BONUS)
 	assert_array(bonuses).has_size(1)
 	assert_int(bonuses[0].target).is_equal(StyleShots.Style.SLIDE)
-	assert_int(game.shot_points).is_equal(70)
+	# Four bricks at 10 points and the bonus.
+	assert_int(game.shot_points).is_equal(60)

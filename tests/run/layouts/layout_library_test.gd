@@ -12,6 +12,7 @@ func test_loads_every_shipped_layout_in_id_order() -> void:
 			"bamboo_02",
 			"bamboo_03",
 			"bamboo_04",
+			"bamboo_05",
 			"jorogumo",
 			"nue_a",
 			"nue_b",
@@ -20,12 +21,13 @@ func test_loads_every_shipped_layout_in_id_order() -> void:
 			"village_01",
 			"village_02",
 			"village_03",
-			"village_04"
+			"village_04",
+			"village_05"
 		]
 	)
-	assert_object(library.find("village_02")).is_same(library.layouts[10])
+	assert_object(library.find("village_02")).is_same(library.layouts[11])
 	for biome: String in ["bamboo_forest", "haunted_village"]:
-		assert_array(library.pool(biome)).has_size(4)
+		assert_array(library.pool(biome)).has_size(5)
 	assert_object(library.find("missing")).is_null()
 
 

@@ -1,0 +1,90 @@
+[gd_scene format=3 uid="uid://dpysrhglpqwkh"]
+
+[ext_resource type="Script" uid="uid://wr1xm1ufr4e0" path="res://src/tools/layout_editor/layout_document.gd" id="1_doc"]
+[ext_resource type="Script" uid="uid://p81dwr5cedpj" path="res://src/tools/layout_editor/arc_pattern.gd" id="2_arc"]
+[ext_resource type="Script" uid="uid://dxqwv3stwpeqi" path="res://src/tools/layout_editor/grid_pattern.gd" id="3_grid"]
+[ext_resource type="Script" uid="uid://dl0veuy6ol4es" path="res://src/tools/layout_editor/moving_group_marker.gd" id="4_group"]
+
+[node name="Bamboo05" type="Node2D" unique_id=100115947]
+script = ExtResource("1_doc")
+id = "bamboo_05"
+
+[node name="UpperSlide" type="Node2D" parent="." unique_id=100218894]
+position = Vector2(165, 60)
+script = ExtResource("2_arc")
+shape = 1
+rect_size = Vector2(24, 6)
+radius = 125.0
+from_degrees = 185.0
+to_degrees = 98.0
+count = 8
+
+[node name="LowerSlide" type="Node2D" parent="." unique_id=100321841]
+position = Vector2(195, 160)
+script = ExtResource("2_arc")
+shape = 1
+rect_size = Vector2(24, 6)
+radius = 125.0
+from_degrees = 355.0
+to_degrees = 442.0
+count = 8
+
+[node name="TopRow" type="Node2D" parent="." unique_id=100424788]
+position = Vector2(230, 40)
+script = ExtResource("3_grid")
+columns = 5
+rows = 1
+spacing = Vector2(40, 0)
+staggered = false
+
+[node name="Canopy" type="Node2D" parent="." unique_id=100527735]
+position = Vector2(275, 92)
+script = ExtResource("3_grid")
+columns = 4
+rows = 3
+spacing = Vector2(36, 30)
+
+[node name="Grove" type="Node2D" parent="." unique_id=100630682]
+position = Vector2(62, 255)
+script = ExtResource("3_grid")
+columns = 3
+rows = 3
+spacing = Vector2(34, 30)
+
+[node name="Clearing" type="Node2D" parent="." unique_id=100733629]
+position = Vector2(165, 235)
+script = ExtResource("3_grid")
+columns = 3
+rows = 3
+spacing = Vector2(34, 30)
+
+[node name="Thicket" type="Node2D" parent="." unique_id=100836576]
+position = Vector2(318, 296)
+script = ExtResource("3_grid")
+columns = 2
+rows = 2
+spacing = Vector2(36, 30)
+
+[node name="Corners" type="Node2D" parent="." unique_id=100939523]
+position = Vector2(180, 325)
+script = ExtResource("3_grid")
+columns = 2
+rows = 1
+spacing = Vector2(320, 0)
+staggered = false
+
+[node name="Stalks" type="Node2D" parent="." unique_id=101042470]
+position = Vector2(180, 318)
+script = ExtResource("4_group")
+motion = 1
+period_seconds = 4.0
+travel = Vector2(24, 0)
+
+[node name="StalkRow" type="Node2D" parent="Stalks" unique_id=101145417]
+script = ExtResource("3_grid")
+shape = 1
+rect_size = Vector2(4, 22)
+columns = 3
+rows = 1
+spacing = Vector2(60, 0)
+staggered = false

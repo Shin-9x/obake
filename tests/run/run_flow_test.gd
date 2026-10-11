@@ -10,9 +10,9 @@ const AIM_SEED: int = 31
 ## else uses the real numbers. If a deliberate change alters them, update them in the same commit
 ## and say why.
 const GOLDEN_FIRST_TARGET: int = 150
-const GOLDEN_FLOOR_MON: int = 58
+const GOLDEN_FLOOR_MON: int = 66
 const GOLDEN_FLOOR_BOARDS: int = 4
-const GOLDEN_FLOOR_CHAIN: int = 893119201
+const GOLDEN_FLOOR_CHAIN: int = 299333672
 
 
 func test_a_run_plays_from_the_start_to_victory() -> void:

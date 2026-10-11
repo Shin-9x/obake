@@ -2,7 +2,6 @@
 
 [ext_resource type="Script" uid="uid://wr1xm1ufr4e0" path="res://src/tools/layout_editor/layout_document.gd" id="1_dgufl"]
 [ext_resource type="Script" uid="uid://p81dwr5cedpj" path="res://src/tools/layout_editor/arc_pattern.gd" id="2_xyans"]
-[ext_resource type="Script" uid="uid://c18xxja5btt3j" path="res://src/tools/layout_editor/peg_marker.gd" id="3_oenk5"]
 [ext_resource type="Script" uid="uid://dxqwv3stwpeqi" path="res://src/tools/layout_editor/grid_pattern.gd" id="4_w5nkn"]
 [ext_resource type="Script" uid="uid://dl0veuy6ol4es" path="res://src/tools/layout_editor/moving_group_marker.gd" id="5_nlrng"]
 
@@ -19,18 +18,24 @@ to_degrees = 140.0
 count = 9
 
 [node name="LeftRamp" type="Node2D" parent="." unique_id=1970635662]
-position = Vector2(40, 110)
-rotation = 0.43633232
-script = ExtResource("3_oenk5")
+position = Vector2(105, 50)
+script = ExtResource("2_xyans")
 shape = 1
-size = Vector2(26, 6)
+rect_size = Vector2(24, 6)
+radius = 80.0
+from_degrees = 178.0
+to_degrees = 100.0
+count = 5
 
 [node name="RightRamp" type="Node2D" parent="." unique_id=1213889172]
-position = Vector2(320, 110)
-rotation = -0.43633232
-script = ExtResource("3_oenk5")
+position = Vector2(255, 50)
+script = ExtResource("2_xyans")
 shape = 1
-size = Vector2(26, 6)
+rect_size = Vector2(24, 6)
+radius = 80.0
+from_degrees = 2.0
+to_degrees = 80.0
+count = 5
 
 [node name="Field" type="Node2D" parent="." unique_id=64980535]
 position = Vector2(180, 200)

@@ -39,6 +39,8 @@ extends Resource
 @export_group("Pegs")
 @export var peg_radius: int = 5_000
 @export var peg_restitution: int = 800
+## Rectangular pegs bounce less than lanterns, so a ball slides along a row of them.
+@export var brick_restitution: int = 450
 ## A peg hit with less sideways speed than this counts as head-on.
 @export var head_on_tolerance: int = 5_000
 ## Sideways push given on a head-on hit, as a share of the rebound speed. Exact integer physics
@@ -93,12 +95,12 @@ extends Resource
 @export var long_shot_points: int = 20
 @export var super_long_shot_points: int = 50
 ## Rectangular pegs a ball lights in a row for a slide and for an extreme slide.
-@export var slide_pegs: int = 5
-@export var extreme_slide_pegs: int = 10
+@export var slide_pegs: int = 4
+@export var extreme_slide_pegs: int = 8
 @export var slide_points: int = 20
 @export var extreme_slide_points: int = 50
 ## Longest pause, in ticks, between two pegs of a slide.
-@export var slide_gap_ticks: int = 30
+@export var slide_gap_ticks: int = 60
 
 @export_group("Hard mode")
 ## Hard targets over the normal ones, in permille.

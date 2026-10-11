@@ -1,6 +1,6 @@
 extends GdUnitTestSuite
 ## Long shots and slides, ball by ball, on the GDD numbers: long from 120 px, super long from
-## 200 px, a slide at 5 rectangular pegs in a row and an extreme slide at 10.
+## 200 px, a slide at 4 rectangular pegs in a row and an extreme slide at 8.
 
 const TestBoards: GDScript = preload("res://tests/sim/support/test_boards.gd")
 const PX: int = FixedMath.PX
@@ -44,37 +44,37 @@ func test_every_ball_and_every_shot_starts_afresh() -> void:
 	assert_int(style.long_shot(0, 300 * PX, 0, true)).is_equal(StyleShots.Style.NONE)
 
 
-func test_five_bricks_lit_in_a_row_are_a_slide_and_ten_an_extreme_one() -> void:
+func test_four_bricks_lit_in_a_row_are_a_slide_and_eight_an_extreme_one() -> void:
 	var style: StyleShots = _style()
 	var styles: Array[int] = []
-	for brick: int in 10:
+	for brick: int in 8:
 		styles.append(style.slide(0, true, true, brick * 10))
-	assert_int(styles[3]).is_equal(StyleShots.Style.NONE)
-	assert_int(styles[4]).is_equal(StyleShots.Style.SLIDE)
-	assert_int(styles[8]).is_equal(StyleShots.Style.NONE)
-	assert_int(styles[9]).is_equal(StyleShots.Style.EXTREME_SLIDE)
-	assert_int(style.slide(0, true, true, 100)).is_equal(StyleShots.Style.NONE)
+	assert_int(styles[2]).is_equal(StyleShots.Style.NONE)
+	assert_int(styles[3]).is_equal(StyleShots.Style.SLIDE)
+	assert_int(styles[6]).is_equal(StyleShots.Style.NONE)
+	assert_int(styles[7]).is_equal(StyleShots.Style.EXTREME_SLIDE)
+	assert_int(style.slide(0, true, true, 80)).is_equal(StyleShots.Style.NONE)
 
 
 func test_touching_a_lit_brick_again_keeps_the_slide_going() -> void:
 	var style: StyleShots = _style()
-	for brick: int in 4:
+	for brick: int in 3:
 		style.slide(0, true, true, brick * 10)
-	assert_int(style.slide(0, true, false, 45)).is_equal(StyleShots.Style.NONE)
-	assert_int(style.slide(0, true, true, 70)).is_equal(StyleShots.Style.SLIDE)
+	assert_int(style.slide(0, true, false, 70)).is_equal(StyleShots.Style.NONE)
+	assert_int(style.slide(0, true, true, 120)).is_equal(StyleShots.Style.SLIDE)
 
 
 func test_a_round_peg_or_a_long_pause_breaks_the_slide() -> void:
 	var style: StyleShots = _style()
-	for brick: int in 4:
+	for brick: int in 3:
 		style.slide(0, true, true, brick * 10)
-	style.slide(0, false, true, 35)
-	assert_int(style.slide(0, true, true, 40)).is_equal(StyleShots.Style.NONE)
+	style.slide(0, false, true, 25)
+	assert_int(style.slide(0, true, true, 30)).is_equal(StyleShots.Style.NONE)
 	style.start_shot()
-	for brick: int in 4:
+	for brick: int in 3:
 		style.slide(1, true, true, brick * 10)
-	# 31 ticks after the fourth brick.
-	assert_int(style.slide(1, true, true, 61)).is_equal(StyleShots.Style.NONE)
+	# 61 ticks after the third brick.
+	assert_int(style.slide(1, true, true, 81)).is_equal(StyleShots.Style.NONE)
 
 
 func test_each_style_has_its_points() -> void:

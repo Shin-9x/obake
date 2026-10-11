@@ -27,6 +27,7 @@ static func gdd_config() -> BalanceConfig:
 	result.stuck_ticks = 240
 	result.peg_radius = 5 * PX
 	result.peg_restitution = 800
+	result.brick_restitution = 800
 	result.head_on_tolerance = 5 * PX
 	result.head_on_nudge = 50
 	result.bucket_width = 40 * PX
@@ -40,11 +41,11 @@ static func gdd_config() -> BalanceConfig:
 	result.super_long_shot_distance = 200 * PX
 	result.long_shot_points = 20
 	result.super_long_shot_points = 50
-	result.slide_pegs = 5
-	result.extreme_slide_pegs = 10
+	result.slide_pegs = 4
+	result.extreme_slide_pegs = 8
 	result.slide_points = 20
 	result.extreme_slide_points = 50
-	result.slide_gap_ticks = 30
+	result.slide_gap_ticks = 60
 	return result
 
 

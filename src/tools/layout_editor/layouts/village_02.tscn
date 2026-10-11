@@ -70,18 +70,24 @@ spacing = Vector2(90, 0)
 staggered = false
 
 [node name="LeftRamp" type="Node2D" parent="." unique_id=1872426019]
-position = Vector2(50, 100)
-rotation = 0.5235988
-script = ExtResource("4_lkpey")
+position = Vector2(110, 60)
+script = ExtResource("6_fhxbt")
 shape = 1
-size = Vector2(26, 6)
+rect_size = Vector2(24, 6)
+radius = 70.0
+from_degrees = 172.0
+to_degrees = 108.0
+count = 4
 
 [node name="RightRamp" type="Node2D" parent="." unique_id=114601680]
-position = Vector2(310, 100)
-rotation = -0.5235988
-script = ExtResource("4_lkpey")
+position = Vector2(250, 60)
+script = ExtResource("6_fhxbt")
 shape = 1
-size = Vector2(26, 6)
+rect_size = Vector2(24, 6)
+radius = 70.0
+from_degrees = 8.0
+to_degrees = 72.0
+count = 4
 
 [node name="Side" type="Node2D" parent="." unique_id=525317445]
 position = Vector2(30, 170)

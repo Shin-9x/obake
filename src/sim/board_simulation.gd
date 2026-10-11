@@ -445,7 +445,7 @@ func _hit_peg(ball_index: int, ball: SimBall, peg_index: int) -> void:
 		return
 	var restitution: int = peg.restitution
 	if restitution < 0:
-		restitution = ball.restitution if ball.restitution >= 0 else _config.peg_restitution
+		restitution = ball.restitution if ball.restitution >= 0 else _shape_restitution(peg)
 	var impact: bool = _resolve_contact(ball, restitution, peg.vx, peg.vy)
 	if impact:
 		_nudge_head_on(ball, peg.vx, peg.vy)
@@ -535,7 +535,7 @@ func _bounce_ghost(ghost: SimBall) -> bool:
 func _bounce_ghost_off(ghost: SimBall, peg: SimPeg) -> bool:
 	if not _touches_peg(ghost, peg):
 		return false
-	var restitution: int = peg.restitution if peg.restitution >= 0 else _config.peg_restitution
+	var restitution: int = peg.restitution if peg.restitution >= 0 else _shape_restitution(peg)
 	if not _resolve_contact(ghost, restitution, peg.vx, peg.vy):
 		return false
 	_nudge_head_on(ghost, peg.vx, peg.vy)
@@ -550,6 +550,13 @@ func _drag(ball: SimBall) -> void:
 			ball.vx = FixedMath.div_round(ball.vx * keep, _PERMILLE)
 			ball.vy = FixedMath.div_round(ball.vy * keep, _PERMILLE)
 			return
+
+
+## The bounce a peg gives by its shape, when neither the peg nor the ball sets its own.
+func _shape_restitution(peg: SimPeg) -> int:
+	if peg.shape == SimPeg.Shape.RECT:
+		return _config.brick_restitution
+	return _config.peg_restitution
 
 
 func _wall_restitution(ball: SimBall) -> int:
