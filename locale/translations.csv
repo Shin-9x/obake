@@ -200,7 +200,8 @@ END_BOARDS,Boards won: %d,Board vinte: %d
 END_MATSURI,Matsuri: %d,Matsuri: %d
 END_BEST_SHOT,Best shot: %d,Miglior tiro: %d
 END_MON,Mon: %d,Mon: %d
-END_SEED,Seed: %s,Seed: %s
+END_SEED_COPY,Seed %s · copy,Seed %s · copia
+END_SEED_COPIED,Seed copied,Seed copiato
 BUTTON_NEW_RUN,New run,Nuova run
 FEAT_THIRTY_PEGS,Thirty lanterns,Trenta lanterne
 FEAT_THIRTY_PEGS_DESC,Hit 30 pegs in one shot.,Colpisci 30 peg in un tiro.

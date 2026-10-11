@@ -1,10 +1,17 @@
 class_name RunEndScreen
 extends Control
-## The end of a run, won or lost: the character, how far the run went and its seed.
+## The end of a run, won or lost: the character, how far the run went and its seed, which a
+## press copies to the clipboard in the form the character select takes.
 
 signal new_run_requested
 
 const PORTRAIT_SIZE: Vector2 = Vector2(64, 64)
+## Seconds the seed button says it copied.
+const COPIED_SECONDS: float = 1.5
+
+var seed_button: Button
+
+var _seed: String = ""
 
 
 func open(run: Run) -> void:
@@ -26,13 +33,25 @@ func open(run: Run) -> void:
 		tr("END_MATSURI") % state.matsuri_count,
 		tr("END_BEST_SHOT") % state.best_shot,
 		tr("END_MON") % state.mon,
-		tr("END_SEED") % ("%X" % state.run_seed),
 	]
 	for line: String in lines:
 		var label: Label = UiKit.label(line, 0, UiKit.TEXT, false)
 		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		body.add_child(label)
+	_seed = "%X" % state.run_seed
+	seed_button = UiKit.button(tr("END_SEED_COPY") % _seed, false, AudioService.UI_CONFIRM)
+	seed_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	seed_button.pressed.connect(_copy_seed)
+	body.add_child(seed_button)
 	var again: Button = UiKit.button("BUTTON_NEW_RUN")
 	again.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	again.pressed.connect(new_run_requested.emit)
 	body.add_child(again)
+
+
+func _copy_seed() -> void:
+	DisplayServer.clipboard_set(_seed)
+	seed_button.text = tr("END_SEED_COPIED")
+	var restore: Tween = create_tween()
+	restore.tween_interval(COPIED_SECONDS)
+	restore.tween_callback(func() -> void: seed_button.text = tr("END_SEED_COPY") % _seed)
