@@ -60,6 +60,43 @@ func test_the_touch_layout_keeps_the_left_panel_clear_of_the_buttons() -> void:
 	assert_float(obo.get_global_rect().end.y).is_less(buttons_top)
 
 
+func test_the_matsuri_begins_when_its_last_lantern_is_lit() -> void:
+	var runner: GdUnitSceneRunner = scene_runner(SCENE)
+	var screen: BoardScreen = runner.scene() as BoardScreen
+	screen.start_board(SEED)
+	var game: BoardGame = screen.game
+	game.target = 1_000_000_000
+	var last: int = -1
+	for peg: int in game.roles.size():
+		if game.roles[peg] == BoardGame.Role.RED:
+			if last < 0:
+				last = peg
+			else:
+				game.roles[peg] = BoardGame.Role.BLUE
+	screen.shoot()
+	await runner.simulate_frames(2, 16)
+	var ball: SimBall = game.launched_ball()
+	var red: SimPeg = game.simulation.pegs[last]
+	ball.x = red.x + 2000
+	ball.y = red.y - 60_000
+	ball.vx = 0
+	ball.vy = 40_000
+	var banner: Label = screen.get_node("%Celebration") as Label
+	var slowed: bool = false
+	var frames: int = 0
+	while not red.lit and frames < 600:
+		await runner.simulate_frames(1, 16)
+		slowed = slowed or screen._fever.stage == SlowMotion.Stage.APPROACH
+		frames += 1
+	await runner.simulate_frames(2, 16)
+	assert_bool(red.lit).is_true()
+	assert_bool(slowed).is_true()
+	assert_int(screen._fever.stage).is_equal(SlowMotion.Stage.STRUCK)
+	assert_bool(banner.visible).is_true()
+	assert_int(game.outcome).is_equal(BoardGame.Outcome.PLAYING)
+	assert_float((screen.get_node("%World") as Node2D).scale.x).is_greater(1.0)
+
+
 func test_play_again_starts_a_fresh_board() -> void:
 	var runner: GdUnitSceneRunner = scene_runner(SCENE)
 	var screen: BoardScreen = runner.scene() as BoardScreen

@@ -19,10 +19,6 @@ const DEV_LOADOUT: LoadoutDefinition = preload("res://data/debug/dev_loadout.tre
 const TICK_SECONDS: float = 1.0 / BoardSimulation.TICKS_PER_SECOND
 ## Caps catch-up after a long frame, so a hitch never turns into a burst of ticks.
 const MAX_TICKS_PER_FRAME: int = 12
-## Display-only speed of the slow motion near the last red lantern; the simulation is unchanged.
-const SLOW_MOTION_SPEED: float = 0.3
-## How near a ball must come to the last red lantern for the slow motion, in milli-pixels.
-const SLOW_MOTION_REACH: int = 40_000
 ## Screen shake, in pixels, when the mult grows, is multiplied, an explosion goes off, and on a
 ## Matsuri.
 const SHAKE_MULT: float = 1.0
@@ -69,6 +65,10 @@ var _accumulator: float = 0.0
 var _guide_ticks: int = 0
 var _sounds: BoardSounds = BoardSounds.new()
 var _camera: BoardCamera = BoardCamera.new()
+## The slow motion and close-up around the last red lantern; it only changes the view.
+var _fever: SlowMotion = SlowMotion.new()
+## The Matsuri was already celebrated when its last lantern was lit, before the board ended.
+var _matsuri_struck: bool = false
 ## Lit pegs already given their leaving puff, by peg index.
 var _puffed: PackedByteArray = PackedByteArray()
 
@@ -156,6 +156,9 @@ func _show(
 	_sparks.clear()
 	_trails.clear()
 	_camera.reset()
+	_fever.reset()
+	_matsuri_struck = false
+	_sounds.celebrated = false
 	_puffed.resize(game.simulation.pegs.size())
 	_puffed.fill(0)
 	_hud.show_mood(MascotMood.Mood.IDLE)
@@ -193,19 +196,17 @@ func shoot() -> void:
 
 
 func _process(delta: float) -> void:
-	var speed: float = 1.0
-	if game.simulation.is_shot_active():
-		var red: int = SlowMotion.target(game, SLOW_MOTION_REACH)
-		if red >= 0:
-			speed = SLOW_MOTION_SPEED
-			var peg: SimPeg = game.simulation.pegs[red]
-			_camera.focus(Vector2(peg.x, peg.y) / PX, true)
-		else:
-			_camera.focus(Vector2.ZERO, false)
-			if _aim.fast_forward:
-				speed = Settings.values.fast_forward_speed
-	else:
+	var was: SlowMotion.Stage = _fever.stage
+	_fever.update(game, delta)
+	var speed: float = _fever.speed
+	if _fever.stage == SlowMotion.Stage.IDLE:
 		_camera.focus(Vector2.ZERO, false)
+		if game.simulation.is_shot_active() and _aim.fast_forward:
+			speed = Settings.values.fast_forward_speed
+	else:
+		_camera.focus(_fever.focus, true, SlowMotion.ZOOM)
+		if _fever.stage == SlowMotion.Stage.APPROACH and was == SlowMotion.Stage.IDLE:
+			AudioService.play(AudioService.DRUM_ROLL)
 	_accumulator = minf(_accumulator + delta * speed, MAX_TICKS_PER_FRAME * TICK_SECONDS)
 	var started: int = Time.get_ticks_usec()
 	while _accumulator >= TICK_SECONDS:
@@ -312,18 +313,45 @@ func _consume_events() -> void:
 			SimEvent.Kind.BOARD_ENDED:
 				if event.amount != BoardGame.Outcome.FAILED:
 					_vibrate(VIBRATE_WIN)
-				if event.amount == BoardGame.Outcome.MATSURI:
-					_vibrate(VIBRATE_MATSURI)
-					_hud.celebrate("RESULT_MATSURI")
-					_sparks.confetti(Vector2(_camera.size.x / 2.0, _camera.size.y * 0.6), CONFETTI)
-					_shake(SHAKE_MATSURI)
+				# A Matsuri whose last lantern was lit as the shot ended, by fire for one.
+				if event.amount == BoardGame.Outcome.MATSURI and not _matsuri_struck:
+					_celebrate_matsuri(Vector2(_camera.size.x / 2.0, _camera.size.y * 0.6))
 				_hud.show_result(game)
 	_sounds.after_events(game)
 	if score_changed:
 		_hud.update_shot(game)
 	if pegs_changed:
 		_view.refresh_pegs()
+		if not _matsuri_struck and game.simulation.is_shot_active():
+			var red: int = _last_red_lit()
+			if red >= 0:
+				var lantern: SimPeg = game.simulation.pegs[red]
+				var at: Vector2 = Vector2(lantern.x, lantern.y) / PX
+				_matsuri_struck = true
+				_fever.strike(at)
+				_celebrate_matsuri(at)
 	events.clear()
+
+
+## A red lantern when every red lantern on the board is now lit, so the shot ends in a Matsuri;
+## otherwise -1.
+func _last_red_lit() -> int:
+	var lit: int = -1
+	for peg: int in game.roles.size():
+		if game.roles[peg] != BoardGame.Role.RED or game.simulation.pegs[peg].removed:
+			continue
+		if not game.simulation.pegs[peg].lit:
+			return -1
+		lit = peg
+	return lit
+
+
+func _celebrate_matsuri(at: Vector2) -> void:
+	_vibrate(VIBRATE_MATSURI)
+	_hud.celebrate("RESULT_MATSURI")
+	_sparks.confetti(at, CONFETTI)
+	_shake(SHAKE_MATSURI)
+	_sounds.celebrate()
 
 
 func _vibrate(milliseconds: int) -> void:

@@ -45,6 +45,8 @@ func _init() -> void:
 	_save(_arpeggio([783.99, 987.77, 1174.66, 1567.98, 1975.53], 0.07, 0.8), "unlock")
 	_save(_menu_loop(), "menu_loop", MUSIC_DIR, MUSIC_PEAK)
 	_save(_board_loop(), "board_loop", MUSIC_DIR, MUSIC_PEAK)
+	# Added last, so the noise the earlier sounds draw stays the same.
+	_save(_drum_roll(), "drum_roll")
 	quit()
 
 
@@ -140,6 +142,18 @@ func _swell() -> PackedFloat32Array:
 		var vibrato: float = sin(TAU * 6.0 * t) * 8.0
 		buffer[index] += sin(TAU * (520.0 + 300.0 * t + vibrato) * t) * envelope * 0.5
 		buffer[index] += sin(TAU * (780.0 + 450.0 * t) * t) * envelope * 0.25
+	return buffer
+
+
+## Drum strokes that quicken and grow, for the ball closing in on the last red lantern.
+func _drum_roll() -> PackedFloat32Array:
+	var buffer: PackedFloat32Array = _buffer(1.6)
+	var at: float = 0.0
+	var gap: float = 0.17
+	while at < 1.25:
+		_add_taiko(buffer, at, 0.35 + 0.5 * at)
+		at += gap
+		gap = maxf(0.05, gap * 0.86)
 	return buffer
 
 

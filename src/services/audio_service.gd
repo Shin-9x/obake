@@ -36,6 +36,7 @@ const UI_CONFIRM: StringName = &"ui_confirm"
 const UI_BACK: StringName = &"ui_back"
 const PURCHASE: StringName = &"purchase"
 const UNLOCK: StringName = &"unlock"
+const DRUM_ROLL: StringName = &"drum_roll"
 ## Every cue the game plays; the bank must hold them all.
 const CUES: Array[StringName] = [
 	PEG_HIT,
@@ -61,6 +62,7 @@ const CUES: Array[StringName] = [
 	UI_BACK,
 	PURCHASE,
 	UNLOCK,
+	DRUM_ROLL,
 ]
 
 var music: Music = Music.NONE

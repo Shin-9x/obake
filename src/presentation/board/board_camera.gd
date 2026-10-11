@@ -16,6 +16,8 @@ var size: Vector2 = Vector2(360, 360)
 
 var _zoom: float = 1.0
 var _target_zoom: float = 1.0
+## The zoom the current or last close-up aims for.
+var _close_zoom: float = ZOOM
 var _focus: Vector2 = Vector2.ZERO
 var _shake: float = 0.0
 var _time: float = 0.0
@@ -26,16 +28,19 @@ func shake(strength: float) -> void:
 	_shake = minf(MAX_SHAKE, _shake + strength)
 
 
-## Closes in on [param point], in board pixels, or pulls back when [param on] is false.
-func focus(point: Vector2, on: bool) -> void:
+## Closes in on [param point], in board pixels, up to [param zoom], or pulls back when
+## [param on] is false.
+func focus(point: Vector2, on: bool, zoom: float = ZOOM) -> void:
 	if on:
 		_focus = point
-	_target_zoom = ZOOM if on else 1.0
+		_close_zoom = maxf(zoom, 1.0)
+	_target_zoom = _close_zoom if on else 1.0
 
 
 func reset() -> void:
 	_zoom = 1.0
 	_target_zoom = 1.0
+	_close_zoom = ZOOM
 	_shake = 0.0
 	_apply(Vector2.ZERO)
 
@@ -59,6 +64,9 @@ func _apply(offset: Vector2) -> void:
 		return
 	world.scale = Vector2(_zoom, _zoom)
 	var centre: Vector2 = size / 2.0
-	var view: Vector2 = centre.lerp(_focus, (_zoom - 1.0) / (ZOOM - 1.0))
+	var closeness: float = 0.0
+	if _close_zoom > 1.0:
+		closeness = clampf((_zoom - 1.0) / (_close_zoom - 1.0), 0.0, 1.0)
+	var view: Vector2 = centre.lerp(_focus, closeness)
 	var position: Vector2 = centre - view * _zoom
 	world.position = position.clamp(size - size * _zoom, Vector2.ZERO) + offset

@@ -8,6 +8,8 @@ const MAX_SEMITONES: int = 18
 
 ## Plays the boss's drum when a shot is scored on a boss board.
 var boss: bool = false
+## The Matsuri fanfare has played for this board, when its last lantern was lit.
+var celebrated: bool = false
 
 var _sounded_hits: int = 0
 
@@ -57,11 +59,18 @@ func hear(event: SimEvent) -> void:
 		SimEvent.Kind.BOARD_ENDED:
 			match event.amount:
 				BoardGame.Outcome.MATSURI:
-					AudioService.play(AudioService.MATSURI)
+					celebrate()
 				BoardGame.Outcome.TARGET_REACHED:
 					AudioService.play(AudioService.BOARD_WON)
 				_:
 					AudioService.play(AudioService.BOARD_LOST)
+
+
+## Plays the Matsuri fanfare, once per board.
+func celebrate() -> void:
+	if not celebrated:
+		celebrated = true
+		AudioService.play(AudioService.MATSURI)
 
 
 ## Sounds the lanterns lit since the last call.

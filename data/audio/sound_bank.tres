@@ -26,6 +26,7 @@
 [ext_resource type="AudioStream" uid="uid://dc8ohbx33bpks" path="res://assets/sfx/unlock.wav" id="24_vg1ug"]
 [ext_resource type="AudioStream" uid="uid://deg0rx5bru317" path="res://assets/music/menu_loop.wav" id="25_bc1vq"]
 [ext_resource type="Script" uid="uid://c474dhrbekfdk" path="res://data/definitions/sound_bank.gd" id="26_u7lm5"]
+[ext_resource type="AudioStream" uid="uid://bbdve7inf14x0" path="res://assets/sfx/drum_roll.wav" id="26_drum"]
 
 [resource]
 script = ExtResource("26_u7lm5")
@@ -35,6 +36,7 @@ cues = Dictionary[StringName, AudioStream]({
 &"board_won": ExtResource("14_xfp70"),
 &"boss_hit": ExtResource("18_gul8s"),
 &"bucket": ExtResource("4_j8m74"),
+&"drum_roll": ExtResource("26_drum"),
 &"explosion": ExtResource("9_46htt"),
 &"fire": ExtResource("10_8pmpq"),
 &"launch": ExtResource("12_vim1x"),
