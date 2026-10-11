@@ -25,6 +25,8 @@ const PAUSE_BUTTON_SIZE: Vector2 = Vector2(20, 18)
 const PAUSE_MARGIN: float = 4.0
 ## Seconds a new screen takes to fade in.
 const FADE_TIME: float = 0.15
+## Seconds the phone's back button stays armed on the title: a second press within them leaves.
+const EXIT_CONFIRM_SECONDS: float = 2.0
 
 var run: Run
 var profile: Profile
@@ -36,6 +38,8 @@ var toasts: UnlockToasts
 var perf_overlay: PerfOverlay
 ## Shown over a paused run; null while the run is playing.
 var pause_menu: PauseMenu
+## Leaves the game; tests replace it.
+var leave: Callable
 
 var _library: LayoutLibrary
 var _navigator: FocusNavigator = FocusNavigator.new()
@@ -45,10 +49,13 @@ var _fade: ColorRect
 var _fade_tween: Tween
 ## Settings opened over the pause menu.
 var _overlay_settings: SettingsScreen
+## Clock time, in milliseconds, until which a press of the back button on the title leaves.
+var _exit_armed_until: int = 0
 
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	leave = get_tree().quit
 	_library = LayoutLibrary.load_from()
 	profile = SaveService.load_profile()
 	add_child(_navigator)
@@ -90,7 +97,7 @@ func show_title() -> void:
 	screen.compendium_requested.connect(show_compendium)
 	screen.statistics_requested.connect(show_statistics)
 	screen.settings_requested.connect(show_settings)
-	screen.quit_requested.connect(get_tree().quit)
+	screen.quit_requested.connect(func() -> void: leave.call())
 
 
 func show_character_select() -> void:
@@ -247,17 +254,45 @@ func _unhandled_input(event: InputEvent) -> void:
 	var pausing: bool = event.is_action_pressed("pause") and (can_pause() or pause_menu != null)
 	if not pausing and not event.is_action_pressed("ui_cancel"):
 		return
+	if _step_back(pausing):
+		get_viewport().set_input_as_handled()
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
+		go_back()
+
+
+## The phone's back button: one step back wherever there is one, the pause menu during a run, and
+## on the title a hint first, leaving the game only on a second press soon after.
+func go_back() -> void:
+	if _step_back(true):
+		return
+	if not current is TitleScreen:
+		show_title()
+		return
+	var now: int = Time.get_ticks_msec()
+	if now < _exit_armed_until:
+		leave.call()
+		return
+	_exit_armed_until = now + roundi(EXIT_CONFIRM_SECONDS * 1000.0)
+	toasts.hint(tr("TOAST_EXIT"), EXIT_CONFIRM_SECONDS)
+
+
+## Closes the topmost thing with a way back; [param pausing] lets a playing run pause. False when
+## nothing was there to close.
+func _step_back(pausing: bool) -> bool:
 	if _overlay_settings != null:
 		_close_pause_settings()
 	elif pause_menu != null:
 		resume()
-	elif pausing:
+	elif pausing and can_pause():
 		pause()
 	elif current != null and current.has_method("back"):
 		current.call("back")
 	else:
-		return
-	get_viewport().set_input_as_handled()
+		return false
+	return true
 
 
 func _open_pause_settings() -> void:

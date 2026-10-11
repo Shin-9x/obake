@@ -1,7 +1,7 @@
 class_name UnlockToasts
 extends Control
 ## Short notes that pop up over every screen when something is unlocked, with Obo celebrating.
-## Notes queue up and each fades out on its own.
+## Notes queue up and each fades out on its own. A hint jumps the queue and makes no sound.
 
 const SHOW_TIME: float = 3.0
 const FADE_TIME: float = 0.4
@@ -10,9 +10,24 @@ const MASCOT_SIZE: Vector2 = Vector2(24, 24)
 const PANEL_COLOUR: Color = Color("#22263aee")
 const TOP_MARGIN: float = 6.0
 
+
+class Note:
+	var title: String
+	var text: String
+	var seconds: float
+	var cue: StringName
+
+	func _init(note_title: String, note_text: String, shown: float, sound: StringName) -> void:
+		title = note_title
+		text = note_text
+		seconds = shown
+		cue = sound
+
+
 var skin: UiSkin
 
-var _queue: Array[PackedStringArray] = []
+var _queue: Array[Note] = []
+var _show_time: float = SHOW_TIME
 var _panel: ColorRect
 var _title: Label
 var _text: Label
@@ -50,9 +65,15 @@ func _ready() -> void:
 
 ## Queues a note with a [param title] and a line of [param text], both already translated.
 func announce(title: String, text: String) -> void:
-	_queue.append(PackedStringArray([title, text]))
+	_queue.append(Note.new(title, text, SHOW_TIME, AudioService.UNLOCK))
 	if _age < 0.0:
 		_next()
+
+
+## Shows [param title] at once for [param seconds], ahead of the notes waiting, without a sound.
+func hint(title: String, seconds: float) -> void:
+	_queue.push_front(Note.new(title, "", seconds, &""))
+	_next()
 
 
 func pending() -> int:
@@ -65,19 +86,22 @@ func _next() -> void:
 		_panel.visible = false
 		set_process(false)
 		return
-	var note: PackedStringArray = _queue.pop_front()
-	_title.text = note[0]
-	_text.text = note[1]
+	var note: Note = _queue.pop_front()
+	_title.text = note.title
+	_text.text = note.text
+	_text.visible = not note.text.is_empty()
+	_show_time = note.seconds
 	_panel.modulate = Color.WHITE
 	_panel.visible = true
-	AudioService.play(AudioService.UNLOCK)
+	if not note.cue.is_empty():
+		AudioService.play(note.cue)
 	_age = 0.0
 	set_process(true)
 
 
 func _process(delta: float) -> void:
 	_age += delta
-	var left: float = SHOW_TIME - _age
+	var left: float = _show_time - _age
 	_panel.modulate.a = clampf(left / FADE_TIME, 0.0, 1.0)
 	if left <= 0.0:
 		_next()

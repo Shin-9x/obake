@@ -272,6 +272,46 @@ func test_only_screens_that_move_every_frame_need_every_frame() -> void:
 	assert_bool(GameScreen.wants_low_power(title)).is_true()
 
 
+func test_the_back_button_steps_back_through_the_menus() -> void:
+	var screen: GameScreen = scene_runner(SCENE).scene() as GameScreen
+	screen.show_statistics()
+	screen.go_back()
+	assert_object(screen.current).is_instanceof(TitleScreen)
+
+
+func test_the_back_button_pauses_and_resumes_a_run() -> void:
+	var screen: GameScreen = _started()
+	screen.go_back()
+	assert_object(screen.pause_menu).is_not_null()
+	screen.go_back()
+	assert_object(screen.pause_menu).is_null()
+	assert_object(screen.current).is_instanceof(MapScreen)
+
+
+func test_the_back_button_leaves_from_the_title_only_when_pressed_twice() -> void:
+	var screen: GameScreen = scene_runner(SCENE).scene() as GameScreen
+	var left: Array[bool] = [false]
+	screen.leave = func() -> void: left[0] = true
+	screen.go_back()
+	assert_bool(left[0]).is_false()
+	assert_int(screen.toasts.pending()).is_equal(1)
+	# The hint has run out: the next press only shows it again.
+	screen._exit_armed_until = 0
+	screen.go_back()
+	assert_bool(left[0]).is_false()
+	screen.go_back()
+	assert_bool(left[0]).is_true()
+
+
+func test_the_back_button_goes_from_the_end_of_a_run_to_the_title() -> void:
+	var screen: GameScreen = _started()
+	screen._on_node_chosen(screen.run.reachable_nodes()[0])
+	_end_board(screen, BoardGame.Outcome.FAILED)
+	assert_object(screen.current).is_instanceof(RunEndScreen)
+	screen.go_back()
+	assert_object(screen.current).is_instanceof(TitleScreen)
+
+
 func _run_log() -> Array[Dictionary]:
 	var lines: Array[Dictionary] = []
 	var text: String = FileAccess.get_file_as_string(SaveService.run_log_path())

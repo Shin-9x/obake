@@ -70,6 +70,9 @@ definitions live in `data/`, with their behaviour in `src/sim/effects/`; events 
 | Pause | Esc | Start | Pause button |
 | Menus | Mouse, or arrows and Enter | D-pad, A, B | Tap |
 
+On Android the back button goes one step back in the menus and pauses a run; on the title it asks
+for a second press before leaving the game.
+
 ## Builds
 
 `make templates` downloads the official Godot 4.7.2 export templates once (about 1.3 GB, checked
